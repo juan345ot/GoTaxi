@@ -12,4 +12,5 @@ export default {
   logout: 'Logout',
   profile: 'Profile',
   history: 'History',
+  loading: 'Loading...'
 };

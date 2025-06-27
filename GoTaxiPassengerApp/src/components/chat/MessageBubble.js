@@ -11,7 +11,7 @@ export default function MessageBubble({ message, sender, time, isOwn }) {
         isOwn ? styles.ownMessage : styles.otherMessage,
       ]}
     >
-      <Text style={styles.text}>{message}</Text>
+      <Text style={[styles.text, isOwn ? styles.textOwn : styles.textOther]}>{message}</Text>
       <Text style={styles.timestamp}>{formatDate(time)}</Text>
     </View>
   );
@@ -35,7 +35,13 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   text: {
+    fontSize: 15,
+  },
+  textOwn: {
     color: '#fff',
+  },
+  textOther: {
+    color: colors.text,
   },
   timestamp: {
     fontSize: 11,
@@ -44,3 +50,4 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
 });
+

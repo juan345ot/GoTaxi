@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import ProfileField from '../../components/common/ProfileField';
 import PrimaryButton from '../../components/common/PrimaryButton';
 import { showToast } from '../../utils/toast';
-import { useLanguage } from '../../hooks/useLanguage';
+import useLanguage from '../../hooks/useLanguage';
 
 export default function ProfileScreen({ navigation }) {
   const { language, changeLanguage } = useLanguage();
@@ -36,3 +36,4 @@ const styles = StyleSheet.create({
     padding: 20,
   },
 });
+
