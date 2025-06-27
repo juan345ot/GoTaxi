@@ -1,7 +1,10 @@
 import React, { useContext, useState, useEffect } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, Text, TextInput, StyleSheet } from 'react-native';
 import { AuthContext } from '../../contexts/AuthContext';
 import i18n from '../../translations';
+import Toast from 'react-native-root-toast';
+import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export default function ProfileScreen({ navigation }) {
   const { user, logout } = useContext(AuthContext);
@@ -16,7 +19,10 @@ export default function ProfileScreen({ navigation }) {
   }, [language]);
 
   const handleSave = () => {
-    Alert.alert(i18n.t('profile_updated'), `${i18n.t('name')}: ${name}\n${i18n.t('language')}: ${language}`);
+    Toast.show(i18n.t('profile_updated'), {
+      duration: Toast.durations.SHORT,
+      position: Toast.positions.BOTTOM,
+    });
   };
 
   return (
@@ -45,8 +51,15 @@ export default function ProfileScreen({ navigation }) {
         placeholder="es o en"
       />
 
-      <Button title={i18n.t('save')} onPress={handleSave} />
-      <Button title={i18n.t('logout')} onPress={logout} color="#d9534f" />
+      <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
+        <Ionicons name="save-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
+        <Text style={styles.buttonText}>{i18n.t('save')}</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+        <Ionicons name="log-out-outline" size={20} color="#fff" style={{ marginRight: 8 }} />
+        <Text style={styles.buttonText}>{i18n.t('logout')}</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -62,5 +75,28 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     paddingHorizontal: 10,
     marginTop: 5,
+  },
+  saveButton: {
+    marginTop: 20,
+    backgroundColor: '#1E90FF',
+    padding: 12,
+    borderRadius: 6,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  logoutButton: {
+    marginTop: 10,
+    backgroundColor: '#d9534f',
+    padding: 12,
+    borderRadius: 6,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
