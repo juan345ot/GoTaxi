@@ -1,96 +1,95 @@
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TextInput,
-  FlatList,
-  TouchableOpacity,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-} from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform, Text } from 'react-native';
+import ChatInput from '../../components/chat/ChatInput';
 import MessageBubble from '../../components/chat/MessageBubble';
+import { colors } from '../../styles/theme';
 
 export default function ChatScreen() {
   const [messages, setMessages] = useState([
-    { id: '1', text: 'Hola, ya estoy llegando.', from: 'driver' },
-    { id: '2', text: 'Perfecto, te espero en la esquina.', from: 'passenger' },
+    {
+      id: '1',
+      text: '¡Hola! Estoy en camino.',
+      time: new Date().toISOString(),
+      isOwn: false,
+    },
+    {
+      id: '2',
+      text: 'Perfecto, gracias!',
+      time: new Date().toISOString(),
+      isOwn: true,
+    },
   ]);
-  const [input, setInput] = useState('');
-  const flatListRef = useRef(null);
 
-  const sendMessage = () => {
-    if (!input.trim()) return;
-    const newMessage = {
+  const [newMessage, setNewMessage] = useState('');
+  const listRef = useRef(null);
+  const inputRef = useRef(null);
+
+  const handleSend = () => {
+    if (!newMessage.trim()) return;
+
+    const msg = {
       id: Date.now().toString(),
-      text: input,
-      from: 'passenger',
+      text: newMessage.trim(),
+      time: new Date().toISOString(),
+      isOwn: true,
     };
-    setMessages((prev) => [...prev, newMessage]);
-    setInput('');
-  };
 
-  useEffect(() => {
-    if (flatListRef.current) {
-      flatListRef.current.scrollToEnd({ animated: true });
-    }
-  }, [messages]);
+    setMessages((prev) => [...prev, msg]);
+    setNewMessage('');
+    setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
+  };
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
+      style={styles.wrapper}
+      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      keyboardVerticalOffset={90}
     >
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Conversación con el conductor</Text>
+      </View>
+
       <FlatList
-        ref={flatListRef}
+        ref={listRef}
         data={messages}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <MessageBubble text={item.text} from={item.from} />
+          <MessageBubble
+            message={item.text}
+            time={item.time}
+            isOwn={item.isOwn}
+          />
         )}
-        contentContainerStyle={styles.messageList}
+        contentContainerStyle={styles.messages}
       />
 
-      <View style={styles.inputContainer}>
-        <TextInput
-          value={input}
-          onChangeText={setInput}
-          placeholder="Escribe un mensaje..."
-          style={styles.input}
-        />
-        <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
-          <Text style={styles.sendText}>Enviar</Text>
-        </TouchableOpacity>
-      </View>
+      <ChatInput
+        ref={inputRef}
+        value={newMessage}
+        onChangeText={setNewMessage}
+        onSend={handleSend}
+      />
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  messageList: { padding: 10, paddingBottom: 80 },
-  inputContainer: {
-    flexDirection: 'row',
-    padding: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#ddd',
-    backgroundColor: '#f9f9f9',
-  },
-  input: {
+  wrapper: {
     flex: 1,
-    height: 42,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    marginRight: 8,
+    backgroundColor: '#fff',
   },
-  sendButton: {
-    justifyContent: 'center',
-    paddingHorizontal: 10,
+  messages: {
+    padding: 10,
+    paddingBottom: 5,
   },
-  sendText: {
-    color: '#1E90FF',
-    fontWeight: 'bold',
+  header: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    backgroundColor: colors.primary,
+  },
+  headerText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
