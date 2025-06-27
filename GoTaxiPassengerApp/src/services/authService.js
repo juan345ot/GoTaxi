@@ -1,10 +1,11 @@
-// Simulación de autenticación
+/**
+ * Simula inicio de sesión
+ */
 export const loginUser = async (email, password) => {
-  // En el futuro se conectará con un backend
   return new Promise((resolve, reject) => {
     setTimeout(() => {
       if (email && password) {
-        resolve({ token: 'fake-jwt-token', user: { email } });
+        resolve({ email, name: 'Juan' });
       } else {
         reject('Credenciales inválidas');
       }
@@ -12,10 +13,17 @@ export const loginUser = async (email, password) => {
   });
 };
 
+/**
+ * Simula registro de usuario
+ */
 export const registerUser = async (email, password) => {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     setTimeout(() => {
-      resolve({ success: true });
+      if (email && password.length >= 6) {
+        resolve({ email, name: 'Nuevo Usuario' });
+      } else {
+        reject('Error al registrar');
+      }
     }, 1000);
   });
 };

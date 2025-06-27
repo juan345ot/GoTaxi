@@ -1,36 +1,40 @@
-// Simulación de solicitud de viaje
-export const requestRide = async ({ origin, destination, user }) => {
+export const requestRide = async (origin, destination) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      if (origin && destination && user) {
+      if (origin && destination) {
         resolve({
-          success: true,
-          rideId: Math.floor(Math.random() * 10000),
-          status: 'pending',
-          driverAssigned: false,
+          id: Date.now(),
+          origin,
+          destination,
+          driver: 'Juan M.',
+          vehicle: 'Toyota Etios Blanco',
+          status: 'camino',
         });
       } else {
-        reject('Faltan datos para solicitar el viaje.');
+        reject('Faltan datos del viaje');
       }
     }, 1000);
   });
 };
 
-// Simulación de seguimiento de viaje
-export const trackRide = async (rideId) => {
+export const trackRide = async () => {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve({
-        status: 'en camino',
-        driver: {
-          name: 'Juan Pérez',
-          car: 'Toyota Etios - AB123CD',
+        driverPosition: {
+          latitude: -34.602,
+          longitude: -58.384,
         },
-        location: {
-          latitude: -34.6037,
-          longitude: -58.3816,
-        },
+        status: 'camino',
       });
-    }, 1000);
+    }, 500);
+  });
+};
+
+export const cancelRide = async () => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({ message: 'Viaje cancelado correctamente' });
+    }, 500);
   });
 };
