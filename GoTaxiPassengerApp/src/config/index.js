@@ -1,19 +1,9 @@
-const ENV = {
-  dev: {
-    API_URL: 'http://localhost:3000/api',
-    SOCKET_URL: 'http://localhost:3000',
-  },
-  prod: {
-    API_URL: 'https://api.gotaxi.com/api',
-    SOCKET_URL: 'https://api.gotaxi.com',
-  },
-};
+import dev from './dev';
+import prod from './prod';
 
-const getEnvVars = (env = '') => {
-  if (env === null || env === undefined || env === '') return ENV.dev;
-  if (env.indexOf('dev') !== -1) return ENV.dev;
-  if (env.indexOf('prod') !== -1) return ENV.prod;
-  return ENV.dev;
-};
+// Por defecto usa 'dev', cambiar a 'prod' si se despliega
+const ENVIRONMENT = process.env.NODE_ENV || 'dev';
 
-export default getEnvVars(process.env.NODE_ENV);
+const config = ENVIRONMENT === 'prod' ? prod : dev;
+
+export default config;
