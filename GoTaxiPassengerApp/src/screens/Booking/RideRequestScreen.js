@@ -1,27 +1,39 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import React, { useState } from 'react';
+import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
 
-export default function RideTrackingScreen({ route }) {
-  const { origin, destination } = route.params;
+export default function RideRequestScreen({ navigation }) {
+  const [origin, setOrigin] = useState('');
+  const [destination, setDestination] = useState('');
 
-  const [region, setRegion] = useState({
-    latitude: -34.6037,
-    longitude: -58.3816,
-    latitudeDelta: 0.05,
-    longitudeDelta: 0.05,
-  });
+  const handleRequest = () => {
+    if (!origin || !destination) {
+      alert('Por favor completá los campos.');
+      return;
+    }
 
-  // Opcional: ajustar el mapa con datos reales de origen y destino más adelante
+    // Lógica simulada: ir a seguimiento
+    navigation.navigate('RideTracking', { origin, destination });
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Seguimiento del Viaje</Text>
+      <Text style={styles.title}>Solicitar un Taxi</Text>
 
-      <MapView style={styles.map} region={region} showsUserLocation>
-        <Marker coordinate={{ latitude: -34.6037, longitude: -58.3816 }} title="Tu posición" />
-        {/* Se puede agregar Marker para destino si tenés coordenadas */}
-      </MapView>
+      <TextInput
+        placeholder="Dirección de Origen"
+        value={origin}
+        onChangeText={setOrigin}
+        style={styles.input}
+      />
+
+      <TextInput
+        placeholder="Dirección de Destino"
+        value={destination}
+        onChangeText={setDestination}
+        style={styles.input}
+      />
+
+      <Button title="Solicitar Viaje" onPress={handleRequest} />
     </View>
   );
 }
@@ -29,14 +41,19 @@ export default function RideTrackingScreen({ route }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+    padding: 20,
   },
   title: {
-    fontSize: 18,
+    fontSize: 24,
+    marginBottom: 20,
     textAlign: 'center',
-    marginTop: 10,
   },
-  map: {
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height * 0.9,
+  input: {
+    height: 40,
+    borderColor: '#ccc',
+    borderWidth: 1,
+    marginBottom: 15,
+    paddingHorizontal: 10,
   },
 });
