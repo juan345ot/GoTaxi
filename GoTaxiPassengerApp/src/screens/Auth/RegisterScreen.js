@@ -1,46 +1,59 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import { AuthContext } from '../../contexts/AuthContext';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import useAuth from '../../hooks/useAuth';
+import InputField from '../../components/common/InputField';
+import PrimaryButton from '../../components/common/PrimaryButton';
+import { isValidEmail, isValidPassword } from '../../utils/validators';
 
 export default function RegisterScreen({ navigation }) {
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const { login } = useContext(AuthContext);
+  const [error, setError] = useState('');
 
   const handleRegister = () => {
-    if (password === confirmPassword) {
-      login(email, password); // simula registro automático
-    } else {
-      alert('Las contraseñas no coinciden');
+    if (!isValidEmail(email)) {
+      setError('Correo inválido');
+      return;
     }
+    if (!isValidPassword(password)) {
+      setError('Contraseña muy corta');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      return;
+    }
+    setError('');
+    login(email, password); // registro simulado seguido de login
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Registrarse</Text>
-      <TextInput
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+
+      <InputField
         placeholder="Email"
-        style={styles.input}
         value={email}
         onChangeText={setEmail}
       />
-      <TextInput
+      <InputField
         placeholder="Contraseña"
-        secureTextEntry
-        style={styles.input}
         value={password}
         onChangeText={setPassword}
-      />
-      <TextInput
-        placeholder="Confirmar Contraseña"
         secureTextEntry
-        style={styles.input}
+      />
+      <InputField
+        placeholder="Confirmar Contraseña"
         value={confirmPassword}
         onChangeText={setConfirmPassword}
+        secureTextEntry
       />
-      <Button title="Registrarse" onPress={handleRegister} />
-      <Button title="Volver" onPress={() => navigation.goBack()} />
+
+      <PrimaryButton title="Registrarse" onPress={handleRegister} />
+      <PrimaryButton title="Volver" onPress={() => navigation.goBack()} />
     </View>
   );
 }
@@ -56,11 +69,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
+  error: {
+    color: 'red',
+    textAlign: 'center',
     marginBottom: 10,
-    paddingHorizontal: 10,
   },
 });

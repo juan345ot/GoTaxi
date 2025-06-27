@@ -1,30 +1,51 @@
-import React, { useState, useContext } from 'react';
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native';
-import { AuthContext } from '../../contexts/AuthContext';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import useAuth from '../../hooks/useAuth';
+import InputField from '../../components/common/InputField';
+import PrimaryButton from '../../components/common/PrimaryButton';
+import { isValidEmail, isValidPassword } from '../../utils/validators';
 
 export default function LoginScreen({ navigation }) {
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = useContext(AuthContext);
+  const [error, setError] = useState('');
+
+  const handleLogin = () => {
+    if (!isValidEmail(email)) {
+      setError('Correo inválido');
+      return;
+    }
+    if (!isValidPassword(password)) {
+      setError('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+    setError('');
+    login(email, password);
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Iniciar Sesión</Text>
-      <TextInput
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+
+      <InputField
         placeholder="Email"
-        style={styles.input}
         value={email}
         onChangeText={setEmail}
       />
-      <TextInput
+      <InputField
         placeholder="Contraseña"
-        secureTextEntry
-        style={styles.input}
         value={password}
         onChangeText={setPassword}
+        secureTextEntry
       />
-      <Button title="Entrar" onPress={() => login(email, password)} />
-      <Button title="Registrarse" onPress={() => navigation.navigate('Register')} />
+
+      <PrimaryButton title="Entrar" onPress={handleLogin} />
+      <PrimaryButton
+        title="Registrarse"
+        onPress={() => navigation.navigate('Register')}
+      />
     </View>
   );
 }
@@ -40,11 +61,9 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
   },
-  input: {
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
+  error: {
+    color: 'red',
+    textAlign: 'center',
     marginBottom: 10,
-    paddingHorizontal: 10,
   },
 });
