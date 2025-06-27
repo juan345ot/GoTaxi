@@ -1,27 +1,46 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { colors } from '../../styles/theme';
+import { formatDate } from '../../utils/formatDate';
 
-export default function MessageBubble({ text, from }) {
+export default function MessageBubble({ message, sender, time, isOwn }) {
   return (
-    <View style={[styles.bubble, from === 'passenger' ? styles.passenger : styles.driver]}>
-      <Text>{text}</Text>
+    <View
+      style={[
+        styles.container,
+        isOwn ? styles.ownMessage : styles.otherMessage,
+      ]}
+    >
+      <Text style={styles.text}>{message}</Text>
+      <Text style={styles.timestamp}>{formatDate(time)}</Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  bubble: {
+  container: {
+    maxWidth: '80%',
     padding: 10,
-    borderRadius: 10,
+    borderRadius: 8,
     marginVertical: 4,
-    maxWidth: '70%',
+    alignSelf: 'flex-start',
   },
-  passenger: {
-    backgroundColor: '#dcf8c6',
+  ownMessage: {
+    backgroundColor: colors.primary,
     alignSelf: 'flex-end',
   },
-  driver: {
-    backgroundColor: '#e6e6e6',
-    alignSelf: 'flex-start',
+  otherMessage: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  text: {
+    color: '#fff',
+  },
+  timestamp: {
+    fontSize: 11,
+    color: '#eee',
+    marginTop: 4,
+    textAlign: 'right',
   },
 });

@@ -1,45 +1,52 @@
-import React from 'react';
+import React, { forwardRef } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors } from '../../styles/theme';
 
-export default function ChatInput({ value, onChangeText, onSend }) {
+const ChatInput = forwardRef(({ value, onChangeText, onSend }, ref) => {
   return (
     <View style={styles.container}>
       <TextInput
+        ref={ref}
         style={styles.input}
-        placeholder="Escribe un mensaje..."
         value={value}
         onChangeText={onChangeText}
+        placeholder="Escribe un mensaje..."
+        placeholderTextColor="#aaa"
+        multiline
       />
-      <TouchableOpacity style={styles.button} onPress={onSend}>
+      <TouchableOpacity onPress={onSend} style={styles.sendButton}>
         <Ionicons name="send" size={20} color="#fff" />
       </TouchableOpacity>
     </View>
   );
-}
+});
+
+export default ChatInput;
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    padding: 8,
-    backgroundColor: '#f9f9f9',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderTopColor: colors.border,
     borderTopWidth: 1,
-    borderTopColor: '#ddd',
   },
   input: {
     flex: 1,
-    height: 40,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    borderRadius: 20,
+    minHeight: 40,
+    maxHeight: 100,
+    borderRadius: 6,
     paddingHorizontal: 10,
-    marginRight: 8,
+    backgroundColor: '#f0f0f0',
+    color: colors.text,
   },
-  button: {
-    backgroundColor: '#1E90FF',
-    borderRadius: 20,
+  sendButton: {
+    marginLeft: 10,
+    backgroundColor: colors.primary,
+    borderRadius: 50,
     padding: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
 });

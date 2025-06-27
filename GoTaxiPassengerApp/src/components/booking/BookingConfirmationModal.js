@@ -1,23 +1,37 @@
 import React from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { colors } from '../../styles/theme';
+import { typography } from '../../styles/typography';
 
-export default function BookingConfirmationModal({ visible, origin, destination, onConfirm, onCancel }) {
+export default function BookingConfirmationModal({
+  visible,
+  origin,
+  destination,
+  onConfirm,
+  onCancel,
+  confirmText = 'Confirmar',
+  cancelText = 'Cancelar',
+}) {
   return (
-    <Modal transparent visible={visible} animationType="fade">
+    <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.overlay}>
-        <View style={styles.modalBox}>
-          <Ionicons name="help-circle-outline" size={40} color="#1E90FF" />
-          <Text style={styles.title}>¿Confirmar viaje?</Text>
-          <Text style={styles.text}>Origen: {origin}</Text>
-          <Text style={styles.text}>Destino: {destination}</Text>
+        <View style={styles.modal}>
+          <Text style={[typography.heading, { marginBottom: 10 }]}>¿Confirmar viaje?</Text>
+          <Text style={styles.label}>Origen:</Text>
+          <Text style={styles.text}>{origin}</Text>
+          <Text style={styles.label}>Destino:</Text>
+          <Text style={styles.text}>{destination}</Text>
 
           <View style={styles.actions}>
-            <TouchableOpacity style={styles.buttonSecondary} onPress={onCancel}>
-              <Text style={styles.textSecondary}>Cancelar</Text>
+            <TouchableOpacity style={[styles.button, styles.cancel]} onPress={onCancel}>
+              <Ionicons name="close" size={16} color="#fff" />
+              <Text style={styles.buttonText}>{cancelText}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonPrimary} onPress={onConfirm}>
-              <Text style={styles.textPrimary}>Confirmar</Text>
+
+            <TouchableOpacity style={[styles.button, styles.confirm]} onPress={onConfirm}>
+              <Ionicons name="checkmark" size={16} color="#fff" />
+              <Text style={styles.buttonText}>{confirmText}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -29,56 +43,46 @@ export default function BookingConfirmationModal({ visible, origin, destination,
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: '#00000099',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  modalBox: {
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 24,
-    width: '85%',
-    alignItems: 'center',
-    elevation: 4,
+  modal: {
+    width: '90%',
+    backgroundColor: colors.surface,
+    padding: 20,
+    borderRadius: 8,
   },
-  title: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginVertical: 10,
-    textAlign: 'center',
+  label: {
+    fontWeight: '600',
+    marginTop: 8,
   },
   text: {
-    fontSize: 16,
-    marginBottom: 5,
+    marginBottom: 8,
+    color: colors.textSecondary,
   },
   actions: {
     flexDirection: 'row',
-    marginTop: 20,
-    width: '100%',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
+    marginTop: 15,
   },
-  buttonPrimary: {
-    backgroundColor: '#1E90FF',
-    padding: 10,
-    borderRadius: 8,
-    flex: 1,
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 5,
     marginLeft: 10,
-    alignItems: 'center',
   },
-  buttonSecondary: {
-    backgroundColor: '#ccc',
-    padding: 10,
-    borderRadius: 8,
-    flex: 1,
-    marginRight: 10,
-    alignItems: 'center',
+  cancel: {
+    backgroundColor: colors.error,
   },
-  textPrimary: {
+  confirm: {
+    backgroundColor: colors.primary,
+  },
+  buttonText: {
     color: '#fff',
-    fontWeight: 'bold',
-  },
-  textSecondary: {
-    color: '#333',
-    fontWeight: 'bold',
+    marginLeft: 6,
+    fontWeight: '600',
   },
 });
