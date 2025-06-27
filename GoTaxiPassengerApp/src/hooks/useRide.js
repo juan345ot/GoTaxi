@@ -1,34 +1,53 @@
 import { useState } from 'react';
-import { requestRide, trackRide } from '../services/rideService';
+import { showToast } from '../utils/toast';
 
+/**
+ * Hook para gestionar viajes (solicitar, cancelar, seguir)
+ */
 export default function useRide() {
   const [rideData, setRideData] = useState(null);
   const [trackingInfo, setTrackingInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const createRide = async (origin, destination, user) => {
+  const requestRide = async (origin, destination) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await requestRide({ origin, destination, user });
-      setRideData(response);
-      return response;
+      // Simulación de viaje solicitado
+      await new Promise((res) => setTimeout(res, 1000));
+      const mockRide = {
+        id: Date.now(),
+        origin,
+        destination,
+        driver: 'Juan M.',
+        vehicle: 'Toyota Etios Blanco',
+        status: 'camino',
+      };
+      setRideData(mockRide);
+      showToast('Viaje solicitado');
     } catch (err) {
-      setError(err);
-      return null;
+      setError('Error al solicitar el viaje');
     } finally {
       setLoading(false);
     }
   };
 
-  const trackCurrentRide = async (rideId) => {
-    try {
-      const info = await trackRide(rideId);
-      setTrackingInfo(info);
-    } catch (err) {
-      console.error(err);
-    }
+  const trackCurrentRide = () => {
+    // Simula seguimiento
+    setTrackingInfo({
+      driverPosition: {
+        latitude: -34.602,
+        longitude: -58.384,
+      },
+      status: 'camino',
+    });
+  };
+
+  const cancelRide = () => {
+    setRideData(null);
+    setTrackingInfo(null);
+    showToast('Viaje cancelado');
   };
 
   return {
@@ -36,7 +55,8 @@ export default function useRide() {
     trackingInfo,
     loading,
     error,
-    createRide,
+    requestRide,
     trackCurrentRide,
+    cancelRide,
   };
 }
