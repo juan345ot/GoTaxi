@@ -1,50 +1,50 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import InputField from '../../components/common/InputField';
+import PrimaryButton from '../../components/common/PrimaryButton';
+import { showToast } from '../../utils/toast';
 
 export default function SupportScreen() {
+  const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
 
   const handleSubmit = () => {
-    if (!message.trim()) {
-      Alert.alert('Error', 'Por favor escribí tu consulta.');
+    if (!subject || !message) {
+      showToast('Completá todos los campos');
       return;
     }
-    Alert.alert('Enviado', 'Tu mensaje fue enviado al soporte.');
+
+    showToast('Mensaje enviado al soporte');
+    setSubject('');
     setMessage('');
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Centro de Soporte</Text>
-      <TextInput
-        multiline
-        placeholder="Escribí tu mensaje o consulta..."
-        style={styles.input}
+      <InputField
+        label="Asunto"
+        value={subject}
+        onChangeText={setSubject}
+        placeholder="Ej: Problema con el viaje"
+        icon="help-circle"
+      />
+
+      <InputField
+        label="Mensaje"
         value={message}
         onChangeText={setMessage}
+        placeholder="Escribí tu consulta"
+        icon="chatbubble-ellipses"
       />
-      <Button title="Enviar" onPress={handleSubmit} />
+
+      <PrimaryButton title="Enviar" icon="send" onPress={handleSubmit} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  input: {
-    height: 150,
-    borderColor: '#ccc',
-    borderWidth: 1,
-    marginBottom: 20,
-    padding: 10,
-    textAlignVertical: 'top',
-    borderRadius: 8,
+    flex: 1,
   },
 });
