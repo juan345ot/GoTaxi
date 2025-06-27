@@ -1,21 +1,44 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet, Dimensions, Text } from 'react-native';
+import MapView, { Marker } from 'react-native-maps';
 
-export default function MapPreview() {
+export default function MapPreview({ region, markers = [] }) {
+  if (!region) {
+    return (
+      <View style={[styles.map, styles.placeholder]}>
+        <Text style={styles.placeholderText}>Mapa no disponible</Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <Text>Vista previa del mapa (componente temporal)</Text>
-    </View>
+    <MapView style={styles.map} region={region} showsUserLocation>
+      {markers.map((marker, index) => (
+        <Marker
+          key={index}
+          coordinate={marker.coordinate}
+          title={marker.title}
+          description={marker.description}
+        />
+      ))}
+    </MapView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    backgroundColor: '#f0f0f0',
-    height: 200,
+  map: {
+    width: Dimensions.get('window').width,
+    height: Dimensions.get('window').height * 0.4,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  placeholder: {
+    backgroundColor: '#eee',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
-    marginVertical: 10,
+  },
+  placeholderText: {
+    color: '#888',
+    fontStyle: 'italic',
   },
 });
