@@ -1,5 +1,15 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+} from 'react-native';
+import MessageBubble from '../../components/chat/MessageBubble';
 
 export default function ChatScreen() {
   const [messages, setMessages] = useState([
@@ -7,6 +17,7 @@ export default function ChatScreen() {
     { id: '2', text: 'Perfecto, te espero en la esquina.', from: 'passenger' },
   ]);
   const [input, setInput] = useState('');
+  const flatListRef = useRef(null);
 
   const sendMessage = () => {
     if (!input.trim()) return;
@@ -15,25 +26,29 @@ export default function ChatScreen() {
       text: input,
       from: 'passenger',
     };
-    setMessages([...messages, newMessage]);
+    setMessages((prev) => [...prev, newMessage]);
     setInput('');
   };
 
+  useEffect(() => {
+    if (flatListRef.current) {
+      flatListRef.current.scrollToEnd({ animated: true });
+    }
+  }, [messages]);
+
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
       <FlatList
+        ref={flatListRef}
         data={messages}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <View
-            style={[
-              styles.message,
-              item.from === 'passenger' ? styles.passenger : styles.driver,
-            ]}>
-            <Text style={styles.text}>{item.text}</Text>
-          </View>
+          <MessageBubble text={item.text} from={item.from} />
         )}
-        contentContainerStyle={{ paddingBottom: 20 }}
+        contentContainerStyle={styles.messageList}
       />
 
       <View style={styles.inputContainer}>
@@ -47,49 +62,32 @@ export default function ChatScreen() {
           <Text style={styles.sendText}>Enviar</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 10,
-  },
-  message: {
-    padding: 10,
-    borderRadius: 8,
-    marginVertical: 5,
-    maxWidth: '70%',
-  },
-  passenger: {
-    backgroundColor: '#DCF8C6',
-    alignSelf: 'flex-end',
-  },
-  driver: {
-    backgroundColor: '#ECECEC',
-    alignSelf: 'flex-start',
-  },
-  text: {
-    fontSize: 16,
-  },
+  container: { flex: 1, backgroundColor: '#fff' },
+  messageList: { padding: 10, paddingBottom: 80 },
   inputContainer: {
     flexDirection: 'row',
+    padding: 8,
     borderTopWidth: 1,
-    borderTopColor: '#ccc',
-    paddingTop: 8,
+    borderTopColor: '#ddd',
+    backgroundColor: '#f9f9f9',
   },
   input: {
     flex: 1,
-    height: 40,
-    borderColor: '#ccc',
+    height: 42,
     borderWidth: 1,
-    borderRadius: 8,
-    paddingHorizontal: 10,
+    borderColor: '#ccc',
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    marginRight: 8,
   },
   sendButton: {
     justifyContent: 'center',
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
   },
   sendText: {
     color: '#1E90FF',
