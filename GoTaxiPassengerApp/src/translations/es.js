@@ -1,0 +1,15 @@
+export default {
+  welcome: 'Bienvenido a GoTaxi',
+  login: 'Iniciar sesión',
+  register: 'Registrarse',
+  email: 'Correo electrónico',
+  password: 'Contraseña',
+  confirmPassword: 'Confirmar contraseña',
+  origin: 'Origen',
+  destination: 'Destino',
+  requestRide: 'Solicitar viaje',
+  tracking: 'Seguimiento',
+  logout: 'Cerrar sesión',
+  profile: 'Perfil',
+  history: 'Historial',
+};
