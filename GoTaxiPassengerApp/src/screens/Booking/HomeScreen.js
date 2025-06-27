@@ -1,26 +1,54 @@
-import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import React, { useContext } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import PrimaryButton from '../../components/common/PrimaryButton';
+import { typography } from '../../styles/typography';
+import { colors } from '../../styles/theme';
+import { useAuth } from '../../hooks/useAuth';
 
 export default function HomeScreen({ navigation }) {
+  const { user } = useAuth();
+
+  const handleNavigate = (screen) => {
+    navigation.navigate(screen);
+  };
+
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bienvenido a GoTaxi</Text>
-      <Button title="Pedir Taxi" onPress={() => navigation.navigate('RideRequest')} />
-      <Button title="Historial de Viajes" onPress={() => navigation.navigate('History')} />
-      <Button title="Perfil" onPress={() => navigation.navigate('Profile')} />
+      <Text style={typography.heading}>
+        ¡Hola{user?.name ? `, ${user.name}` : ''}! 👋
+      </Text>
+      <Text style={styles.subtext}>¿Qué querés hacer hoy?</Text>
+
+      <PrimaryButton
+        title="Solicitar un Taxi"
+        icon="car"
+        onPress={() => handleNavigate('RideRequest')}
+      />
+      <PrimaryButton
+        title="Ver Historial"
+        icon="time"
+        onPress={() => handleNavigate('History')}
+        variant="secondary"
+      />
+      <PrimaryButton
+        title="Mi Perfil"
+        icon="person"
+        onPress={() => handleNavigate('Profile')}
+        variant="secondary"
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    padding: 20,
     flex: 1,
     justifyContent: 'center',
-    padding: 20,
   },
-  title: {
-    fontSize: 26,
+  subtext: {
+    fontSize: 16,
     marginBottom: 30,
-    textAlign: 'center',
+    color: colors.textSecondary,
   },
 });

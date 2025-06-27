@@ -1,64 +1,58 @@
 import React, { useState, useContext } from 'react';
-import { View, Text, StyleSheet, Alert } from 'react-native';
-import InputField from '../../components/common/InputField';
+import { View, StyleSheet } from 'react-native';
 import PrimaryButton from '../../components/common/PrimaryButton';
+import InputField from '../../components/common/InputField';
+import BookingConfirmationModal from '../../components/booking/BookingConfirmationModal';
 import { LocationContext } from '../../contexts/LocationContext';
-import useAuth from '../../hooks/useAuth';
-import { isFieldFilled } from '../../utils/validators';
+import { showToast } from '../../utils/toast';
+import useMap from '../../hooks/useMap';
 
 export default function RideRequestScreen({ navigation }) {
+  const { location } = useMap();
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
-  const [error, setError] = useState('');
-  const { location } = useContext(LocationContext);
-  const { user } = useAuth();
+  const [showModal, setShowModal] = useState(false);
 
-  const handleRequest = () => {
-    if (!isFieldFilled(origin) || !isFieldFilled(destination)) {
-      setError('Debes completar ambos campos');
+  const handleConfirm = () => {
+    setShowModal(false);
+    showToast('¡Viaje solicitado!');
+    navigation.navigate('RideTracking', { origin, destination });
+  };
+
+  const handleRequestRide = () => {
+    if (!origin || !destination) {
+      showToast('Por favor completá origen y destino');
       return;
     }
-    setError('');
-    Alert.alert(
-      'Confirmar viaje',
-      `¿Querés solicitar un viaje de "${origin}" a "${destination}"?`,
-      [
-        {
-          text: 'Cancelar',
-          style: 'cancel',
-        },
-        {
-          text: 'Confirmar',
-          onPress: () => {
-            navigation.navigate('RideTracking', {
-              origin,
-              destination,
-              user,
-              currentLocation: location,
-            });
-          },
-        },
-      ]
-    );
+    setShowModal(true);
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Solicitar un Taxi</Text>
-      {error ? <Text style={styles.error}>{error}</Text> : null}
-
       <InputField
-        placeholder="Dirección de Origen"
+        label="Origen"
         value={origin}
         onChangeText={setOrigin}
+        placeholder="Ingresá tu ubicación actual"
+        icon="location"
       />
       <InputField
-        placeholder="Dirección de Destino"
+        label="Destino"
         value={destination}
         onChangeText={setDestination}
+        placeholder="¿A dónde querés ir?"
+        icon="flag"
       />
 
-      <PrimaryButton title="Solicitar Viaje" onPress={handleRequest} />
+      <PrimaryButton title="Solicitar Viaje" onPress={handleRequestRide} icon="car" />
+
+      <BookingConfirmationModal
+        visible={showModal}
+        origin={origin}
+        destination={destination}
+        onConfirm={handleConfirm}
+        onCancel={() => setShowModal(false)}
+      />
     </View>
   );
 }
@@ -66,17 +60,6 @@ export default function RideRequestScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
     padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  error: {
-    color: 'red',
-    textAlign: 'center',
-    marginBottom: 10,
   },
 });
