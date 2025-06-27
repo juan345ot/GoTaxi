@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import PrimaryButton from '../../components/common/PrimaryButton';
 import { typography } from '../../styles/typography';
 import { colors } from '../../styles/theme';
-import { useAuth } from '../../hooks/useAuth';
+import useAuth from '../../hooks/useAuth';
 
 export default function HomeScreen({ navigation }) {
   const { user } = useAuth();
@@ -52,3 +52,4 @@ const styles = StyleSheet.create({
     color: colors.textSecondary,
   },
 });
+

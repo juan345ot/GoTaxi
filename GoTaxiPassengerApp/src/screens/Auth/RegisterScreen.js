@@ -3,10 +3,11 @@ import { View, Text, StyleSheet } from 'react-native';
 import useAuth from '../../hooks/useAuth';
 import InputField from '../../components/common/InputField';
 import PrimaryButton from '../../components/common/PrimaryButton';
+import Loader from '../../components/common/Loader';
 import { isValidEmail, isValidPassword } from '../../utils/validators';
 
 export default function RegisterScreen({ navigation }) {
-  const { login } = useAuth();
+  const { login, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -52,6 +53,7 @@ export default function RegisterScreen({ navigation }) {
         secureTextEntry
       />
 
+      {loading && <Loader />}
       <PrimaryButton title="Registrarse" onPress={handleRegister} />
       <PrimaryButton title="Volver" onPress={() => navigation.goBack()} />
     </View>
@@ -75,3 +77,4 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
+

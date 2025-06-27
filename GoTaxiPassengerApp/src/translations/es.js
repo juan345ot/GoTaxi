@@ -12,4 +12,6 @@ export default {
   logout: 'Cerrar sesión',
   profile: 'Perfil',
   history: 'Historial',
+  loading: 'Cargando...'
 };
+

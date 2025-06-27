@@ -3,10 +3,11 @@ import { View, Text, StyleSheet } from 'react-native';
 import useAuth from '../../hooks/useAuth';
 import InputField from '../../components/common/InputField';
 import PrimaryButton from '../../components/common/PrimaryButton';
+import Loader from '../../components/common/Loader';
 import { isValidEmail, isValidPassword } from '../../utils/validators';
 
 export default function LoginScreen({ navigation }) {
-  const { login } = useAuth();
+  const { login, loading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -41,6 +42,7 @@ export default function LoginScreen({ navigation }) {
         secureTextEntry
       />
 
+      {loading && <Loader />}
       <PrimaryButton title="Entrar" onPress={handleLogin} />
       <PrimaryButton
         title="Registrarse"
@@ -67,3 +69,4 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
 });
+
