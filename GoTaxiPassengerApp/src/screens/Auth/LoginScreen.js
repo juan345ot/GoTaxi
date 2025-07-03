@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import AuthForm from '../../components/auth/AuthForm';
-import { useAuth } from '../../hooks/useAuth';
+import useAuth  from '../../hooks/useAuth';
 import { validateLogin } from '../../utils/validators';
 import { showToast } from '../../utils/toast';
 
