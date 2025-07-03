@@ -2,6 +2,20 @@
 
 ---
 
+## [1.3.0] - 2025-07-03
+### ✨ Auditoría y mejoras finales
+- Sistema de métodos de pago simulados (efectivo, tarjeta, Mercado Pago)
+- Sistema de calificación de viaje (estrellas)
+- Filtros avanzados en historial
+- Estado y respuesta de reclamos en soporte
+- Persistencia local en chat (AsyncStorage)
+- Avatar editable y campo teléfono en perfil
+- Revisión y mejoras finas por carpeta
+- Proyecto listo para conexión real y producción
+
+
+---
+
 ## [1.2.0] - 2025-06-30
 ### ✨ Refactor total por carpetas
 - ✅ `components/`: nuevos componentes reutilizables, íconos, estilos y modularización

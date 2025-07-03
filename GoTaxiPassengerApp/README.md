@@ -1,23 +1,39 @@
-# GoTaxi Passenger App
+# 🚕 GoTaxi Passenger App
 
-Aplicación móvil para pasajeros de GoTaxi, desarrollada en React Native con Expo.
-
----
-
-## 🚀 Funcionalidades
-
-- Autenticación: login, registro, cierre de sesión
-- Solicitud de viaje con origen y destino
-- Seguimiento de viaje con mapa
-- Historial de viajes
-- Perfil del pasajero
-- Chat con el conductor
-- Soporte integrado
-- Multilenguaje (español e inglés)
+Aplicación móvil desarrollada en React Native (Expo) para pasajeros, parte del ecosistema GoTaxi.
 
 ---
 
-## 📁 Estructura del proyecto
+## 📲 Funcionalidades
+
+- Login y registro de usuarios
+- Solicitud de viaje con mapa, origen/destino y confirmación
+- Selección de método de pago: efectivo, tarjeta, Mercado Pago (simulado)
+- Seguimiento del viaje y estado en tiempo real
+- Chat con el conductor (persistente local)
+- Calificación del viaje con sistema de estrellas
+- Historial de viajes (filtrado por método de pago y con calificación)
+- Edición de perfil (nombre, email, teléfono, avatar estático editable)
+- Soporte y reclamos (estado y respuesta simulada)
+- Internacionalización (ES/EN)
+- UI/UX profesional, modular y escalable
+
+---
+
+## 🧱 Tecnologías principales
+
+- React Native + Expo
+- React Navigation (stack + tabs)
+- Axios
+- i18n-js + expo-localization
+- react-native-maps
+- react-native-root-toast
+- Context API + hooks personalizados
+- AsyncStorage para persistencia local
+
+---
+
+## 🗂 Estructura del proyecto
 
 ```
 GoTaxiPassengerApp/
@@ -59,7 +75,12 @@ npx expo install
 Instalá también las siguientes dependencias cuando ejecutes por primera vez:
 
 ```bash
-npx expo install @react-navigation/native @react-navigation/native-stack @react-navigation/bottom-tabs react-native-screens react-native-safe-area-context react-native-gesture-handler react-native-reanimated react-native-vector-icons i18n-js expo-localization expo-location react-native-maps
+npx expo install react-native-maps react-native-safe-area-context \
+react-native-screens react-native-gesture-handler react-native-reanimated \
+react-native-root-toast @react-navigation/native \
+@react-navigation/native-stack @react-navigation/bottom-tabs \
+@expo/vector-icons expo-location i18n-js expo-localization \
+@react-native-async-storage/async-storage
 ```
 
 ---
@@ -72,12 +93,14 @@ npx expo start
 
 ---
 
-## ✅ To-Do
+🧪 Estado actual
+✔ Análisis y mejoras exhaustivas por carpeta
+✔ Métodos de pago y calificación listos
+✔ Estructura profesional y modular
+✔ Simulación avanzada de todas las features
+✔ Preparada para conectar a backend real y escalar
 
-- Conectar con backend real
-- WebSocket para chat en tiempo real
-- Integración con pasarela de pagos
-- Validaciones más robustas y alertas globales
+
 
 ---
 
