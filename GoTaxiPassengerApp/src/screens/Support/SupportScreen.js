@@ -7,13 +7,24 @@ import { showToast } from '../../utils/toast';
 export default function SupportScreen() {
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
+  const [reclamos, setReclamos] = useState([]); // Simulación local
 
   const handleSubmit = () => {
     if (!subject || !message) {
       showToast('Completá todos los campos');
       return;
     }
-
+    setReclamos((prev) => [
+      ...prev,
+      {
+        id: Date.now().toString(),
+        subject,
+        message,
+        date: new Date().toISOString(),
+        status: 'pendiente',
+        respuesta: '',
+      },
+    ]);
     showToast('Mensaje enviado al soporte');
     setSubject('');
     setMessage('');
