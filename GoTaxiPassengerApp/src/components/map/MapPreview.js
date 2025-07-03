@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet, Dimensions, Text } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 
-export default function MapPreview({ region, markers = [] }) {
+export default function MapPreview({ region, markers = [], onPressMarker }) { // ✅ Nueva prop agregada
   if (!region) {
     return (
       <View style={[styles.map, styles.placeholder]}>
@@ -19,6 +19,7 @@ export default function MapPreview({ region, markers = [] }) {
           coordinate={marker.coordinate}
           title={marker.title}
           description={marker.description}
+          onPress={() => onPressMarker && onPressMarker(marker)} // ✅ aplicado aquí
         />
       ))}
     </MapView>

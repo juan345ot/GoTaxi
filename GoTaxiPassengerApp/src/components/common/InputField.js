@@ -15,6 +15,8 @@ export default function InputField({
   keyboardType = 'default',
   returnKeyType = 'done',
   accessibilityLabel,
+  autoFocus = false,                  // ✅ Nueva prop agregada
+  onSubmitEditing,                    // ✅ Nueva prop agregada
 }) {
   return (
     <View style={styles.container}>
@@ -34,6 +36,8 @@ export default function InputField({
           keyboardType={keyboardType}
           returnKeyType={returnKeyType}
           accessibilityLabel={accessibilityLabel || placeholder}
+          autoFocus={autoFocus}                 // ✅ aplicado aquí
+          onSubmitEditing={onSubmitEditing}     // ✅ aplicado aquí
         />
 
         {icon && iconPosition === 'right' && (

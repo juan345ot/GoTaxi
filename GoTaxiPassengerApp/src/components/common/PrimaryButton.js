@@ -11,6 +11,7 @@ export default function PrimaryButton({
   icon,
   iconSize = 20,
   variant = 'primary',
+  style, // ✅ Nueva prop agregada
 }) {
   const background = {
     primary: colors.primary,
@@ -20,7 +21,11 @@ export default function PrimaryButton({
 
   return (
     <TouchableOpacity
-      style={[styles.button, { backgroundColor: background[variant] || colors.primary }]}
+      style={[
+        styles.button,
+        { backgroundColor: background[variant] || colors.primary },
+        style, // ✅ aplicada aquí
+      ]}
       onPress={onPress}
       disabled={disabled || loading}
     >

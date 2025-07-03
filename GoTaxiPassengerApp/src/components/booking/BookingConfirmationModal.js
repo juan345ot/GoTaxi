@@ -12,6 +12,8 @@ export default function BookingConfirmationModal({
   onCancel,
   confirmText = 'Confirmar',
   cancelText = 'Cancelar',
+  customConfirmText, // ✅ Nueva prop agregada
+  customCancelText,  // ✅ Nueva prop agregada
 }) {
   return (
     <Modal visible={visible} animationType="slide" transparent>
@@ -26,12 +28,12 @@ export default function BookingConfirmationModal({
           <View style={styles.actions}>
             <TouchableOpacity style={[styles.button, styles.cancel]} onPress={onCancel}>
               <Ionicons name="close" size={16} color="#fff" />
-              <Text style={styles.buttonText}>{cancelText}</Text>
+              <Text style={styles.buttonText}>{customCancelText || cancelText}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={[styles.button, styles.confirm]} onPress={onConfirm}>
               <Ionicons name="checkmark" size={16} color="#fff" />
-              <Text style={styles.buttonText}>{confirmText}</Text>
+              <Text style={styles.buttonText}>{customConfirmText || confirmText}</Text>
             </TouchableOpacity>
           </View>
         </View>

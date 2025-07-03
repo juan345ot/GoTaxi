@@ -3,7 +3,7 @@ import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../styles/theme';
 
-const ChatInput = forwardRef(({ value, onChangeText, onSend }, ref) => {
+const ChatInput = forwardRef(({ value, onChangeText, onSend, placeholderText = 'Escribe un mensaje...' }, ref) => { // ✅ Nueva prop agregada
   return (
     <View style={styles.container}>
       <TextInput
@@ -11,7 +11,7 @@ const ChatInput = forwardRef(({ value, onChangeText, onSend }, ref) => {
         style={styles.input}
         value={value}
         onChangeText={onChangeText}
-        placeholder="Escribe un mensaje..."
+        placeholder={placeholderText} // ✅ aplicado aquí
         placeholderTextColor="#aaa"
         multiline
       />

@@ -19,6 +19,11 @@ const statusMap = {
     icon: 'checkmark-circle',
     color: colors.success,
   },
+  cancelado: { // ✅ nuevo estado agregado
+    label: 'Viaje cancelado',
+    icon: 'close-circle',
+    color: colors.error,
+  },
 };
 
 export default function BookingStatus({ status }) {
