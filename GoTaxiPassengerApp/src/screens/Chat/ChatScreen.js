@@ -1,28 +1,43 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform, Text } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import ChatInput from '../../components/chat/ChatInput';
 import MessageBubble from '../../components/chat/MessageBubble';
 import { colors } from '../../styles/theme';
 
-export default function ChatScreen() {
-  const [messages, setMessages] = useState([
-    {
-      id: '1',
-      text: '¡Hola! Estoy en camino.',
-      time: new Date().toISOString(),
-      isOwn: false,
-    },
-    {
-      id: '2',
-      text: 'Perfecto, gracias!',
-      time: new Date().toISOString(),
-      isOwn: true,
-    },
-  ]);
+const STORAGE_KEY = 'gotaxi_chat_messages';
 
+export default function ChatScreen() {
+  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const listRef = useRef(null);
   const inputRef = useRef(null);
+
+  // Cargar mensajes al iniciar
+  useEffect(() => {
+    (async () => {
+      const stored = await AsyncStorage.getItem(STORAGE_KEY);
+      setMessages(stored ? JSON.parse(stored) : [
+        {
+          id: '1',
+          text: '¡Hola! Estoy en camino.',
+          time: new Date().toISOString(),
+          isOwn: false,
+        },
+        {
+          id: '2',
+          text: 'Perfecto, gracias!',
+          time: new Date().toISOString(),
+          isOwn: true,
+        },
+      ]);
+    })();
+  }, []);
+
+  // Guardar mensajes al modificar
+  useEffect(() => {
+    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+  }, [messages]);
 
   const handleSend = () => {
     if (!newMessage.trim()) return;
