@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, FlatList, StyleSheet, TextInput, Text, TouchableOpacity } from 'react-native';
 import TripItem from '../../components/booking/TripItem';
-import RatingStars from '../../components/common/RatingStars';
 import { colors } from '../../styles/theme';
 
 const MOCK_TRIPS = [
@@ -13,6 +12,8 @@ const MOCK_TRIPS = [
     status: 'finalizado',
     paymentMethod: 'cash',
     rating: 5,
+    driver: 'Carlos Pérez',
+    vehicle: 'Toyota Etios Blanco',
   },
   {
     id: '2',
@@ -22,6 +23,8 @@ const MOCK_TRIPS = [
     status: 'cancelado',
     paymentMethod: 'mp',
     rating: 0,
+    driver: 'Ricardo López',
+    vehicle: 'Renault Logan Gris',
   },
   {
     id: '3',
@@ -31,6 +34,8 @@ const MOCK_TRIPS = [
     status: 'finalizado',
     paymentMethod: 'card',
     rating: 3,
+    driver: 'Ana Martínez',
+    vehicle: 'Chevrolet Prisma Rojo',
   },
 ];
 
@@ -53,10 +58,7 @@ export default function HistoryScreen() {
   );
 
   const renderItem = ({ item }) => (
-    <View style={styles.tripRow}>
-      <TripItem trip={item} />
-      <RatingStars value={item.rating || 0} size={18} disabled />
-    </View>
+    <TripItem trip={item} />
   );
 
   return (
@@ -116,16 +118,16 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: '600',
     marginBottom: 10,
-    color: colors.text,
+    color: colors.text || '#333',
   },
   input: {
     height: 42,
-    borderColor: colors.border,
+    borderColor: colors.border || '#e0e0e0',
     borderWidth: 1,
     borderRadius: 6,
     paddingHorizontal: 10,
     marginBottom: 10,
-    color: colors.text,
+    color: colors.text || '#222',
   },
   paymentFilter: {
     flexDirection: 'row',
@@ -135,18 +137,18 @@ const styles = StyleSheet.create({
   },
   methodBtn: {
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.border || '#e0e0e0',
     borderRadius: 6,
     paddingVertical: 5,
     paddingHorizontal: 12,
     backgroundColor: '#fff',
   },
   methodBtnActive: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primaryDark,
+    backgroundColor: colors.primary || '#007aff',
+    borderColor: colors.primaryDark || '#0057b8',
   },
   methodBtnText: {
-    color: colors.textSecondary,
+    color: colors.textSecondary || '#777',
     fontSize: 13,
   },
   methodBtnTextActive: {
@@ -156,14 +158,9 @@ const styles = StyleSheet.create({
   list: {
     paddingBottom: 10,
   },
-  tripRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
   empty: {
     textAlign: 'center',
-    color: colors.textSecondary,
+    color: colors.textSecondary || '#777',
     marginTop: 40,
     fontSize: 16,
   },
