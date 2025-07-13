@@ -1,51 +1,83 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import AuthForm from '../../components/auth/AuthForm';
+import { View, StyleSheet, TouchableOpacity, Text, ScrollView } from 'react-native';
 import AuthHeader from '../../components/auth/AuthHeader';
 import useAuth from '../../hooks/useAuth';
-import { validateRegister } from '../../utils/validators';
+import InputField from '../../components/common/InputField';
+import PrimaryButton from '../../components/common/PrimaryButton';
 import { showToast } from '../../utils/toast';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function RegisterScreen({ navigation }) {
   const { register, loading } = useAuth();
-  const [email, setEmail] = useState('');
-  const [name, setName] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const [form, setForm] = useState({
+    name: '',
+    lastname: '',
+    dni: '',
+    birthdate: '',
+    email: '',
+    password: '',
+    confirmPassword: '',
+    address: '',
+    city: '',
+    province: '',
+    country: 'Argentina',
+  });
+
+  const handleChange = (field, value) => {
+    setForm({ ...form, [field]: value });
+  };
+
+  const validate = () => {
+    const {
+      name, lastname, dni, birthdate, email, password,
+      confirmPassword, address, city, province, country,
+    } = form;
+
+    if (!name || !lastname || !dni || !birthdate || !email || !password || !confirmPassword || !address || !city || !province || !country) {
+      return 'Todos los campos son obligatorios';
+    }
+    if (password !== confirmPassword) {
+      return 'Las contraseñas no coinciden';
+    }
+    if (dni.length !== 8 || isNaN(dni)) {
+      return 'El DNI debe tener 8 números';
+    }
+    // Podés agregar más validaciones (ej: formato fecha, mail, etc)
+    return null;
+  };
 
   const handleRegister = () => {
-    if (password !== confirmPassword) return showToast('Las contraseñas no coinciden');
-    const error = validateRegister({ name, email, password });
+    const error = validate();
     if (error) return showToast(error);
-    register(email, password);
+
+    register(form.email, form.password); // Simulado
+    showToast('Registro exitoso');
+    navigation.navigate('Home');
   };
 
   const handleGoogleRegister = () => {
     showToast('Registro con Google (simulado)');
-    // Lógica real de Google a futuro
   };
 
   return (
-    <View style={styles.wrapper}>
+    <ScrollView style={styles.scroll} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
       <AuthHeader eslogan="¡Su taxi a un click de distancia!" />
 
       <View style={styles.card}>
-        <AuthForm
-          email={email}
-          password={password}
-          confirmPassword={confirmPassword}
-          name={name}
-          showName
-          showConfirm
-          onChangeEmail={setEmail}
-          onChangePassword={setPassword}
-          onChangeConfirmPassword={setConfirmPassword}
-          onChangeName={setName}
-          onSubmit={handleRegister}
-          buttonText="Registrarme"
-          loading={loading}
-        />
+        <InputField label="Nombre" value={form.name} onChangeText={(v) => handleChange('name', v)} icon="person" />
+        <InputField label="Apellido" value={form.lastname} onChangeText={(v) => handleChange('lastname', v)} icon="person" />
+        <InputField label="DNI" keyboardType="numeric" value={form.dni} onChangeText={(v) => handleChange('dni', v)} icon="card" />
+        <InputField label="Fecha de Nacimiento" placeholder="DD/MM/AAAA" value={form.birthdate} onChangeText={(v) => handleChange('birthdate', v)} icon="calendar" />
+        <InputField label="Correo" value={form.email} keyboardType="email-address" onChangeText={(v) => handleChange('email', v)} icon="mail" />
+        <InputField label="Contraseña" secureTextEntry value={form.password} onChangeText={(v) => handleChange('password', v)} icon="lock-closed" />
+        <InputField label="Confirmar Contraseña" secureTextEntry value={form.confirmPassword} onChangeText={(v) => handleChange('confirmPassword', v)} icon="lock-closed" />
+        <InputField label="Dirección" value={form.address} onChangeText={(v) => handleChange('address', v)} icon="location" />
+        <InputField label="Ciudad" value={form.city} onChangeText={(v) => handleChange('city', v)} icon="business" />
+        <InputField label="Provincia" value={form.province} onChangeText={(v) => handleChange('province', v)} icon="flag" />
+        <InputField label="País" value={form.country} editable={false} icon="earth" />
+
+        <PrimaryButton title="Registrarme" loading={loading} onPress={handleRegister} icon="person-add" />
 
         <TouchableOpacity style={styles.googleBtn} onPress={handleGoogleRegister}>
           <Ionicons name="logo-google" size={22} color="#fff" style={{ marginRight: 7 }} />
@@ -58,26 +90,22 @@ export default function RegisterScreen({ navigation }) {
           </Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  wrapper: {
-    flex: 1,
-    backgroundColor: '#fff',
-    justifyContent: 'center',
-  },
+  scroll: { flex: 1, backgroundColor: '#fff' },
+  container: { padding: 16 },
   card: {
     backgroundColor: '#f7f7f7',
     borderRadius: 20,
-    marginHorizontal: 16,
     padding: 24,
-    shadowColor: '#222',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.09,
-    shadowRadius: 12,
-    elevation: 7,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 4,
+    marginBottom: 30,
   },
   googleBtn: {
     flexDirection: 'row',

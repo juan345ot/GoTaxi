@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
-import AuthForm from '../../components/auth/AuthForm';
 import AuthHeader from '../../components/auth/AuthHeader';
 import useAuth from '../../hooks/useAuth';
-import { validateLogin } from '../../utils/validators';
+import InputField from '../../components/common/InputField';
+import PrimaryButton from '../../components/common/PrimaryButton';
 import { showToast } from '../../utils/toast';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -13,14 +13,14 @@ export default function LoginScreen({ navigation }) {
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
-    const error = validateLogin({ email, password });
-    if (error) return showToast(error);
+    if (!email || !password) {
+      return showToast('Completá ambos campos');
+    }
     login(email, password);
   };
 
   const handleGoogleLogin = () => {
     showToast('Login con Google (simulado)');
-    // Aquí va la lógica real de Google en el futuro
   };
 
   return (
@@ -28,19 +28,28 @@ export default function LoginScreen({ navigation }) {
       <AuthHeader eslogan="¡Su taxi a un click de distancia!" />
 
       <View style={styles.card}>
-        <AuthForm
-          email={email}
-          password={password}
-          onChangeEmail={setEmail}
-          onChangePassword={setPassword}
-          onSubmit={handleLogin}
-          buttonText="Iniciar sesión"
-          loading={loading}
+        <InputField
+          label="Correo"
+          value={email}
+          onChangeText={setEmail}
+          placeholder="ejemplo@email.com"
+          icon="mail"
+          keyboardType="email-address"
+        />
+        <InputField
+          label="Contraseña"
+          value={password}
+          onChangeText={setPassword}
+          placeholder="******"
+          icon="lock-closed"
+          secureTextEntry
         />
 
         <TouchableOpacity style={styles.forgot} onPress={() => showToast('Funcionalidad próximamente')}>
           <Text style={styles.forgotText}>¿Olvidaste tu contraseña?</Text>
         </TouchableOpacity>
+
+        <PrimaryButton title="Iniciar sesión" loading={loading} onPress={handleLogin} icon="log-in" />
 
         <TouchableOpacity style={styles.googleBtn} onPress={handleGoogleLogin}>
           <Ionicons name="logo-google" size={22} color="#fff" style={{ marginRight: 7 }} />
@@ -77,7 +86,7 @@ const styles = StyleSheet.create({
   forgot: {
     alignSelf: 'flex-end',
     marginTop: -8,
-    marginBottom: 18,
+    marginBottom: 14,
   },
   forgotText: {
     color: '#007aff',
