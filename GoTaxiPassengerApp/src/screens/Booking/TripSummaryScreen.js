@@ -4,15 +4,23 @@ import { calcularImporte, generarPin, BASE_FARE, FARE_PER_100M } from '../../uti
 import { Ionicons } from '@expo/vector-icons';
 
 export default function TripSummaryScreen({ route, navigation }) {
-  // Recibimos datos del viaje; mock si hace falta
-  const { origin = "Ejemplo 1", destination = "Ejemplo 2", distancia = 3200, duration = 14, driver = "Carlos Pérez", vehicle = "Toyota Etios Blanco" } = route.params || {};
+  const {
+    origin = "Ejemplo 1",
+    destination = "Ejemplo 2",
+    distancia = 3200,
+    duration = 14,
+    driver = "Carlos Pérez",
+    vehicle = "Toyota Etios Blanco",
+    multa = 0,
+    cancelado = false,
+  } = route.params || {};
 
-  const importe = calcularImporte(distancia);
+  const importe = cancelado ? multa : calcularImporte(distancia);
   const pin = generarPin();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>¡Llegaste a tu destino!</Text>
+      <Text style={styles.title}>{cancelado ? 'Viaje cancelado' : '¡Llegaste a tu destino!'}</Text>
 
       <View style={styles.section}>
         <Text style={styles.label}>Desde:</Text>
@@ -30,10 +38,18 @@ export default function TripSummaryScreen({ route, navigation }) {
 
       <View style={styles.section}>
         <Text style={styles.label}>Importe total:</Text>
-        <Text style={styles.importe}>${importe}</Text>
-        <Text style={styles.tarifaDetalle}>
-          Tarifa base: ${BASE_FARE} + ${FARE_PER_100M} cada 100m
+        <Text style={cancelado ? styles.importeMulta : styles.importe}>
+          ${importe}
         </Text>
+        {!cancelado ? (
+          <Text style={styles.tarifaDetalle}>
+            Tarifa base: ${BASE_FARE} + ${FARE_PER_100M} cada 100m
+          </Text>
+        ) : (
+          <Text style={styles.multaDetalle}>
+            Se aplicó una <Text style={{ fontWeight: 'bold' }}>multa de ${multa}</Text> por cancelar el viaje.
+          </Text>
+        )}
       </View>
 
       <View style={styles.section}>
@@ -51,7 +67,7 @@ export default function TripSummaryScreen({ route, navigation }) {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.btnPago}
-          onPress={() => navigation.navigate('PaymentMethod', { importe, pin, ...route.params })}
+          onPress={() => navigation.navigate('PaymentMethod', { importe, pin, origin, destination, driver, vehicle, cancelado, multa })}
         >
           <Ionicons name="cash-outline" size={21} color="#fff" style={{ marginRight: 7 }} />
           <Text style={styles.btnPagoText}>Ir a métodos de pago</Text>
@@ -68,7 +84,9 @@ const styles = StyleSheet.create({
   label: { fontWeight: '700', color: '#444', fontSize: 14, marginTop: 7 },
   value: { color: '#222', fontSize: 16 },
   importe: { fontSize: 28, color: '#222', fontWeight: 'bold', marginTop: 3 },
+  importeMulta: { fontSize: 28, color: '#e53935', fontWeight: 'bold', marginTop: 3 },
   tarifaDetalle: { color: '#666', fontSize: 12, marginTop: 1 },
+  multaDetalle: { color: '#e53935', fontSize: 13, marginTop: 2, fontWeight: '600' },
   pin: { fontSize: 30, color: '#007aff', fontWeight: 'bold', textAlign: 'center', marginTop: 5 },
   pinDesc: { color: '#555', fontSize: 13, textAlign: 'center', marginTop: 2 },
   actions: { marginTop: 28 },
