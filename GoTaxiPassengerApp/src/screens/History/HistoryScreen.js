@@ -2,42 +2,7 @@ import React, { useState } from 'react';
 import { View, FlatList, StyleSheet, TextInput, Text, TouchableOpacity } from 'react-native';
 import TripItem from '../../components/booking/TripItem';
 import { colors } from '../../styles/theme';
-
-const MOCK_TRIPS = [
-  {
-    id: '1',
-    origin: 'Calle 123',
-    destination: 'Av. Libertador',
-    date: '2025-06-28T14:30:00Z',
-    status: 'finalizado',
-    paymentMethod: 'cash',
-    rating: 5,
-    driver: 'Carlos Pérez',
-    vehicle: 'Toyota Etios Blanco',
-  },
-  {
-    id: '2',
-    origin: 'San Martín',
-    destination: 'Belgrano',
-    date: '2025-06-27T10:15:00Z',
-    status: 'cancelado',
-    paymentMethod: 'mp',
-    rating: 0,
-    driver: 'Ricardo López',
-    vehicle: 'Renault Logan Gris',
-  },
-  {
-    id: '3',
-    origin: 'Rivadavia',
-    destination: '9 de Julio',
-    date: '2025-06-22T10:00:00Z',
-    status: 'finalizado',
-    paymentMethod: 'card',
-    rating: 3,
-    driver: 'Ana Martínez',
-    vehicle: 'Chevrolet Prisma Rojo',
-  },
-];
+import { useHistory } from '../../contexts/HistoryContext';
 
 const PAYMENT_METHODS = [
   { label: 'Todos', value: '' },
@@ -47,14 +12,15 @@ const PAYMENT_METHODS = [
 ];
 
 export default function HistoryScreen() {
+  const { trips } = useHistory();
   const [query, setQuery] = useState('');
   const [paymentFilter, setPaymentFilter] = useState('');
 
-  const filteredTrips = MOCK_TRIPS.filter(
+  const filteredTrips = trips.filter(
     (trip) =>
-      (trip.origin.toLowerCase().includes(query.toLowerCase()) ||
-        trip.destination.toLowerCase().includes(query.toLowerCase())) &&
-      (paymentFilter ? trip.paymentMethod === paymentFilter : true)
+      (trip.origin?.toLowerCase().includes(query.toLowerCase()) ||
+        trip.destination?.toLowerCase().includes(query.toLowerCase())) &&
+      (paymentFilter ? trip.metodoPago === paymentFilter : true)
   );
 
   const renderItem = ({ item }) => (

@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import RatingStars from '../../components/common/RatingStars';
 import { Ionicons } from '@expo/vector-icons';
+import { useHistory } from '../../contexts/HistoryContext';
 
 export default function RateRideScreen({ route, navigation }) {
-  // Recibimos todos los datos del viaje y pago por params
   const {
     driver = 'Carlos Pérez',
     vehicle = 'Toyota Etios Blanco',
@@ -15,16 +15,26 @@ export default function RateRideScreen({ route, navigation }) {
     destination = '',
     distancia = 0,
     duration = 0,
-    // ...otros datos si querés
   } = route.params || {};
 
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
+  const { addTrip } = useHistory();
 
   const handleFinish = () => {
-    // Guardá en historial (simulado; después hacelo persistente o global)
-    // Podés armar una función saveTrip({ ...datos }) y llamarla aquí
-    // O usar context/global si querés que sea pro
+    addTrip({
+      driver,
+      vehicle,
+      importe,
+      metodoPago,
+      pin,
+      origin,
+      destination,
+      distancia,
+      duration,
+      rating,
+      comment,
+    });
     navigation.replace('Home');
   };
 
