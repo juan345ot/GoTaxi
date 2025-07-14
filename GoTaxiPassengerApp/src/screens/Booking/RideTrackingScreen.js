@@ -3,8 +3,10 @@ import { View, StyleSheet, Text, Alert, TouchableOpacity } from 'react-native';
 import TaxiMap from '../../components/map/TaxiMap';
 import DriverInfoCard from '../../components/booking/DriverInfoCard';
 
+const MULTA_BEFORE = 500; // Antes de confirmar subida
+const MULTA_AFTER = 1500; // Después de confirmar subida
+
 export default function RideTrackingScreen({ route, navigation }) {
-  // Simulación: origen y destino fijos, taxi va interpolando entre ambos
   const {
     origin = { latitude: -34.61, longitude: -58.38 },
     destination = { latitude: -34.62, longitude: -58.44 },
@@ -16,8 +18,9 @@ export default function RideTrackingScreen({ route, navigation }) {
   const [progress, setProgress] = useState(0);
   const [estado, setEstado] = useState('esperandoTaxi'); // "esperandoTaxi", "confirmarSubida", "enCurso"
   const [usuarioArriba, setUsuarioArriba] = useState(false);
+  const [cancelando, setCancelando] = useState(false);
 
-  // Simula animación de taxi hasta la partida (progreso < 0.2), luego espera confirmación, después avanza a destino
+  // Simula animación taxi → partida y luego viaje real
   useEffect(() => {
     if (estado === 'esperandoTaxi' && progress < 0.2) {
       const timer = setTimeout(() => setProgress((p) => Math.min(0.2, p + 0.018)), 100);
@@ -35,19 +38,17 @@ export default function RideTrackingScreen({ route, navigation }) {
         longitude: origin.longitude + (destination.longitude - origin.longitude) * progress,
       });
       if (progress >= 1) {
-        // Llegó a destino: ir al resumen (puede recibir los datos por route)
         navigation.replace('TripSummary', {
           origin,
           destination,
-          distancia: 3200, // simulado, podés calcularlo real
-          duration: 15, // simulado
+          distancia: 3200, // simulado
+          duration: 15,
           driver,
           vehicle,
         });
       }
       return () => clearTimeout(timer);
     }
-    // eslint-disable-next-line
   }, [estado, progress, origin, destination]);
 
   const handleSOS = () => {
@@ -69,11 +70,40 @@ export default function RideTrackingScreen({ route, navigation }) {
     Alert.alert('Llamar', 'Llamando al conductor (simulado)');
   };
 
-  // Cuando usuario confirma que subió, arranca el viaje real
   const handleConfirmarSubida = () => {
     setUsuarioArriba(true);
     setEstado('enCurso');
-    setProgress(0.21); // inicia después de la partida
+    setProgress(0.21);
+  };
+
+  // NUEVO: lógica para cancelar viaje con advertencia y multa
+  const handleCancelar = () => {
+    const multa = estado === 'enCurso' ? MULTA_AFTER : MULTA_BEFORE;
+    setCancelando(true);
+    Alert.alert(
+      '¿Seguro que querés cancelar el viaje?',
+      `Cancelar ahora implicará una multa de $${multa}. ¿Deseás continuar?`,
+      [
+        { text: 'No', style: 'cancel', onPress: () => setCancelando(false) },
+        {
+          text: 'Sí, cancelar',
+          style: 'destructive',
+          onPress: () => {
+            setCancelando(false);
+            navigation.replace('TripSummary', {
+              origin,
+              destination,
+              driver,
+              vehicle,
+              distancia: 0,
+              duration: 0,
+              multa,
+              cancelado: true,
+            });
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -107,6 +137,13 @@ export default function RideTrackingScreen({ route, navigation }) {
           <Text style={styles.estado}>Tu viaje está en curso...</Text>
         )}
       </View>
+      <TouchableOpacity
+        style={[styles.cancelBtn, cancelando && { opacity: 0.4 }]}
+        onPress={handleCancelar}
+        disabled={cancelando}
+      >
+        <Text style={styles.cancelBtnText}>Cancelar viaje</Text>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -144,5 +181,22 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+  },
+  cancelBtn: {
+    backgroundColor: '#fdecea',
+    borderRadius: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginTop: 8,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: '#e53935',
+  },
+  cancelBtnText: {
+    color: '#e53935',
+    fontWeight: 'bold',
+    fontSize: 15,
   },
 });
