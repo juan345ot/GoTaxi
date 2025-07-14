@@ -1,74 +1,40 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet, ActivityIndicator, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
-export default function PrimaryButton({
-  title,
-  onPress,
-  loading = false,
-  disabled = false,
-  icon,
-  iconSize = 20,
-  style,
-  textStyle,
-  variant = 'primary',
-}) {
-  const background = {
-    primary: '#007aff',
-    secondary: '#ffd600',
-    danger: '#e53935',
-  };
-
+export default function PrimaryButton({ title, onPress, disabled = false, style, accessibilityLabel }) {
   return (
     <TouchableOpacity
-      style={[
-        styles.button,
-        { backgroundColor: background[variant] || '#007aff' },
-        disabled && { opacity: 0.5 },
-        style,
-      ]}
+      style={[styles.button, disabled && styles.disabled, style]}
       onPress={onPress}
-      disabled={disabled || loading}
       activeOpacity={0.82}
+      disabled={disabled}
+      accessibilityLabel={accessibilityLabel || title}
+      accessibilityRole="button"
     >
-      {loading ? (
-        <ActivityIndicator color="#fff" />
-      ) : (
-        <View style={styles.row}>
-          {icon && <Ionicons name={icon} size={iconSize} color="#fff" style={styles.icon} />}
-          <Text style={[styles.text, textStyle]}>{title}</Text>
-        </View>
-      )}
+      <Text style={styles.text}>{title}</Text>
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   button: {
-    height: 46,
-    borderRadius: 7,
+    backgroundColor: '#007aff',
+    borderRadius: 8,
+    minHeight: 48,
     justifyContent: 'center',
     alignItems: 'center',
-    flexDirection: 'row',
-    marginVertical: 10,
-    paddingHorizontal: 20,
-    shadowColor: '#222',
-    shadowOpacity: 0.07,
-    shadowRadius: 8,
-    shadowOffset: { width: 1, height: 4 },
-    elevation: 5,
-  },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    paddingVertical: 13,
+    paddingHorizontal: 34,
+    elevation: 2,
   },
   text: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
-    letterSpacing: 1,
+    fontSize: 18,
+    fontWeight: 'bold',
+    letterSpacing: 0.5,
   },
-  icon: {
-    marginRight: 9,
+  disabled: {
+    backgroundColor: '#a8c7fa',
+    opacity: 0.7,
   },
 });

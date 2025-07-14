@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, Alert, TouchableOpacity } from 'react-native';
 import TaxiMap from '../../components/map/TaxiMap';
 import DriverInfoCard from '../../components/booking/DriverInfoCard';
+import { t } from '../../translations';
 
-const MULTA_BEFORE = 500; // Antes de confirmar subida
-const MULTA_AFTER = 1500; // Después de confirmar subida
+const MULTA_BEFORE = 500;
+const MULTA_AFTER = 1500;
 
 export default function RideTrackingScreen({ route, navigation }) {
   const {
@@ -16,11 +17,10 @@ export default function RideTrackingScreen({ route, navigation }) {
 
   const [taxiPosition, setTaxiPosition] = useState(origin);
   const [progress, setProgress] = useState(0);
-  const [estado, setEstado] = useState('esperandoTaxi'); // "esperandoTaxi", "confirmarSubida", "enCurso"
+  const [estado, setEstado] = useState('esperandoTaxi');
   const [usuarioArriba, setUsuarioArriba] = useState(false);
   const [cancelando, setCancelando] = useState(false);
 
-  // Simula animación taxi → partida y luego viaje real
   useEffect(() => {
     if (estado === 'esperandoTaxi' && progress < 0.2) {
       const timer = setTimeout(() => setProgress((p) => Math.min(0.2, p + 0.018)), 100);
@@ -41,7 +41,7 @@ export default function RideTrackingScreen({ route, navigation }) {
         navigation.replace('TripSummary', {
           origin,
           destination,
-          distancia: 3200, // simulado
+          distancia: 3200,
           duration: 15,
           driver,
           vehicle,
@@ -52,22 +52,26 @@ export default function RideTrackingScreen({ route, navigation }) {
   }, [estado, progress, origin, destination]);
 
   const handleSOS = () => {
-    Alert.alert('Emergencia', '¿Deseás llamar a tus contactos de emergencia?', [
-      { text: 'Cancelar', style: 'cancel' },
-      { text: 'Llamar', onPress: () => Alert.alert('Llamando... (simulado)') },
-    ]);
+    Alert.alert(
+      t('emergency'),
+      t('emergency_confirm'),
+      [
+        { text: t('no'), style: 'cancel' },
+        { text: t('yes_cancel'), onPress: () => Alert.alert(t('calling')) }
+      ]
+    );
   };
 
   const handleShare = () => {
-    Alert.alert('Compartir viaje', 'Se envió tu ubicación y ruta a tu contacto (simulado)');
+    Alert.alert(t('share_trip'), t('share_sent'));
   };
 
   const handleChat = () => {
-    Alert.alert('Chat', 'Función de chat con el conductor (simulada)');
+    Alert.alert(t('chat'), t('chat'));
   };
 
   const handleCall = () => {
-    Alert.alert('Llamar', 'Llamando al conductor (simulado)');
+    Alert.alert(t('call_driver'));
   };
 
   const handleConfirmarSubida = () => {
@@ -76,17 +80,16 @@ export default function RideTrackingScreen({ route, navigation }) {
     setProgress(0.21);
   };
 
-  // NUEVO: lógica para cancelar viaje con advertencia y multa
   const handleCancelar = () => {
     const multa = estado === 'enCurso' ? MULTA_AFTER : MULTA_BEFORE;
     setCancelando(true);
     Alert.alert(
-      '¿Seguro que querés cancelar el viaje?',
-      `Cancelar ahora implicará una multa de $${multa}. ¿Deseás continuar?`,
+      t('cancel_trip_btn'),
+      t('cancel_warning_dialog', { fine: multa }),
       [
-        { text: 'No', style: 'cancel', onPress: () => setCancelando(false) },
+        { text: t('no'), style: 'cancel', onPress: () => setCancelando(false) },
         {
-          text: 'Sí, cancelar',
+          text: t('yes_cancel'),
           style: 'destructive',
           onPress: () => {
             setCancelando(false);
@@ -122,27 +125,28 @@ export default function RideTrackingScreen({ route, navigation }) {
       <View style={styles.infoBox}>
         <DriverInfoCard driver={driver} vehicle={vehicle} />
         {estado === 'esperandoTaxi' && (
-          <Text style={styles.estado}>El taxi está llegando a tu ubicación...</Text>
+          <Text style={styles.estado}>{t('taxi_on_the_way')}</Text>
         )}
         {estado === 'confirmarSubida' && !usuarioArriba && (
           <>
-            <Text style={styles.estadoBold}>¡El taxi llegó!</Text>
-            <TouchableOpacity style={styles.btnSubi} onPress={handleConfirmarSubida}>
-              <Text style={styles.btnSubiText}>Confirmar que subí</Text>
+            <Text style={styles.estadoBold}>{t('confirm_board')}</Text>
+            <TouchableOpacity style={styles.btnSubi} onPress={handleConfirmarSubida} accessibilityLabel={t('confirm_board')}>
+              <Text style={styles.btnSubiText}>{t('confirm_board')}</Text>
             </TouchableOpacity>
-            <Text style={styles.estado}>Avisale al conductor que ya estás arriba para comenzar el viaje.</Text>
+            <Text style={styles.estado}>{t('tell_driver')}</Text>
           </>
         )}
         {estado === 'enCurso' && (
-          <Text style={styles.estado}>Tu viaje está en curso...</Text>
+          <Text style={styles.estado}>{t('trip_in_progress')}</Text>
         )}
       </View>
       <TouchableOpacity
         style={[styles.cancelBtn, cancelando && { opacity: 0.4 }]}
         onPress={handleCancelar}
         disabled={cancelando}
+        accessibilityLabel={t('cancel_trip_btn')}
       >
-        <Text style={styles.cancelBtnText}>Cancelar viaje</Text>
+        <Text style={styles.cancelBtnText}>{t('cancel_trip_btn')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -157,14 +161,14 @@ const styles = StyleSheet.create({
   },
   estado: {
     marginTop: 12,
-    fontSize: 15,
+    fontSize: 16,
     color: '#555',
     textAlign: 'center',
     fontWeight: '500',
   },
   estadoBold: {
     marginTop: 8,
-    fontSize: 16,
+    fontSize: 17,
     color: '#007aff',
     textAlign: 'center',
     fontWeight: 'bold',
@@ -173,30 +177,36 @@ const styles = StyleSheet.create({
     marginTop: 14,
     backgroundColor: '#007aff',
     borderRadius: 8,
-    paddingVertical: 13,
-    paddingHorizontal: 33,
+    paddingVertical: 14,
+    paddingHorizontal: 37,
     elevation: 4,
+    minHeight: 48,
+    minWidth: 210,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   btnSubiText: {
     color: '#fff',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 18,
+    letterSpacing: 0.5,
   },
   cancelBtn: {
     backgroundColor: '#fdecea',
     borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 32,
+    paddingVertical: 13,
+    paddingHorizontal: 34,
     alignItems: 'center',
     alignSelf: 'center',
-    marginTop: 8,
-    marginBottom: 12,
+    marginTop: 10,
+    marginBottom: 13,
     borderWidth: 1,
     borderColor: '#e53935',
+    minHeight: 48,
   },
   cancelBtnText: {
     color: '#e53935',
     fontWeight: 'bold',
-    fontSize: 15,
+    fontSize: 17,
   },
 });
