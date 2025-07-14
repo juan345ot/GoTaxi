@@ -1,70 +1,79 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-import BookingStatus from '../../components/booking/BookingStatus';
-import MapPreview from '../../components/map/MapPreview';
-import PrimaryButton from '../../components/common/PrimaryButton';
-import { showToast } from '../../utils/toast';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, Text, Alert } from 'react-native';
+import TaxiMap from '../../components/map/TaxiMap';
+import DriverInfoCard from '../../components/booking/DriverInfoCard';
 
 export default function RideTrackingScreen({ route, navigation }) {
-  const { origin, destination, paymentMethod, driver = 'Juan M.', vehicle = 'Toyota Etios Blanco' } = route.params || {};
-  const [status, setStatus] = useState('camino');
+  // Simulación: origen y destino fijos, taxi va interpolando entre ambos
+  const { origin = { latitude: -34.61, longitude: -58.38 }, destination = { latitude: -34.62, longitude: -58.44 }, driver, vehicle } = route.params || {};
+  const [taxiPosition, setTaxiPosition] = useState(origin);
+  const [progress, setProgress] = useState(0);
 
-  const region = {
-    latitude: -34.6037,
-    longitude: -58.3816,
-    latitudeDelta: 0.01,
-    longitudeDelta: 0.01,
+  // Simula animación de taxi avanzando hacia destino
+  useEffect(() => {
+    if (progress >= 1) return;
+    const timer = setTimeout(() => {
+      setProgress((p) => Math.min(1, p + 0.015));
+    }, 120);
+    setTaxiPosition({
+      latitude: origin.latitude + (destination.latitude - origin.latitude) * progress,
+      longitude: origin.longitude + (destination.longitude - origin.longitude) * progress,
+    });
+    return () => clearTimeout(timer);
+  }, [progress, origin, destination]);
+
+  const handleSOS = () => {
+    Alert.alert('Emergencia', '¿Deseás llamar a tus contactos de emergencia?', [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Llamar', onPress: () => Alert.alert('Llamando... (simulado)') },
+    ]);
   };
 
-  const markers = [
-    {
-      coordinate: region,
-      title: 'Tu ubicación',
-    },
-    {
-      coordinate: {
-        latitude: region.latitude + 0.003,
-        longitude: region.longitude + 0.003,
-      },
-      title: 'Conductor',
-    },
-  ];
+  const handleShare = () => {
+    Alert.alert('Compartir viaje', 'Se envió tu ubicación y ruta a tu contacto (simulado)');
+  };
 
-  const handleCancel = () => {
-    setStatus('cancelado');
-    showToast('Viaje cancelado');
-    // Si querés, podrías volver a Home después de unos segundos:
-    setTimeout(() => navigation.navigate('Home'), 1500);
+  const handleChat = () => {
+    Alert.alert('Chat', 'Función de chat con el conductor (simulada)');
+  };
+
+  const handleCall = () => {
+    Alert.alert('Llamar', 'Llamando al conductor (simulado)');
   };
 
   return (
     <View style={styles.container}>
-      <BookingStatus status={status} />
-      <MapPreview region={region} markers={markers} />
-      <Text style={styles.info}>Conductor: {driver} - {vehicle}</Text>
-      <Text style={styles.info}>
-        Pago: {paymentMethod === 'cash' ? 'Efectivo' : paymentMethod === 'card' ? 'Tarjeta' : 'Mercado Pago'}
-      </Text>
-      {status !== 'cancelado' && (
-        <PrimaryButton
-          title="Cancelar Viaje"
-          icon="close-circle"
-          variant="danger"
-          onPress={handleCancel}
-          style={{ marginTop: 20 }}
-        />
-      )}
+      <TaxiMap
+        origin={origin}
+        destination={destination}
+        taxiPosition={taxiPosition}
+        onPressSOS={handleSOS}
+        onPressShare={handleShare}
+        onPressChat={handleChat}
+        onPressCall={handleCall}
+        chatEnabled={true}
+        callEnabled={true}
+      />
+      <View style={styles.infoBox}>
+        <DriverInfoCard driver={driver} vehicle={vehicle} />
+        <Text style={styles.estado}>El taxi está yendo a tu ubicación...</Text>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  container: { flex: 1, backgroundColor: '#fff' },
+  infoBox: {
+    padding: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  info: {
+  estado: {
+    marginTop: 12,
+    fontSize: 15,
+    color: '#555',
     textAlign: 'center',
-    marginVertical: 5,
-    fontSize: 16,
+    fontWeight: '500',
   },
 });
