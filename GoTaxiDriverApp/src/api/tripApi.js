@@ -1,18 +1,13 @@
-export const getTripRequests = async () => {
-  // Aquí harás el fetch a la API real cuando esté lista
-  // Por ahora mock
+import axios from './axiosInstance';
+
+/** Obtener solicitudes */
+export async function getTripRequests() {
   return [
-    { id: '1', origen: 'Calle 9 y 23', destino: 'Hospital Municipal', pasajero: 'Carlos Díaz', rating: 4.8, motivo: 'Turno médico', monto: 1200 }
-    // ...más viajes
+    { id: '1', origen: 'Plaza', destino: 'Hospital', pasajero: 'Juan', rating: 4.5, motivo: 'Consulta médica', monto: 1200 }
   ];
-};
+}
 
-export const acceptTrip = async (tripId) => {
-  // Integrar con backend real a futuro
-  return { success: true };
-};
-
-export const rejectTrip = async (tripId) => {
-  // Integrar con backend real a futuro
-  return { success: true };
-};
+/** Aceptar viaje */
+export async function acceptTrip(tripId) {
+  return { ok: true };
+}

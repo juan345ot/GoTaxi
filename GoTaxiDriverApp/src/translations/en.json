@@ -1,0 +1,20 @@
+{
+  "login": "Login",
+  "register": "Register",
+  "logout": "Logout",
+  "welcome": "Welcome to GoTaxi",
+  "driver": "Driver",
+  "passenger": "Passenger",
+  "ride": "Ride",
+  "fare": "Fare",
+  "destination": "Destination",
+  "pickup_location": "Pickup Location",
+  "dropoff_location": "Dropoff Location",
+  "confirm_ride": "Confirm Ride",
+  "cancel_ride": "Cancel Ride",
+  "ride_history": "Ride History",
+  "profile": "Profile",
+  "settings": "Settings",
+  "help": "Help",
+  "contact_support": "Contact Support"
+}

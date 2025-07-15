@@ -1,0 +1,20 @@
+{
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "logout": "Cerrar sesión",
+    "welcome": "Bienvenido a GoTaxi",
+    "driver": "Conductor",
+    "passenger": "Pasajero",
+    "ride": "Viaje",
+    "fare": "Tarifa",
+    "destination": "Destino",
+    "pickup_location": "Ubicación de recogida",
+    "dropoff_location": "Ubicación de entrega",
+    "confirm_ride": "Confirmar viaje",
+    "cancel_ride": "Cancelar viaje",
+    "ride_history": "Historial de viajes",
+    "profile": "Perfil",
+    "settings": "Configuraciones",
+    "help": "Ayuda",
+    "contact_support": "Contactar soporte"
+}

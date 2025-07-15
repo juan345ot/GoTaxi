@@ -1,11 +1,22 @@
-// Aquí va la integración real con backend cuando esté listo
-export const loginDriver = async (email, password) => {
-  // Ejemplo:
-  // return await fetch('/api/driver/login', { ... });
-  return { success: true, token: "mock-token" };
-};
+import axios from './axiosInstance';
 
-export const registerDriver = async (data) => {
-  // data: {name, email, password, documentos...}
-  return { success: true };
-};
+/**
+ * Login del conductor.
+ * @param {string} email
+ * @param {string} password
+ * @returns {Promise<{token: string, user: object}>}
+ */
+export async function loginDriver(email, password) {
+  // Mock hasta backend
+  // return axios.post('/drivers/login', { email, password });
+  return { token: "mock-token", user: { email } };
+}
+
+/**
+ * Registro conductor.
+ * @param {object} data
+ * @returns {Promise<{ok: boolean}>}
+ */
+export async function registerDriver(data) {
+  return { ok: true };
+}

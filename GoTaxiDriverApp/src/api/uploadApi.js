@@ -1,4 +1,6 @@
-export const uploadDocument = async (fileUri, type) => {
-  // Aquí integrás el upload real cuando esté backend
-  return { success: true, url: fileUri };
-};
+import axios from './axiosInstance';
+
+export async function uploadDocument(fileUri, type) {
+  // Implementar upload real a futuro.
+  return { ok: true, url: fileUri };
+}
