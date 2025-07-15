@@ -1,14 +1,35 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
 import AuthHeader from '../../components/common/AuthHeader';
+import { useToast } from '../../components/common/Toast';
 
 export default function LoginScreen({ navigation }) {
+  const { showToast } = useToast();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const validateEmail = (value) => /\S+@\S+\.\S+/.test(value);
 
   const handleLogin = () => {
-    // TODO: Integrar login real con backend
-    // navigation.replace('Driver'); // Simula login exitoso
+    if (!email || !password) {
+      showToast('Completa todos los campos', '#d32f2f');
+      return;
+    }
+    if (!validateEmail(email)) {
+      showToast('Email inválido', '#d32f2f');
+      return;
+    }
+    if (password.length < 6) {
+      showToast('La contraseña debe tener al menos 6 caracteres', '#d32f2f');
+      return;
+    }
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      showToast('¡Login exitoso!');
+      // navigation.replace('Driver');
+    }, 1500);
   };
 
   return (
@@ -36,7 +57,9 @@ export default function LoginScreen({ navigation }) {
           <TouchableOpacity
             onPress={handleLogin}
             style={{ backgroundColor: '#007aff', padding: 12, borderRadius: 6, marginTop: 16 }}>
-            <Text style={{ color: '#fff', textAlign: 'center', fontWeight: 'bold' }}>Iniciar sesión</Text>
+            <Text style={{ color: '#fff', textAlign: 'center', fontWeight: 'bold' }}>
+              {loading ? 'Cargando...' : 'Iniciar sesión'}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate('Register')}

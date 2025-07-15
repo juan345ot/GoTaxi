@@ -1,29 +1,31 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, Alert, Linking } from 'react-native';
+import { useToast } from '../../components/common/Toast';
 
 const PASAJERO = {
   nombre: 'Romina López',
-  telefono: '+5492991234567', // cambia por el teléfono real cuando sea necesario
+  telefono: '+5492991234567',
   whatsapp: '+5492991234567',
   destino: 'Terminal',
   monto: 950,
 };
 
 export default function CurrentTripScreen({ navigation }) {
+  const { showToast } = useToast();
   const [pasajeroSubio, setPasajeroSubio] = useState(false);
   const [confirmarPago, setConfirmarPago] = useState(false);
 
   const handleSOS = () => {
-    Alert.alert('SOS', 'Se notificará a emergencias y tus contactos de confianza.');
+    showToast('SOS enviado. Emergencias y contactos avisados.', '#d32f2f');
   };
 
   const handleCompartir = () => {
-    Alert.alert('Compartir viaje', 'Función próxima: compartir ubicación en tiempo real.');
+    showToast('Función próxima: compartir ubicación en tiempo real', '#ffd600');
   };
 
   const handleConfirmarSubida = () => {
     setPasajeroSubio(true);
-    Alert.alert('¡Listo!', 'Ahora podés iniciar el viaje.');
+    showToast('¡Listo! Ahora podés iniciar el viaje.', '#10b981');
   };
 
   const handleTerminarViaje = () => {
@@ -31,17 +33,17 @@ export default function CurrentTripScreen({ navigation }) {
   };
 
   const handleConfirmarPago = () => {
-    Alert.alert('Pago confirmado', '¡Gracias por usar GoTaxi Driver!');
+    showToast('Pago confirmado', '#10b981');
     navigation.navigate('PassengerRatingScreen');
   };
 
-  // Llamada
   const llamarPasajero = () => {
+    showToast('Abriendo llamada...', '#007aff');
     Linking.openURL(`tel:${PASAJERO.telefono}`);
   };
 
-  // WhatsApp
   const mensajePasajero = () => {
+    showToast('Abriendo WhatsApp...', '#25d366');
     const msg = encodeURIComponent('¡Hola! Soy tu conductor de GoTaxi, ¿listo para el viaje?');
     Linking.openURL(`https://wa.me/${PASAJERO.whatsapp.replace('+', '')}?text=${msg}`);
   };

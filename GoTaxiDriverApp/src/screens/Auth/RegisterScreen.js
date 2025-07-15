@@ -1,29 +1,43 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from 'react-native';
 import AuthHeader from '../../components/common/AuthHeader';
 import UploadField from '../../components/common/UploadField';
+import { useToast } from '../../components/common/Toast';
 
 export default function RegisterScreen({ navigation }) {
+  const { showToast } = useToast();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  // Estados para los uploads
   const [auto, setAuto] = useState(null);
   const [carnet, setCarnet] = useState(null);
   const [seguro, setSeguro] = useState(null);
   const [vtv, setVtv] = useState(null);
   const [multas, setMultas] = useState(null);
   const [antecedentes, setAntecedentes] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  const validateEmail = (value) => /\S+@\S+\.\S+/.test(value);
 
   const handleRegister = () => {
     if (!name || !email || !password || !auto || !carnet || !seguro || !vtv || !multas || !antecedentes) {
-      Alert.alert('Completa todos los campos y documentos');
+      showToast('Completá todos los campos y documentos', '#d32f2f');
       return;
     }
-    // Aquí irá la lógica de registro con backend
-    Alert.alert('Registro exitoso', '¡Ahora espera la validación de tus documentos!');
-    // navigation.replace('Login');
+    if (!validateEmail(email)) {
+      showToast('Email inválido', '#d32f2f');
+      return;
+    }
+    if (password.length < 6) {
+      showToast('La contraseña debe tener al menos 6 caracteres', '#d32f2f');
+      return;
+    }
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      showToast('¡Registro exitoso! Esperá validación.', '#10b981');
+      // navigation.replace('Login');
+    }, 2000);
   };
 
   return (
@@ -66,7 +80,9 @@ export default function RegisterScreen({ navigation }) {
           <TouchableOpacity
             onPress={handleRegister}
             style={{ backgroundColor: '#007aff', padding: 12, borderRadius: 6, marginTop: 16 }}>
-            <Text style={{ color: '#fff', textAlign: 'center', fontWeight: 'bold' }}>Registrarse</Text>
+            <Text style={{ color: '#fff', textAlign: 'center', fontWeight: 'bold' }}>
+              {loading ? 'Cargando...' : 'Registrarse'}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => navigation.navigate('Login')}

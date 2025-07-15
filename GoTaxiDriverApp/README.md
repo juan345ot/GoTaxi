@@ -1,50 +1,59 @@
-# Welcome to your Expo app 👋
+# GoTaxi Driver App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+App profesional para conductores de GoTaxi (versión MVP).
 
-## Get started
+## Funcionalidades
 
-1. Install dependencies
+- Registro de conductor con subida de documentos y validación
+- Inicio de sesión seguro
+- Home con branding y estado de disponibilidad
+- Recepción, aceptación y rechazo de viajes
+- Penalización visual por rechazos
+- Flujo completo de viaje: inicio, SOS, compartir, confirmar subida, PIN de pago, calificación del pasajero
+- Historial avanzado de viajes
+- Chat de soporte
+- Perfil de conductor y documentación
+- Llamada y WhatsApp directo al pasajero
 
+## Instalación
+
+1. Cloná el repo y corré:
    ```bash
    npm install
-   ```
+   # o
+   yarn install
 
-2. Start the app
 
-   ```bash
-   npx expo start
-   ```
+---
 
-In the output, you'll find options to open the app in a
+## 7️⃣ **Opcional: Animaciones**
+Si querés sumar animaciones, te recomiendo usar [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) o [react-native-animatable](https://github.com/oblador/react-native-animatable). Pero podés dejarlo para después.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## **Checklist final**
 
-## Get a fresh project
-
-When you're ready, run:
+1. Agregá todos estos archivos y mejoras.
+2. Commit y push:
 
 ```bash
-npm run reset-project
-```
+git add .
+git commit -m "Mejoras pro: toasts, validaciones, feedback visual y README"
+git push origin main
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+---
 
-## Learn more
+## 7️⃣ **Opcional: Animaciones**
+Si querés sumar animaciones, te recomiendo usar [react-native-reanimated](https://docs.swmansion.com/react-native-reanimated/) o [react-native-animatable](https://github.com/oblador/react-native-animatable). Pero podés dejarlo para después.
 
-To learn more about developing your project with Expo, look at the following resources:
+---
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## **Checklist final**
 
-## Join the community
+1. Agregá todos estos archivos y mejoras.
+2. Commit y push:
 
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+```bash
+git add .
+git commit -m "Mejoras pro: toasts, validaciones, feedback visual y README"
+git push origin main
