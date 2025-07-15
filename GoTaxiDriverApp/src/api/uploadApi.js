@@ -1,6 +1,4 @@
-import axios from './axiosInstance';
-
 export async function uploadDocument(fileUri, type) {
-  // Implementar upload real a futuro.
+  // MOCK hasta tener backend
   return { ok: true, url: fileUri };
 }

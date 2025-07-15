@@ -23,28 +23,11 @@ export default function AuthHeader({ eslogan = '¡Conduce con GoTaxi y ganá má
 const styles = StyleSheet.create({
   container: { alignItems: 'center', marginTop: 14, marginBottom: 24 },
   row: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
-  goBox: {
-    backgroundColor: '#ffd600',
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    borderTopLeftRadius: 18,
-    borderBottomLeftRadius: 18,
-  },
+  goBox: { backgroundColor: '#ffd600', paddingVertical: 8, paddingHorizontal: 20, borderTopLeftRadius: 18, borderBottomLeftRadius: 18 },
   goText: { color: '#007aff', fontSize: 36, fontWeight: 'bold', letterSpacing: 2 },
-  taxiBox: {
-    backgroundColor: '#ffd600',
-    paddingVertical: 8,
-    paddingHorizontal: 26,
-  },
+  taxiBox: { backgroundColor: '#ffd600', paddingVertical: 8, paddingHorizontal: 26 },
   taxiText: { color: '#007aff', fontSize: 36, fontWeight: 'bold', letterSpacing: 2 },
-  driverBox: {
-    backgroundColor: '#ffd600',
-    paddingVertical: 8,
-    paddingHorizontal: 22,
-    borderTopRightRadius: 18,
-    borderBottomRightRadius: 18,
-    marginLeft: -4,
-  },
+  driverBox: { backgroundColor: '#ffd600', paddingVertical: 8, paddingHorizontal: 22, borderTopRightRadius: 18, borderBottomRightRadius: 18, marginLeft: -4 },
   driverText: { color: '#007aff', fontSize: 36, fontWeight: 'bold', letterSpacing: 2 },
   slogan: { marginTop: 5, fontSize: 16, fontStyle: 'italic', fontWeight: '600', color: '#555', textAlign: 'center' },
 });

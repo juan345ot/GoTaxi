@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import AuthNavigator from './AuthNavigator';
 import DriverNavigator from './DriverNavigator';
+import { useUser } from '../contexts/UserContext';
 
 export default function AppNavigator() {
-  // TODO: Reemplazar este estado por auth real
-  const [user, setUser] = useState(null);
-
+  const { user } = useUser();
   return (
     <NavigationContainer>
       {user ? <DriverNavigator /> : <AuthNavigator />}

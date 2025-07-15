@@ -8,7 +8,7 @@ const instance = axios.create({
 
 instance.interceptors.request.use(
   async config => {
-    // Podés agregar token desde storage/context aquí
+    // Agregá token global si hay login
     return config;
   },
   error => Promise.reject(error)

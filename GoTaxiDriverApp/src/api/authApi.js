@@ -7,8 +7,7 @@ import axios from './axiosInstance';
  * @returns {Promise<{token: string, user: object}>}
  */
 export async function loginDriver(email, password) {
-  // Mock hasta backend
-  // return axios.post('/drivers/login', { email, password });
+  // MOCK hasta el backend
   return { token: "mock-token", user: { email } };
 }
 
@@ -18,5 +17,6 @@ export async function loginDriver(email, password) {
  * @returns {Promise<{ok: boolean}>}
  */
 export async function registerDriver(data) {
+  // MOCK hasta backend
   return { ok: true };
 }
