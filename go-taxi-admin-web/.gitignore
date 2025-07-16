@@ -25,3 +25,6 @@ yarn-error.log*
 
 # Contentlayer
 .contentlayer
+.DS_Store
+.vscode
+.idea
