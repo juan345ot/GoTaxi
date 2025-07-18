@@ -1,99 +1,81 @@
 import axios from "./axiosInstance";
 
-export const getRates = async () => {
-  const { data } = await axios.get('/rates');
-  return data;
+/** Helper para GET */
+const apiGet = async (url, params = {}) => {
+  try {
+    const { data } = await axios.get(url, { params });
+    return { data };
+  } catch (error) {
+    return { error: error?.response?.data?.message || "Error al consultar tarifas" };
+  }
 };
 
-export const updateRates = async (rates) => {
-  const { data } = await axios.put('/rates', rates);
-  return data;
+/** Helper para POST */
+const apiPost = async (url, payload) => {
+  try {
+    const { data } = await axios.post(url, payload);
+    return { data };
+  } catch (error) {
+    return { error: error?.response?.data?.message || "Error al crear tarifa" };
+  }
 };
-export const createRate = async (rate) => {
-  const { data } = await axios.post('/rates', rate);
-  return data;
+
+/** Helper para PUT */
+const apiPut = async (url, payload) => {
+  try {
+    const { data } = await axios.put(url, payload);
+    return { data };
+  } catch (error) {
+    return { error: error?.response?.data?.message || "Error al actualizar tarifa" };
+  }
 };
-export const deleteRate = async (id) => {
-  const { data } = await axios.delete(`/rates/${id}`);
-  return data;
+
+/** Helper para DELETE */
+const apiDelete = async (url) => {
+  try {
+    const { data } = await axios.delete(url);
+    return { data };
+  } catch (error) {
+    return { error: error?.response?.data?.message || "Error al eliminar tarifa" };
+  }
 };
-export const getRateById = async (id) => {
-  const { data } = await axios.get(`/rates/${id}`);
-  return data;
-}
-export const updateRate = async (id, rate) => {
-  const { data } = await axios.put(`/rates/${id}`, rate);
-  return data;
-}
-export const getRatesByType = async (type) => {
-  const { data } = await axios.get(`/rates/type/${type}`);
-  return data;
-}
-export const getRatesByVehicleType = async (vehicleType) => {
-  const { data } = await axios.get(`/rates/vehicleType/${vehicleType}`);
-  return data;
-}
-export const getRatesByCompany = async (companyId) => {
-  const { data } = await axios.get(`/rates/company/${companyId}`);
-  return data;
-}
-export const getRatesByCompanyAndType = async (companyId, type) => {
-  const { data } = await axios.get(`/rates/company/${companyId}/type/${type}`);
-  return data;
-}
-export const getRatesByCompanyAndVehicleType = async (companyId, vehicleType) => {
-  const { data } = await axios.get(`/rates/company/${companyId}/vehicleType/${vehicleType}`);
-  return data;
-}
-export const getRatesByCompanyAndTypeAndVehicleType = async (companyId, type, vehicleType) => {
-  const { data } = await axios.get(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}`);
-  return data;
-}
-export const getRatesByCompanyAndTypeAndVehicleTypeAndId = async (companyId, type, vehicleType, id) => {
-  const { data } = await axios.get(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}`);
-  return data;
-}
-export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatus = async (companyId, type, vehicleType, id, status) => {
-  const { data } = await axios.get(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}`);
-  return data;
-}
-export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDate = async (companyId, type, vehicleType, id, status, date) => {
-  const { data } = await axios.get(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}`);
-  return data;
-}
-export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTime = async (companyId, type, vehicleType, id, status, date, time) => {
-  const { data } = await axios.get(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}`);
-  return data;
-}
-export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUser = async (companyId, type, vehicleType, id, status, date, time, userId) => {
-  const { data } = await axios.get(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}`);
-  return data;
-}
-export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUserAndDriver = async (companyId, type, vehicleType, id, status, date, time, userId, driverId) => {
-  const { data } = await axios.get(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}/driver/${driverId}`);
-  return data;
-}
-export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUserAndDriverAndVehicle = async (companyId, type, vehicleType, id, status, date, time, userId, driverId, vehicleId) => {
-  const { data } = await axios.get(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}/driver/${driverId}/vehicle/${vehicleId}`);
-  return data;
-}
-export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUserAndDriverAndVehicleAndLocation = async (companyId, type, vehicleType, id, status, date, time, userId, driverId, vehicleId, location) => {
-  const { data } = await axios.get(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}/driver/${driverId}/vehicle/${vehicleId}/location/${location}`);
-  return data;
-}
-export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUserAndDriverAndVehicleAndLocationAndPrice = async (companyId, type, vehicleType, id, status, date, time, userId, driverId, vehicleId, location, price) => {
-  const { data } = await axios.get(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}/driver/${driverId}/vehicle/${vehicleId}/location/${location}/price/${price}`);
-  return data;
-}
-export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUserAndDriverAndVehicleAndLocationAndPriceAndCurrency = async (companyId, type, vehicleType, id, status, date, time, userId, driverId, vehicleId, location, price, currency) => {
-  const { data } = await axios.get(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}/driver/${driverId}/vehicle/${vehicleId}/location/${location}/price/${price}/currency/${currency}`);
-  return data;
-}
-export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUserAndDriverAndVehicleAndLocationAndPriceAndCurrencyAndPaymentMethod = async (companyId, type, vehicleType, id, status, date, time, userId, driverId, vehicleId, location, price, currency, paymentMethod) => {
-  const { data } = await axios.get(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}/driver/${driverId}/vehicle/${vehicleId}/location/${location}/price/${price}/currency/${currency}/paymentMethod/${paymentMethod}`);
-  return data;
-}
-export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUserAndDriverAndVehicleAndLocationAndPriceAndCurrencyAndPaymentMethodAndDiscount = async (companyId, type, vehicleType, id, status, date, time, userId, driverId, vehicleId, location, price, currency, paymentMethod, discount) => {
-  const { data } = await axios.get(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}/driver/${driverId}/vehicle/${vehicleId}/location/${location}/price/${price}/currency/${currency}/paymentMethod/${paymentMethod}/discount/${discount}`);
-  return data;
-}
+
+// ============= FUNCIONES PRINCIPALES RATES =============
+
+export const getRates = (params = {}) => apiGet('/rates', params);
+export const updateRates = (rates) => apiPut('/rates', rates);
+export const createRate = (rate) => apiPost('/rates', rate);
+export const deleteRate = (id) => apiDelete(`/rates/${id}`);
+export const getRateById = (id) => apiGet(`/rates/${id}`);
+export const updateRate = (id, rate) => apiPut(`/rates/${id}`, rate);
+
+// ============= FILTROS Y BUSQUEDAS AVANZADAS =============
+
+export const getRatesByType = (type) => apiGet(`/rates/type/${type}`);
+export const getRatesByVehicleType = (vehicleType) => apiGet(`/rates/vehicleType/${vehicleType}`);
+export const getRatesByCompany = (companyId) => apiGet(`/rates/company/${companyId}`);
+export const getRatesByCompanyAndType = (companyId, type) => apiGet(`/rates/company/${companyId}/type/${type}`);
+export const getRatesByCompanyAndVehicleType = (companyId, vehicleType) => apiGet(`/rates/company/${companyId}/vehicleType/${vehicleType}`);
+export const getRatesByCompanyAndTypeAndVehicleType = (companyId, type, vehicleType) => apiGet(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}`);
+export const getRatesByCompanyAndTypeAndVehicleTypeAndId = (companyId, type, vehicleType, id) => apiGet(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}`);
+export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatus = (companyId, type, vehicleType, id, status) => apiGet(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}`);
+export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDate = (companyId, type, vehicleType, id, status, date) => apiGet(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}`);
+export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTime = (companyId, type, vehicleType, id, status, date, time) => apiGet(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}`);
+export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUser = (companyId, type, vehicleType, id, status, date, time, userId) => apiGet(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}`);
+export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUserAndDriver = (companyId, type, vehicleType, id, status, date, time, userId, driverId) => apiGet(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}/driver/${driverId}`);
+export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUserAndDriverAndVehicle = (companyId, type, vehicleType, id, status, date, time, userId, driverId, vehicleId) => apiGet(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}/driver/${driverId}/vehicle/${vehicleId}`);
+export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUserAndDriverAndVehicleAndLocation = (companyId, type, vehicleType, id, status, date, time, userId, driverId, vehicleId, location) => apiGet(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}/driver/${driverId}/vehicle/${vehicleId}/location/${location}`);
+export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUserAndDriverAndVehicleAndLocationAndPrice = (companyId, type, vehicleType, id, status, date, time, userId, driverId, vehicleId, location, price) => apiGet(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}/driver/${driverId}/vehicle/${vehicleId}/location/${location}/price/${price}`);
+export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUserAndDriverAndVehicleAndLocationAndPriceAndCurrency = (companyId, type, vehicleType, id, status, date, time, userId, driverId, vehicleId, location, price, currency) => apiGet(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}/driver/${driverId}/vehicle/${vehicleId}/location/${location}/price/${price}/currency/${currency}`);
+export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUserAndDriverAndVehicleAndLocationAndPriceAndCurrencyAndPaymentMethod = (companyId, type, vehicleType, id, status, date, time, userId, driverId, vehicleId, location, price, currency, paymentMethod) => apiGet(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}/driver/${driverId}/vehicle/${vehicleId}/location/${location}/price/${price}/currency/${currency}/paymentMethod/${paymentMethod}`);
+export const getRatesByCompanyAndTypeAndVehicleTypeAndIdAndStatusAndDateAndTimeAndUserAndDriverAndVehicleAndLocationAndPriceAndCurrencyAndPaymentMethodAndDiscount = (companyId, type, vehicleType, id, status, date, time, userId, driverId, vehicleId, location, price, currency, paymentMethod, discount) => apiGet(`/rates/company/${companyId}/type/${type}/vehicleType/${vehicleType}/id/${id}/status/${status}/date/${date}/time/${time}/user/${userId}/driver/${driverId}/vehicle/${vehicleId}/location/${location}/price/${price}/currency/${currency}/paymentMethod/${paymentMethod}/discount/${discount}`);
+
+/*
+// Ejemplo TEST UNITARIO (con Jest)
+import { getRates } from './ratesApi';
+test('getRates: debe devolver array o error', async () => {
+  const res = await getRates();
+  expect(res.data || res.error).toBeDefined();
+});
+*/
+

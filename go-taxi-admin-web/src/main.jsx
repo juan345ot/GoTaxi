@@ -5,6 +5,8 @@ import { AuthProvider } from "./contexts/AuthContext";
 import App from "./App";
 import "./index.css";
 
+// Si vas a usar algún provider global (ej: Theme, Toaster, QueryClientProvider), podés agregarlo acá.
+
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>

@@ -10,6 +10,24 @@ import ComplaintsManagement from "./components/Complaints/ComplaintsManagement";
 import Metrics from "./components/Dashboard/Metrics";
 import SupportChat from "./components/Dashboard/SupportChat";
 
+// Puedes crear este componente para error 404 custom
+function NotFound() {
+  return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="text-center">
+        <div className="text-6xl font-bold text-blue-600 mb-3">404</div>
+        <div className="text-xl font-semibold mb-2">Página no encontrada</div>
+        <a href="/" className="text-blue-700 underline">Ir al inicio</a>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * En el futuro podés agregar protección por roles:
+ *   if (!admin || !admin.roles.includes('superadmin')) return <Navigate to="/" />;
+ */
+
 export default function Router() {
   const { admin } = useAuth();
 
@@ -31,7 +49,8 @@ export default function Router() {
         <Route path="metrics" element={<Metrics />} />
         <Route path="support" element={<SupportChat />} />
       </Route>
-      <Route path="*" element={<Navigate to="/" />} />
+      {/* Página de error 404 profesional */}
+      <Route path="*" element={<NotFound />} />
     </Routes>
   );
 }

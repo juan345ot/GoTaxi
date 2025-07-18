@@ -1,115 +1,102 @@
 import axios from "./axiosInstance";
 
-export const getDrivers = async () => {
-  const { data } = await axios.get('/drivers');
-  return data;
+/** Helper para GET */
+const apiGet = async (url, params = {}) => {
+  try {
+    const { data } = await axios.get(url, { params });
+    return { data };
+  } catch (error) {
+    return { error: error?.response?.data?.message || "Error al consultar recurso" };
+  }
 };
 
-export const approveDriver = async (id, promo = false) => {
-  const { data } = await axios.put(`/drivers/${id}/approve`, { promo });
-  return data;
+/** Helper para POST */
+const apiPost = async (url, payload) => {
+  try {
+    const { data } = await axios.post(url, payload);
+    return { data };
+  } catch (error) {
+    return { error: error?.response?.data?.message || "Error al crear recurso" };
+  }
 };
 
-export const rejectDriver = async (id) => {
-  const { data } = await axios.put(`/drivers/${id}/reject`);
-  return data;
+/** Helper para PUT */
+const apiPut = async (url, payload) => {
+  try {
+    const { data } = await axios.put(url, payload);
+    return { data };
+  } catch (error) {
+    return { error: error?.response?.data?.message || "Error al actualizar recurso" };
+  }
 };
 
-export const updateDriverCommission = async (id, commission) => {
-  const { data } = await axios.put(`/drivers/${id}/commission`, { commission });
-  return data;
+/** Helper para DELETE */
+const apiDelete = async (url) => {
+  try {
+    const { data } = await axios.delete(url);
+    return { data };
+  } catch (error) {
+    return { error: error?.response?.data?.message || "Error al eliminar recurso" };
+  }
 };
 
-export const updateDriverStatus = async (id, status) => {
-  const { data } = await axios.put(`/drivers/${id}/status`, { status });
-  return data;
+// ============================
+// Métodos principales Drivers
+// ============================
+
+export const getDrivers = (params = {}) => apiGet("/drivers", params);
+
+export const approveDriver = (id, promo = false) => apiPut(`/drivers/${id}/approve`, { promo });
+export const rejectDriver = (id) => apiPut(`/drivers/${id}/reject`);
+export const updateDriverCommission = (id, commission) => apiPut(`/drivers/${id}/commission`, { commission });
+export const updateDriverStatus = (id, status) => apiPut(`/drivers/${id}/status`, { status });
+
+export const getDriverById = (id) => apiGet(`/drivers/${id}`);
+export const getDriverStats = (id) => apiGet(`/drivers/${id}/stats`);
+export const getDriverEarnings = (id) => apiGet(`/drivers/${id}/earnings`);
+export const getDriverTrips = (id) => apiGet(`/drivers/${id}/trips`);
+export const getDriverVehicles = (id) => apiGet(`/drivers/${id}/vehicles`);
+export const getDriverDocuments = (id) => apiGet(`/drivers/${id}/documents`);
+
+export const uploadDriverDocument = async (id, document) => {
+  if (!document) return { error: "Documento faltante" };
+  try {
+    const formData = new FormData();
+    formData.append('document', document);
+    const { data } = await axios.post(`/drivers/${id}/documents`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+    return { data };
+  } catch (error) {
+    return { error: error?.response?.data?.message || "Error al subir documento" };
+  }
 };
 
-export const getDriverById = async (id) => {
-  const { data } = await axios.get(`/drivers/${id}`);
-  return data;
-};
+export const deleteDriverDocument = (id, documentId) =>
+  apiDelete(`/drivers/${id}/documents/${documentId}`);
 
-export const getDriverStats = async (id) => {
-  const { data } = await axios.get(`/drivers/${id}/stats`);
-  return data;
-}   
-export const getDriverEarnings = async (id) => {
-  const { data } = await axios.get(`/drivers/${id}/earnings`);
-  return data;
-}
-export const getDriverTrips = async (id) => {
-  const { data } = await axios.get(`/drivers/${id}/trips`);
-  return data;
-}
-export const getDriverVehicles = async (id) => {
-  const { data } = await axios.get(`/drivers/${id}/vehicles`);
-  return data;
-} 
-export const getDriverDocuments = async (id) => {
-  const { data } = await axios.get(`/drivers/${id}/documents`);
-  return data;
-}
-export const uploadDriverDocument = async (id, document) => {   
-  const formData = new FormData();
-  formData.append('document', document);
-  const { data } = await axios.post(`/drivers/${id}/documents`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data'
-    }
-  });
-  return data;
-}
-export const deleteDriverDocument = async (id, documentId) => {
-  const { data } = await axios.delete(`/drivers/${id}/documents/${documentId}`);
-  return data;
-}
+export const getDriverRatings = (id) => apiGet(`/drivers/${id}/ratings`);
+export const getDriverReviews = (id) => apiGet(`/drivers/${id}/reviews`);
 
-export const getDriverRatings = async (id) => {
-  const { data } = await axios.get(`/drivers/${id}/ratings`);
-  return data;
-}   
+export const getDriverPromotions = (id) => apiGet(`/drivers/${id}/promotions`);
+export const createDriverPromotion = (id, promotion) => apiPost(`/drivers/${id}/promotions`, promotion);
+export const updateDriverPromotion = (id, promotionId, promotion) => apiPut(`/drivers/${id}/promotions/${promotionId}`, promotion);
+export const deleteDriverPromotion = (id, promotionId) => apiDelete(`/drivers/${id}/promotions/${promotionId}`);
 
-export const getDriverReviews = async (id) => {
-  const { data } = await axios.get(`/drivers/${id}/reviews`);
-  return data;
-}
+export const getDriverNotifications = (id) => apiGet(`/drivers/${id}/notifications`);
+export const markDriverNotificationAsRead = (id, notificationId) =>
+  apiPut(`/drivers/${id}/notifications/${notificationId}/read`);
+export const deleteDriverNotification = (id, notificationId) =>
+  apiDelete(`/drivers/${id}/notifications/${notificationId}`);
 
-export const getDriverPromotions = async (id) => {
-  const { data } = await axios.get(`/drivers/${id}/promotions`);
-  return data;
-}
+export const getDriverSettings = (id) => apiGet(`/drivers/${id}/settings`);
 
-export const createDriverPromotion = async (id, promotion) => {
-  const { data } = await axios.post(`/drivers/${id}/promotions`, promotion);
-  return data;
-}
+/*
+// Ejemplo TEST UNITARIO (con Jest)
+import { getDrivers } from './driversApi';
+test('getDrivers: debe devolver array', async () => {
+  const res = await getDrivers();
+  expect(Array.isArray(res.data)).toBe(true);
+});
+*/
 
-export const updateDriverPromotion = async (id, promotionId, promotion) => {
-  const { data } = await axios.put(`/drivers/${id}/promotions/${promotionId}`, promotion);
-  return data;
-}
-
-export const deleteDriverPromotion = async (id, promotionId) => {
-  const { data } = await axios.delete(`/drivers/${id}/promotions/${promotionId}`);
-  return data;
-}
-
-export const getDriverNotifications = async (id) => {
-  const { data } = await axios.get(`/drivers/${id}/notifications`);
-  return data;
-}
-
-export const markDriverNotificationAsRead = async (id, notificationId) => {
-  const { data } = await axios.put(`/drivers/${id}/notifications/${notificationId}/read`);
-  return data;
-}
-
-export const deleteDriverNotification = async (id, notificationId) => {
-  const { data } = await axios.delete(`/drivers/${id}/notifications/${notificationId}`);
-  return data;
-}
-export const getDriverSettings = async (id) => {
-  const { data } = await axios.get(`/drivers/${id}/settings`);
-  return data;
-}

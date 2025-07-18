@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ----------- CUSTOM GLOBAL STYLES ----------- */
+
+html, body {
+  @apply bg-gray-100 text-gray-900;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+/* Loader, toasts y accesibilidad extra */
+
+::-webkit-scrollbar {
+  width: 10px;
+  background: #e5e7eb;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 8px;
+}
+
+/* Focus para accesibilidad */
+:focus {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Ejemplo de clase utilitaria para animaciones (puedes ampliar) */
+.fade-in {
+  animation: fadeIn 0.5s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0 }
+  to   { opacity: 1 }
+}
+
+/* Puedes agregar aquí tus estilos personalizados */

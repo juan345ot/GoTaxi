@@ -1,23 +1,35 @@
 import { useState } from "react";
 import { updateDriverCommission } from "../../api/driversApi";
+import Loader from "../ui/Loader";
 
 export default function DriverDetails({ driver, onUpdate }) {
   const [editing, setEditing] = useState(false);
   const [commission, setCommission] = useState(driver.commission || 0);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState("");
+  const [error, setError] = useState("");
 
-  const handleEdit = () => setEditing(true);
+  const handleEdit = () => {
+    setMsg("");
+    setError("");
+    setEditing(true);
+  };
 
   const handleSave = async () => {
+    if (isNaN(commission) || commission < 0 || commission > 99) {
+      setError("Comisión inválida (0-99)");
+      return;
+    }
     setSaving(true);
     try {
-      await updateDriverCommission(driver.id, commission);
+      const res = await updateDriverCommission(driver.id, commission);
+      if (res.error) throw new Error(res.error);
       setMsg("Comisión actualizada");
       setEditing(false);
+      setError("");
       onUpdate && onUpdate(commission);
-    } catch {
-      setMsg("Error al actualizar comisión");
+    } catch (err) {
+      setError(err.message || "Error al actualizar comisión");
     }
     setSaving(false);
     setTimeout(() => setMsg(""), 2000);
@@ -40,18 +52,20 @@ export default function DriverDetails({ driver, onUpdate }) {
               value={commission}
               onChange={e => setCommission(Number(e.target.value))}
               min={0}
-              max={100}
+              max={99}
+              disabled={saving}
             />
             <button
               className="ml-2 px-2 py-1 bg-green-500 text-white rounded"
               onClick={handleSave}
               disabled={saving}
             >
-              {saving ? "Guardando..." : "Guardar"}
+              {saving ? <Loader size={4} /> : "Guardar"}
             </button>
             <button
               className="ml-2 px-2 py-1 bg-gray-300 text-black rounded"
               onClick={() => setEditing(false)}
+              disabled={saving}
             >
               Cancelar
             </button>
@@ -62,13 +76,15 @@ export default function DriverDetails({ driver, onUpdate }) {
             <button
               className="ml-2 px-2 py-1 bg-blue-500 text-white rounded"
               onClick={handleEdit}
+              disabled={saving}
             >
               Editar
             </button>
           </>
         )}
       </div>
-      {msg && <div className="mt-2 text-green-600">{msg}</div>}
+      {msg && <div className="mt-2 text-green-600 bg-green-100 rounded px-2 py-1">{msg}</div>}
+      {error && <div className="mt-2 text-red-600 bg-red-100 rounded px-2 py-1">{error}</div>}
     </div>
   );
 }
