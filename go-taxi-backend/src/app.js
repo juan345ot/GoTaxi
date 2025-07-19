@@ -43,9 +43,9 @@ app.get('/', (req, res) => {
   res.send('¡GoTaxi Backend corriendo!');
 });
 
-// Aquí luego importarás y usarás tus rutas, ej:
-// const authRoutes = require('./api/routes/authRoutes');
-// app.use('/api/auth', authRoutes);
+// Importar rutas de autenticación
+const authRoutes = require('./api/routes/authRoutes');
+app.use('/api/auth', authRoutes);
 
 // WebSocket para tracking en tiempo real (configura más adelante)
 const { createServer } = require('http');
