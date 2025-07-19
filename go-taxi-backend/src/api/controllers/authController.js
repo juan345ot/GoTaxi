@@ -1,9 +1,10 @@
 const User = require('../../models/User');
+const Driver = require('../../models/Driver');
+const Admin = require('../../models/Admin');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const ROLES = require('../../config/roles');
 
-// Helper para generar token
 const generateToken = (user) => {
   return jwt.sign(
     {
@@ -20,11 +21,10 @@ const generateToken = (user) => {
 
 exports.register = async (req, res) => {
   try {
-    const { nombre, apellido, email, password, role, telefono, licencia, auto } = req.body;
+    const { nombre, apellido, email, password, role, telefono, licencia, vehiculo } = req.body;
     if (!nombre || !apellido || !email || !password)
       return res.status(400).json({ message: 'Campos obligatorios faltantes' });
 
-    // No se permite registro de admin por usuarios normales
     if (role === ROLES.ADMIN)
       return res.status(403).json({ message: 'No puedes crear admins desde este endpoint' });
 
@@ -33,26 +33,34 @@ exports.register = async (req, res) => {
 
     const hash = await bcrypt.hash(password, 10);
 
-    const nuevo = new User({
+    const nuevoUsuario = new User({
       nombre,
       apellido,
       email,
       password: hash,
       role: role || ROLES.PASAJERO,
       telefono,
-      licencia: role === ROLES.CONDUCTOR ? licencia : undefined,
-      auto: role === ROLES.CONDUCTOR ? auto : undefined
     });
-    await nuevo.save();
+    await nuevoUsuario.save();
 
-    const token = generateToken(nuevo);
+    // Si es conductor, creamos Driver también
+    if (role === ROLES.CONDUCTOR) {
+      const newDriver = new Driver({
+        user: nuevoUsuario._id,
+        licencia,
+        vehiculo
+      });
+      await newDriver.save();
+    }
+
+    const token = generateToken(nuevoUsuario);
     res.status(201).json({
       user: {
-        id: nuevo._id,
-        nombre: nuevo.nombre,
-        apellido: nuevo.apellido,
-        email: nuevo.email,
-        role: nuevo.role
+        id: nuevoUsuario._id,
+        nombre: nuevoUsuario.nombre,
+        apellido: nuevoUsuario.apellido,
+        email: nuevoUsuario.email,
+        role: nuevoUsuario.role
       },
       token
     });
@@ -86,7 +94,7 @@ exports.login = async (req, res) => {
   }
 };
 
-// Crear admin solo por seed o desde panel admin. (Ejemplo, opcional)
+// Solo admins pueden crear otros admins
 exports.createAdmin = async (req, res) => {
   try {
     const { nombre, apellido, email, password } = req.body;
@@ -107,6 +115,9 @@ exports.createAdmin = async (req, res) => {
       activo: true
     });
     await nuevoAdmin.save();
+
+    const adminRef = new Admin({ user: nuevoAdmin._id });
+    await adminRef.save();
 
     res.status(201).json({ message: 'Admin creado', id: nuevoAdmin._id });
   } catch (err) {
