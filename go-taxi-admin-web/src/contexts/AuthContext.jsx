@@ -6,10 +6,15 @@ export const AuthContext = createContext();
 export function AuthProvider({ children }) {
   // Lee el admin desde localStorage o sessionStorage según lo último
   const getStoredAdmin = () => {
-    const l = localStorage.getItem("admin");
-    if (l) return JSON.parse(l);
-    const s = sessionStorage.getItem("admin");
-    if (s) return JSON.parse(s);
+    try {
+      const l = localStorage.getItem("admin");
+      if (l) return JSON.parse(l);
+      const s = sessionStorage.getItem("admin");
+      if (s) return JSON.parse(s);
+    } catch {
+      localStorage.removeItem("admin");
+      sessionStorage.removeItem("admin");
+    }
     return null;
   };
 
@@ -30,7 +35,6 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     if (admin) {
-      // Detecta si el token expiró (futuro: usar axiosInstance para logout global)
       storeAdmin(admin, admin.remember);
     } else {
       localStorage.removeItem("admin");
@@ -38,7 +42,6 @@ export function AuthProvider({ children }) {
     }
   }, [admin]);
 
-  // Login ahora retorna {data, error}
   const login = async (credentials) => {
     setIsLoading(true);
     setError(null);
@@ -48,7 +51,6 @@ export function AuthProvider({ children }) {
         setError(error);
         return { error };
       }
-      // Suponemos que data incluye roles y token
       setAdmin({ ...data, remember: credentials.remember });
       return { data };
     } finally {
