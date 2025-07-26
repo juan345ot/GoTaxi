@@ -23,4 +23,3 @@ const validateLogin = (data) => {
 };
 
 module.exports = { validateRegister, validateLogin };
- 
