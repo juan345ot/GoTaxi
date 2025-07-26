@@ -12,25 +12,33 @@
   "author": "Juan Scapellato",
   "license": "MIT",
   "dependencies": {
+    "axios": "^1.5.0",
     "bcryptjs": "^2.4.3",
+    "compression": "^1.7.4",
+    "connect-mongo": "^4.6.0",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "express-rate-limit": "^7.0.0",
     "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.0.0",
+    "express-session": "^1.17.3",
+    "express-validator": "^7.0.0",
     "helmet": "^7.0.0",
+    "joi": "^17.9.2",
     "jsonwebtoken": "^9.0.2",
+    "mercadopago": "^1.5.13",
     "mongoose": "^8.2.2",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
-    "ws": "^8.13.0",
-    "mercadopago": "^1.8.0",
-    "joi": "^17.9.2",
-    "nodemailer": "^6.9.13"
+    "nodemailer": "^6.9.13",
+    "uuid": "^9.0.0",
+    "winston": "^3.8.2",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "jest": "^29.7.0",
     "nodemon": "^3.0.3",
-    "supertest": "^6.4.2"
+    "supertest": "^6.3.3"
   }
 }

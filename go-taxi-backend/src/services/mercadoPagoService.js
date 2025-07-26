@@ -1,4 +1,3 @@
-// src/services/mercadoPagoService.js
 const mercadopago = require('mercadopago');
 const { MP_ACCESS_TOKEN } = require('../config/env');
 
@@ -22,7 +21,6 @@ exports.createPayment = async ({ monto, description, payer_email }) => {
   return await mercadopago.preferences.create(preference);
 };
 
-// (Opcional) obtener status de un pago
 exports.getPaymentStatus = async (paymentId) => {
   return await mercadopago.payment.findById(paymentId);
 };
