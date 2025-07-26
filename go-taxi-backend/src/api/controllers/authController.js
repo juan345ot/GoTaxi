@@ -4,6 +4,8 @@ const Admin = require('../../models/Admin');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const ROLES = require('../../config/roles');
+const { validateRegister, validateLogin } = require('../dtos/authDTO');
+const { logToFile } = require('../../utils/logger');
 
 const generateToken = (user) => {
   return jwt.sign(
@@ -21,9 +23,10 @@ const generateToken = (user) => {
 
 exports.register = async (req, res) => {
   try {
+    const { error } = validateRegister(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
     const { nombre, apellido, email, password, role, telefono, licencia, vehiculo } = req.body;
-    if (!nombre || !apellido || !email || !password)
-      return res.status(400).json({ message: 'Campos obligatorios faltantes' });
 
     if (role === ROLES.ADMIN)
       return res.status(403).json({ message: 'No puedes crear admins desde este endpoint' });
@@ -43,7 +46,6 @@ exports.register = async (req, res) => {
     });
     await nuevoUsuario.save();
 
-    // Si es conductor, creamos Driver también
     if (role === ROLES.CONDUCTOR) {
       const newDriver = new Driver({
         user: nuevoUsuario._id,
@@ -54,6 +56,7 @@ exports.register = async (req, res) => {
     }
 
     const token = generateToken(nuevoUsuario);
+    logToFile(`Nuevo registro: ${email} (${role || 'pasajero'})`);
     res.status(201).json({
       user: {
         id: nuevoUsuario._id,
@@ -65,12 +68,16 @@ exports.register = async (req, res) => {
       token
     });
   } catch (err) {
+    logToFile(`Error al registrar usuario: ${err.message}`);
     res.status(500).json({ message: 'Error al registrar usuario', error: err.message });
   }
 };
 
 exports.login = async (req, res) => {
   try {
+    const { error } = validateLogin(req.body);
+    if (error) return res.status(400).json({ message: error.details[0].message });
+
     const { email, password } = req.body;
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ message: 'Email o contraseña incorrectos' });
@@ -79,6 +86,7 @@ exports.login = async (req, res) => {
     if (!valid) return res.status(401).json({ message: 'Email o contraseña incorrectos' });
 
     const token = generateToken(user);
+    logToFile(`Login: ${email} (${user.role})`);
     res.json({
       user: {
         id: user._id,
@@ -90,11 +98,11 @@ exports.login = async (req, res) => {
       token
     });
   } catch (err) {
+    logToFile(`Error login: ${err.message}`);
     res.status(500).json({ message: 'Error al iniciar sesión', error: err.message });
   }
 };
 
-// Solo admins pueden crear otros admins
 exports.createAdmin = async (req, res) => {
   try {
     const { nombre, apellido, email, password } = req.body;
@@ -119,8 +127,10 @@ exports.createAdmin = async (req, res) => {
     const adminRef = new Admin({ user: nuevoAdmin._id });
     await adminRef.save();
 
+    logToFile(`Admin creado: ${email}`);
     res.status(201).json({ message: 'Admin creado', id: nuevoAdmin._id });
   } catch (err) {
+    logToFile(`Error al crear admin: ${err.message}`);
     res.status(500).json({ message: 'Error al crear admin', error: err.message });
   }
 };
