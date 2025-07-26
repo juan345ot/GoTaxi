@@ -3,7 +3,10 @@ const path = require('path');
 
 function logToFile(message) {
   const logPath = path.join(__dirname, '../logs/app.log');
-  fs.appendFileSync(logPath, `[${new Date().toISOString()}] ${message}\n`);
+  const logMsg = `[${new Date().toISOString()}] ${message}\n`;
+  fs.appendFile(logPath, logMsg, err => {
+    if (err) console.error('Error escribiendo log:', err);
+  });
 }
 
 module.exports = { logToFile };
