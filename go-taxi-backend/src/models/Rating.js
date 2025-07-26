@@ -8,6 +8,6 @@ const ratingSchema = new mongoose.Schema({
   comentario: String,
   autor: { type: String, enum: ['pasajero', 'conductor'], required: true },
   fecha: { type: Date, default: Date.now }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Rating', ratingSchema);

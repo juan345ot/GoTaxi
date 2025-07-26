@@ -11,7 +11,10 @@ const userSchema = new mongoose.Schema({
   telefono: { type: String },
   foto: { type: String },
   activo: { type: Boolean, default: true },
-  penalizaciones: [{ motivo: String, fecha: Date }]
+  penalizaciones: [{
+    motivo: String,
+    fecha: { type: Date, default: Date.now }
+  }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

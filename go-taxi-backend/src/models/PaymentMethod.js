@@ -5,6 +5,6 @@ const paymentMethodSchema = new mongoose.Schema({
   tipo: { type: String, enum: ['tarjeta', 'mercadopago'], required: true },
   datos: Object,
   activo: { type: Boolean, default: true }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('PaymentMethod', paymentMethodSchema);
