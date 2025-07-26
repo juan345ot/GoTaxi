@@ -1,8 +1,9 @@
 {
   "name": "go-taxi-backend",
   "version": "1.0.0",
-  "description": "Backend para GoTaxi - Express, MongoDB, JWT, WebSocket, Mercado Pago",
+  "description": "Backend profesional GoTaxi - Express, MongoDB, JWT, WebSocket, Mercado Pago",
   "main": "src/app.js",
+  "type": "commonjs",
   "scripts": {
     "start": "node src/app.js",
     "dev": "nodemon src/app.js",
