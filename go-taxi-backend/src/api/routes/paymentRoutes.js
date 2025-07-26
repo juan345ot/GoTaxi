@@ -3,10 +3,16 @@ const router = express.Router();
 const paymentController = require('../controllers/paymentController');
 const { verifyToken } = require('../../middlewares/auth');
 
-// Simulado: efectivo/tarjeta (no real)
+/**
+ * @route   POST /api/payments/simulado
+ * @desc    Pago simulado (efectivo/tarjeta)
+ */
 router.post('/simulado', verifyToken, paymentController.paySimulado);
 
-// Real: Mercado Pago
+/**
+ * @route   POST /api/payments/mercadopago
+ * @desc    Pago real Mercado Pago
+ */
 router.post('/mercadopago', verifyToken, paymentController.payMercadoPago);
 
 module.exports = router;
