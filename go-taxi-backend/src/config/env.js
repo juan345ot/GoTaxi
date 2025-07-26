@@ -8,5 +8,8 @@ module.exports = {
   ADMIN_EMAIL: process.env.ADMIN_EMAIL,
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD,
   MP_ACCESS_TOKEN: process.env.MP_ACCESS_TOKEN,
-  BASE_URL: process.env.BASE_URL || 'http://localhost:4000'
+  BASE_URL: process.env.BASE_URL || 'http://localhost:4000',
+  EMAIL_HOST: process.env.EMAIL_HOST,
+  EMAIL_USER: process.env.EMAIL_USER,
+  EMAIL_PASS: process.env.EMAIL_PASS
 };
