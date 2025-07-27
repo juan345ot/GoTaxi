@@ -1,6 +1,7 @@
 import axios from 'axios';
 import config from '../config';
 import { showToast } from '../utils/toast';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const http = axios.create({
   baseURL: config.API_URL,
@@ -20,12 +21,17 @@ http.interceptors.response.use(
   }
 );
 
-// Interceptor para agregar token si lo hubiese
+// Interceptor para agregar token real desde AsyncStorage (¡sincrónico!)
 http.interceptors.request.use(
   async (request) => {
-    // Token simulado (podés inyectar desde context)
-    const token = 'fake_token_go_taxi';
-    request.headers.Authorization = `Bearer ${token}`;
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (token) {
+        request.headers.Authorization = `Bearer ${token}`;
+      }
+    } catch (e) {
+      // No hay token, sigue sin auth
+    }
     return request;
   },
   (error) => Promise.reject(error)
