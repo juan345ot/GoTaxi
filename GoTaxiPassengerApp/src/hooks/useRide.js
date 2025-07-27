@@ -1,8 +1,10 @@
+// src/hooks/useRide.js
 import { useState } from 'react';
 import { showToast } from '../utils/toast';
+import * as rideApi from '../api/ride'; // Debes crear este archivo para consumir /api/rides de tu backend
 
 /**
- * Hook para gestionar viajes (solicitar, cancelar, seguir)
+ * Hook para gestionar viajes (solicitar, cancelar, seguir) REAL
  */
 export default function useRide() {
   const [rideData, setRideData] = useState(null);
@@ -10,44 +12,48 @@ export default function useRide() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const requestRide = async (origin, destination) => {
+  const requestRide = async (origin, destination, paymentMethod) => {
     setLoading(true);
     setError(null);
     try {
-      // Simulación de viaje solicitado
-      await new Promise((res) => setTimeout(res, 1000));
-      const mockRide = {
-        id: Date.now(),
-        origin,
-        destination,
-        driver: 'Juan M.',
-        vehicle: 'Toyota Etios Blanco',
-        status: 'camino',
-      };
-      setRideData(mockRide);
+      // Aquí va la llamada real a la API de tu backend
+      const newRide = await rideApi.requestRide({ origin, destination, paymentMethod });
+      setRideData(newRide);
       showToast('Viaje solicitado');
     } catch (err) {
       setError('Error al solicitar el viaje');
+      showToast('Error al solicitar el viaje');
     } finally {
       setLoading(false);
     }
   };
 
-  const trackCurrentRide = () => {
-    // Simula seguimiento
-    setTrackingInfo({
-      driverPosition: {
-        latitude: -34.602,
-        longitude: -58.384,
-      },
-      status: 'camino',
-    });
+  const trackCurrentRide = async (rideId) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const tracking = await rideApi.getTracking(rideId);
+      setTrackingInfo(tracking);
+    } catch (err) {
+      setError('Error al obtener tracking');
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const cancelRide = () => {
-    setRideData(null);
-    setTrackingInfo(null);
-    showToast('Viaje cancelado');
+  const cancelRide = async (rideId) => {
+    setLoading(true);
+    try {
+      await rideApi.cancelRide(rideId);
+      setRideData(null);
+      setTrackingInfo(null);
+      showToast('Viaje cancelado');
+    } catch (err) {
+      setError('Error al cancelar el viaje');
+      showToast('Error al cancelar el viaje');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return {
