@@ -47,13 +47,18 @@ export default function RegisterScreen({ navigation }) {
     return null;
   };
 
-  const handleRegister = () => {
+  const handleRegister = async () => {
     const error = validate();
     if (error) return showToast(error);
 
-    register(form.email, form.password); // Simulado
-    showToast('Registro exitoso');
-    navigation.navigate('Home');
+    try {
+      // Pasa todos los datos al register del contexto (debe mandarlos al backend)
+      await register(form);
+      showToast('Registro exitoso');
+      navigation.navigate('Login'); // Mejor práctica: llevar a login para que el usuario se autentique
+    } catch (err) {
+      // El error ya se muestra por showToast del context
+    }
   };
 
   const handleGoogleRegister = () => {

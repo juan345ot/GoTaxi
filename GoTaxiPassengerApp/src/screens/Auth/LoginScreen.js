@@ -12,11 +12,16 @@ export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!email || !password) {
       return showToast('Completá ambos campos');
     }
-    login(email, password);
+    try {
+      await login(email, password); // Esto ya va al backend real
+      // Si querés redirigir después de login exitoso, lo podés manejar con useEffect en el AuthContext.
+    } catch (e) {
+      // Error ya manejado en showToast del context
+    }
   };
 
   const handleGoogleLogin = () => {
