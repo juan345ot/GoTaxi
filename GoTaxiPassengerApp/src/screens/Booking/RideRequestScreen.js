@@ -4,9 +4,9 @@ import PrimaryButton from '../../components/common/PrimaryButton';
 import InputField from '../../components/common/InputField';
 import BookingConfirmationModal from '../../components/booking/BookingConfirmationModal';
 import PaymentMethodSelector from '../../components/booking/PaymentMethodSelector';
-import { LocationContext } from '../../contexts/LocationContext';
 import { showToast } from '../../utils/toast';
 import useMap from '../../hooks/useMap';
+import useRide from '../../hooks/useRide'; // 🚀 Nuevo hook real
 
 export default function RideRequestScreen({ navigation }) {
   const { location } = useMap();
@@ -15,10 +15,21 @@ export default function RideRequestScreen({ navigation }) {
   const [paymentMethod, setPaymentMethod] = useState('cash');
   const [showModal, setShowModal] = useState(false);
 
-  const handleConfirm = () => {
+  const { requestRide, loading, rideData } = useRide();
+
+  const handleConfirm = async () => {
     setShowModal(false);
-    showToast(`Viaje solicitado. Método: ${getPaymentLabel(paymentMethod)}`);
-    navigation.navigate('RideTracking', { origin, destination, paymentMethod });
+    try {
+      await requestRide(origin, destination, paymentMethod);
+      if (rideData) {
+        navigation.navigate('RideTracking', {
+          rideId: rideData._id,
+          ...rideData
+        });
+      }
+    } catch (e) {
+      showToast('No se pudo solicitar el viaje');
+    }
   };
 
   const handleRequestRide = () => {
@@ -28,15 +39,6 @@ export default function RideRequestScreen({ navigation }) {
     }
     setShowModal(true);
   };
-
-  function getPaymentLabel(method) {
-    switch (method) {
-      case 'cash': return 'Efectivo';
-      case 'card': return 'Tarjeta';
-      case 'mp': return 'Mercado Pago';
-      default: return 'Desconocido';
-    }
-  }
 
   return (
     <View style={styles.container}>
@@ -60,7 +62,7 @@ export default function RideRequestScreen({ navigation }) {
         onSelect={setPaymentMethod}
       />
 
-      <PrimaryButton title="Solicitar Viaje" onPress={handleRequestRide} icon="car" />
+      <PrimaryButton title="Solicitar Viaje" onPress={handleRequestRide} icon="car" loading={loading} />
 
       <BookingConfirmationModal
         visible={showModal}
@@ -68,7 +70,7 @@ export default function RideRequestScreen({ navigation }) {
         destination={destination}
         onConfirm={handleConfirm}
         onCancel={() => setShowModal(false)}
-        customConfirmText={`Confirmar (${getPaymentLabel(paymentMethod)})`}
+        customConfirmText={`Confirmar (${paymentMethod})`}
       />
     </View>
   );
