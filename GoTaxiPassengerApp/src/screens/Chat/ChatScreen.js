@@ -1,57 +1,50 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform, Text } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import ChatInput from '../../components/chat/ChatInput';
 import MessageBubble from '../../components/chat/MessageBubble';
 import { colors } from '../../styles/theme';
+import * as chatApi from '../../api/chat'; // 🚀 Nuevo servicio real
 
-const STORAGE_KEY = 'gotaxi_chat_messages';
-
-export default function ChatScreen() {
+export default function ChatScreen({ route }) {
+  const { rideId } = route.params || {};
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
   const listRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Cargar mensajes al iniciar
+  // 1. Cargar mensajes reales desde la API al iniciar
   useEffect(() => {
-    (async () => {
-      const stored = await AsyncStorage.getItem(STORAGE_KEY);
-      setMessages(stored ? JSON.parse(stored) : [
-        {
-          id: '1',
-          text: '¡Hola! Estoy en camino.',
-          time: new Date().toISOString(),
-          isOwn: false,
-        },
-        {
-          id: '2',
-          text: 'Perfecto, gracias!',
-          time: new Date().toISOString(),
-          isOwn: true,
-        },
-      ]);
-    })();
-  }, []);
+    let polling;
+    if (!rideId) return;
 
-  // Guardar mensajes al modificar
-  useEffect(() => {
-    AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
-  }, [messages]);
-
-  const handleSend = () => {
-    if (!newMessage.trim()) return;
-
-    const msg = {
-      id: Date.now().toString(),
-      text: newMessage.trim(),
-      time: new Date().toISOString(),
-      isOwn: true,
+    const loadMessages = async () => {
+      try {
+        const msgs = await chatApi.getMessages(rideId);
+        setMessages(msgs);
+      } catch {
+        setMessages([]);
+      }
     };
 
-    setMessages((prev) => [...prev, msg]);
-    setNewMessage('');
-    setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
+    loadMessages();
+    // Opcional: polling cada 4s si no usás WebSocket
+    polling = setInterval(loadMessages, 4000);
+    return () => clearInterval(polling);
+  }, [rideId]);
+
+  // 2. Enviar mensaje (POST a la API o vía socket)
+  const handleSend = async () => {
+    if (!newMessage.trim()) return;
+    try {
+      await chatApi.sendMessage(rideId, newMessage.trim());
+      setNewMessage('');
+      // Forzar reload (si no usás socket, con WebSocket no hace falta)
+      const msgs = await chatApi.getMessages(rideId);
+      setMessages(msgs);
+      setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100);
+    } catch {
+      // Manejo de error
+    }
   };
 
   return (
