@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { View, FlatList, StyleSheet, TextInput, Text, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, FlatList, StyleSheet, TextInput, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import TripItem from '../../components/booking/TripItem';
 import { colors } from '../../styles/theme';
-import { useHistory } from '../../contexts/HistoryContext';
+import * as rideApi from '../../api/ride'; // 🚀 Nuevo servicio real
 
 const PAYMENT_METHODS = [
   { label: 'Todos', value: '' },
@@ -12,20 +12,35 @@ const PAYMENT_METHODS = [
 ];
 
 export default function HistoryScreen() {
-  const { trips } = useHistory();
+  const [trips, setTrips] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState('');
   const [paymentFilter, setPaymentFilter] = useState('');
+
+  useEffect(() => {
+    let isMounted = true;
+    const fetchTrips = async () => {
+      try {
+        const data = await rideApi.getUserRides(); // 🚀 Trae todos los viajes del usuario autenticado
+        if (isMounted) setTrips(data);
+      } catch {
+        if (isMounted) setTrips([]);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+    fetchTrips();
+    return () => { isMounted = false; };
+  }, []);
 
   const filteredTrips = trips.filter(
     (trip) =>
       (trip.origin?.toLowerCase().includes(query.toLowerCase()) ||
         trip.destination?.toLowerCase().includes(query.toLowerCase())) &&
-      (paymentFilter ? trip.metodoPago === paymentFilter : true)
+      (paymentFilter ? trip.paymentMethod === paymentFilter : true)
   );
 
-  const renderItem = ({ item }) => (
-    <TripItem trip={item} />
-  );
+  const renderItem = ({ item }) => <TripItem trip={item} />;
 
   return (
     <View style={styles.container}>
@@ -60,10 +75,12 @@ export default function HistoryScreen() {
         ))}
       </View>
 
-      {filteredTrips.length > 0 ? (
+      {loading ? (
+        <ActivityIndicator style={{ marginTop: 40 }} size="large" color="#007aff" />
+      ) : filteredTrips.length > 0 ? (
         <FlatList
           data={filteredTrips}
-          keyExtractor={(item) => item.id}
+          keyExtractor={(item) => item._id}
           renderItem={renderItem}
           contentContainerStyle={styles.list}
         />
