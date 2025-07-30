@@ -7,11 +7,6 @@ export default function HomeScreen({ navigation }) {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <AuthHeader eslogan="¡Su taxi a un click de distancia!" />
-      <Image
-        source={require('../../../assets/images/taxi-banner.png')}
-        style={styles.banner}
-        resizeMode="contain"
-      />
       <Text style={styles.welcome}>
         Bienvenido a <Text style={styles.brand}>GoTaxi</Text>.<br />
         La manera más simple, rápida y segura de pedir un taxi en Argentina.

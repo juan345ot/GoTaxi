@@ -1,15 +1,15 @@
 import * as Localization from 'expo-localization';
-import i18n from 'i18n-js';
+import I18n from 'i18n-js'; // NOTA: Usa "I18n" mayúscula
 
 import es from './es';
 import en from './en';
 
-i18n.translations = {
+const i18n = new I18n({
   es,
   en,
-};
-
+});
 i18n.locale = Localization.locale;
-i18n.fallbacks = true;
+i18n.enableFallback = true;
+i18n.defaultLocale = 'es';
 
 export default i18n;
