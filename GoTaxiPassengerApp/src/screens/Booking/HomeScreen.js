@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, Text, Image, TouchableOpacity, ScrollView } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, ScrollView } from 'react-native';
 import AuthHeader from '../../components/auth/AuthHeader';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -8,8 +8,8 @@ export default function HomeScreen({ navigation }) {
     <ScrollView contentContainerStyle={styles.container}>
       <AuthHeader eslogan="¡Su taxi a un click de distancia!" />
       <Text style={styles.welcome}>
-        Bienvenido a <Text style={styles.brand}>GoTaxi</Text>.<br />
-        La manera más simple, rápida y segura de pedir un taxi en Argentina.
+        Bienvenido a <Text style={styles.brand}>GoTaxi</Text>.
+        {"\n"}La manera más simple, rápida y segura de pedir un taxi en Argentina.
       </Text>
       <TouchableOpacity
         style={styles.rideBtn}

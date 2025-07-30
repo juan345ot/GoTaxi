@@ -6,9 +6,11 @@ import InputField from '../../components/common/InputField';
 import PrimaryButton from '../../components/common/PrimaryButton';
 import { showToast } from '../../utils/toast';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 
-export default function RegisterScreen({ navigation }) {
+export default function RegisterScreen() {
   const { register, loading } = useAuth();
+  const navigation = useNavigation();
 
   const [form, setForm] = useState({
     name: '',
@@ -52,17 +54,17 @@ export default function RegisterScreen({ navigation }) {
     if (error) return showToast(error);
 
     try {
-      // Pasa todos los datos al register del contexto (debe mandarlos al backend)
       await register(form);
-      showToast('Registro exitoso');
-      navigation.navigate('Login'); // Mejor práctica: llevar a login para que el usuario se autentique
+      showToast('¡Registro exitoso!');
+      navigation.replace('Login'); // Lleva directo al login después de registrar
     } catch (err) {
-      // El error ya se muestra por showToast del context
+      // El error ya se muestra por showToast en AuthContext
     }
   };
 
   const handleGoogleRegister = () => {
-    showToast('Registro con Google (simulado)');
+    showToast('Registro con Google (pronto disponible)');
+    // Implementar Google register luego
   };
 
   return (
@@ -82,14 +84,14 @@ export default function RegisterScreen({ navigation }) {
         <InputField label="Provincia" value={form.province} onChangeText={(v) => handleChange('province', v)} icon="flag" />
         <InputField label="País" value={form.country} editable={false} icon="earth" />
 
-        <PrimaryButton title="Registrarme" loading={loading} onPress={handleRegister} icon="person-add" />
+        <PrimaryButton title="Registrarme" loading={loading} onPress={handleRegister} icon="person-add" disabled={loading} />
 
-        <TouchableOpacity style={styles.googleBtn} onPress={handleGoogleRegister}>
+        <TouchableOpacity style={styles.googleBtn} onPress={handleGoogleRegister} disabled={loading}>
           <Ionicons name="logo-google" size={22} color="#fff" style={{ marginRight: 7 }} />
           <Text style={styles.googleBtnText}>Registrarme con Google</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.linkBtn} onPress={() => navigation.navigate('Login')}>
+        <TouchableOpacity style={styles.linkBtn} onPress={() => navigation.navigate('Login')} disabled={loading}>
           <Text style={styles.linkBtnText}>
             ¿Ya tenés cuenta? <Text style={styles.linkBold}>Iniciar sesión</Text>
           </Text>
@@ -100,43 +102,13 @@ export default function RegisterScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+  // ...igual que antes...
   scroll: { flex: 1, backgroundColor: '#fff' },
   container: { padding: 16 },
-  card: {
-    backgroundColor: '#f7f7f7',
-    borderRadius: 20,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOpacity: 0.08,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 4,
-    marginBottom: 30,
-  },
-  googleBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#e94235',
-    paddingVertical: 10,
-    borderRadius: 8,
-    justifyContent: 'center',
-    marginBottom: 14,
-    marginTop: 6,
-  },
-  googleBtnText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 15,
-  },
-  linkBtn: {
-    alignItems: 'center',
-    marginTop: 8,
-  },
-  linkBtnText: {
-    color: '#333',
-    fontSize: 15,
-  },
-  linkBold: {
-    color: '#007aff',
-    fontWeight: 'bold',
-  },
+  card: { backgroundColor: '#f7f7f7', borderRadius: 20, padding: 24, shadowColor: '#000', shadowOpacity: 0.08, shadowOffset: { width: 0, height: 5 }, elevation: 4, marginBottom: 30 },
+  googleBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#e94235', paddingVertical: 10, borderRadius: 8, justifyContent: 'center', marginBottom: 14, marginTop: 6 },
+  googleBtnText: { color: '#fff', fontWeight: '700', fontSize: 15 },
+  linkBtn: { alignItems: 'center', marginTop: 8 },
+  linkBtnText: { color: '#333', fontSize: 15 },
+  linkBold: { color: '#007aff', fontWeight: 'bold' },
 });
