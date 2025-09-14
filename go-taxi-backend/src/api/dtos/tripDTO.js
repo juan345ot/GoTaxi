@@ -5,16 +5,18 @@ const validateCreateTrip = (data) => {
     origen: Joi.object({
       direccion: Joi.string().required(),
       lat: Joi.number().required(),
-      lng: Joi.number().required()
+      lng: Joi.number().required(),
     }).required(),
     destino: Joi.object({
       direccion: Joi.string().required(),
       lat: Joi.number().required(),
-      lng: Joi.number().required()
+      lng: Joi.number().required(),
     }).required(),
-    tarifa: Joi.number().required(),
-    distancia_km: Joi.number().required(),
-    duracion_min: Joi.number().required()
+    // La tarifa debe ser un número positivo. Permitir cero para viajes gratuitos/promocionales.
+    tarifa: Joi.number().min(0).required(),
+    // Distancia (km) y duración (minutos) deben ser positivos
+    distancia_km: Joi.number().positive().required(),
+    duracion_min: Joi.number().positive().required(),
   });
   return schema.validate(data);
 };
