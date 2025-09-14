@@ -12,9 +12,15 @@ router.get('/', verifyToken, permitRoles(ROLES.ADMIN), driverController.getAllDr
 
 /**
  * @route   GET /api/drivers/:id
- * @desc    Ver info de un conductor (usuario/conductor/admin)
+ * @desc    Ver info de un conductor (pasajero/conductor/admin)
  */
-router.get('/:id', verifyToken, driverController.getDriverById);
+// Restringimos el acceso a roles permitidos para mayor claridad.
+router.get(
+  '/:id',
+  verifyToken,
+  permitRoles(ROLES.PASAJERO, ROLES.CONDUCTOR, ROLES.ADMIN),
+  driverController.getDriverById,
+);
 
 /**
  * @route   PUT /api/drivers/:id/approve
