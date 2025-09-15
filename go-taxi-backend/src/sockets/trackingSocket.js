@@ -1,74 +1,103 @@
 const WebSocket = require('ws');
 const helpers = require('./socketHelpers');
+const { logToFile } = require('../utils/logger');
 
 /**
  * Inicializa el servidor WebSocket sobre tu HTTP server Express.
  * Permite tracking real-time y otros eventos por viaje o usuario.
- * 
+ *
  * Conexión: handshake inicial con mensaje { type: 'auth', userId, role, viajeId }
  */
 function initTrackingSocket(server) {
   const wss = new WebSocket.Server({ server });
 
   wss.on('connection', (ws, req) => {
+    // Log de conexión
+    logToFile(`Nueva conexión WebSocket desde ${req.socket.remoteAddress}`);
+
     ws.on('message', (data) => {
+      let msg;
       try {
-        const msg = JSON.parse(data);
+        msg = typeof data === 'string' ? JSON.parse(data) : data;
+      } catch (_e) {
+        helpers.safeSend(ws, { type: 'error', message: 'Formato de mensaje inválido' });
+        return;
+      }
 
-        // 1. Autenticación: registrar cliente
-        if (msg.type === 'auth') {
-          // { type: "auth", userId, role, viajeId }
-          helpers.registerClient(ws, msg);
-          ws.send(JSON.stringify({ type: 'auth', status: 'ok' }));
-          return;
-        }
-
-        // 2. Tracking ubicación (solo conductores)
-        if (msg.type === 'location') {
-          // { type: "location", viajeId, lat, lng }
-          // Requiere ws.userId y ws.viajeId ya registrados
-          if (ws.role === 'conductor' && ws.viajeId === msg.viajeId) {
-            helpers.emitToViaje(msg.viajeId, {
-              type: 'location',
-              conductorId: ws.userId,
-              lat: msg.lat,
-              lng: msg.lng
-            });
+      const { type } = msg;
+      switch (type) {
+        case 'auth': {
+          // Handshake inicial: se requiere userId y role
+          const { userId, role, viajeId } = msg;
+          if (!userId || !role) {
+            helpers.safeSend(ws, { type: 'error', message: 'Faltan datos de autenticación' });
+            return;
           }
+          helpers.registerClient(ws, { userId, role, viajeId });
+          helpers.safeSend(ws, { type: 'auth', status: 'ok' });
+          logToFile(`Cliente autenticado (userId=${userId}, role=${role}, viajeId=${viajeId})`);
           return;
         }
 
-        // 3. Cambios de estado de viaje (ejemplo)
-        if (msg.type === 'status') {
-          // { type: "status", viajeId, estado }
-          helpers.emitToViaje(msg.viajeId, {
-            type: 'status',
-            viajeId: msg.viajeId,
-            estado: msg.estado
+        case 'location': {
+          // { type: 'location', viajeId, lat, lng }
+          const { viajeId, lat, lng } = msg;
+          if (ws.role !== 'conductor') {
+            helpers.safeSend(ws, { type: 'error', message: 'No autorizado para enviar ubicación' });
+            return;
+          }
+          if (!viajeId || viajeId !== ws.viajeId || lat == null || lng == null) {
+            helpers.safeSend(ws, { type: 'error', message: 'Datos de ubicación incompletos' });
+            return;
+          }
+          helpers.emitToViaje(viajeId, {
+            type: 'location',
+            conductorId: ws.userId,
+            lat,
+            lng,
           });
           return;
         }
 
-        // 4. Botón SOS, alertas, etc.
-        if (msg.type === 'sos') {
-          helpers.emitToViaje(msg.viajeId, {
+        case 'status': {
+          // { type: 'status', viajeId, estado }
+          const { viajeId, estado } = msg;
+          if (!viajeId || !estado) {
+            helpers.safeSend(ws, { type: 'error', message: 'Datos de estado incompletos' });
+            return;
+          }
+          helpers.emitToViaje(viajeId, {
+            type: 'status',
+            viajeId,
+            estado,
+          });
+          return;
+        }
+
+        case 'sos': {
+          // { type: 'sos', viajeId, alerta }
+          const { viajeId, alerta } = msg;
+          if (!viajeId || !alerta) {
+            helpers.safeSend(ws, { type: 'error', message: 'Datos de SOS incompletos' });
+            return;
+          }
+          helpers.emitToViaje(viajeId, {
             type: 'sos',
             userId: ws.userId,
-            viajeId: msg.viajeId,
-            alerta: msg.alerta
+            viajeId,
+            alerta,
           });
           return;
         }
 
-        // Otros eventos custom...
-
-      } catch (err) {
-        ws.send(JSON.stringify({ type: 'error', message: 'Formato de mensaje inválido' }));
+        default:
+          helpers.safeSend(ws, { type: 'error', message: 'Tipo de mensaje no soportado' });
       }
     });
 
     ws.on('close', () => {
       helpers.unregisterClient(ws);
+      logToFile(`Cliente WebSocket desconectado (userId=${ws.userId || 'desconocido'})`);
     });
   });
 
