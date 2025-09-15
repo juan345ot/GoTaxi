@@ -6,7 +6,7 @@ const auditLogSchema = new mongoose.Schema({
   entidad: String,
   entidadId: String,
   detalles: Object,
-  fecha: { type: Date, default: Date.now }
+  fecha: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model('AuditLog', auditLogSchema);
