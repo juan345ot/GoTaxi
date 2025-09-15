@@ -1,11 +1,12 @@
 require('dotenv').config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const helmet = require('helmet');
 const path = require('path');
 
-// Middlewares PRO
-const cors = require('./middlewares/cors'); // Usá este si tenés cors.js, si no: require('cors')
+// Middlewares
+const cors = require('./middlewares/cors');
 const logger = require('./middlewares/logger');
 const rateLimit = require('./middlewares/rateLimit');
 const sanitize = require('./middlewares/sanitize');
@@ -24,9 +25,19 @@ app.use(rateLimit);
 // --- Carpeta de archivos subidos ---
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// --- Rutas REST principales ---
-app.get('/', (req, res) => res.send('🚖 GoTaxi Backend funcionando y seguro!'));
+// --- Healthcheck ---
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    ok: true,
+    service: 'go-taxi-backend',
+    env: process.env.NODE_ENV || 'development',
+  });
+});
 
+// --- Home simple ---
+app.get('/', (_req, res) => res.send('🚖 GoTaxi Backend operativo'));
+
+// --- Rutas REST principales ---
 app.use('/api/auth', require('./api/routes/authRoutes'));
 app.use('/api/users', require('./api/routes/userRoutes'));
 app.use('/api/drivers', require('./api/routes/driverRoutes'));
@@ -37,8 +48,8 @@ app.use('/api/payment-methods', require('./api/routes/paymentMethodRoutes'));
 app.use('/api/ratings', require('./api/routes/ratingRoutes'));
 app.use('/api/configs', require('./api/routes/configRoutes'));
 
-// --- Manejo de errores (rutas no encontradas) ---
-app.use((req, res, next) => {
+// --- 404 ---
+app.use((req, res) => {
   res.status(404).json({ message: 'Endpoint no encontrado' });
 });
 
@@ -46,27 +57,41 @@ app.use((req, res, next) => {
 app.use(errorHandler);
 
 // --- Conexión a MongoDB ---
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => console.log('🟢 MongoDB conectado!'))
-.catch((err) => {
-  console.error('🔴 Error conectando a MongoDB:', err.message);
-  process.exit(1);
-});
+if (mongoose.connection.readyState === 0 && process.env.MONGO_URI) {
+  mongoose
+    .connect(process.env.MONGO_URI)
+    .then(() => console.log('🟢 MongoDB conectado'))
+    .catch((err) => {
+      console.error('🔴 Error conectando a MongoDB:', err.message);
+      process.exit(1);
+    });
+}
 
-// --- WebSocket Server para tracking real-time ---
+// --- HTTP Server + WebSocket ---
 const { createServer } = require('http');
-const { initTrackingSocket } = require('./sockets/trackingSocket');
 const server = createServer(app);
 
-initTrackingSocket(server);
+function bootSockets(httpServer) {
+  try {
+    const { initTrackingSocket } = require('./sockets/trackingSocket');
+    initTrackingSocket(httpServer);
+  } catch (e) {
+    console.warn('⚠️ Sockets no inicializados:', e?.message || e);
+  }
+}
+
+// Inicializar sockets sólo si no estamos en entorno de pruebas
+if (process.env.NODE_ENV !== 'test') {
+  bootSockets(server);
+}
 
 // --- Arranque del servidor ---
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => {
-  console.log(`🚖 GoTaxi Backend escuchando en puerto ${PORT}`);
-});
+if (require.main === module) {
+  const PORT = process.env.PORT || 4000;
+  server.listen(PORT, () => {
+    console.log(`🚖 GoTaxi Backend escuchando en puerto ${PORT}`);
+  });
+}
 
+// Exportar la app para que Supertest/Jest la pueda importar sin levantar el servidor
 module.exports = app;
