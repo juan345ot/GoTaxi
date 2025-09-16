@@ -7,5 +7,5 @@ module.exports = {
   restoreMocks: true,
   clearMocks: true,
   resetMocks: true,
-  maxWorkers: 1 // estable con MongoMemory
+  maxWorkers: 1, // estable con MongoMemory
 };
