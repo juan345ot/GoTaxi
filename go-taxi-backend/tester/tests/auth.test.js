@@ -9,14 +9,15 @@ describe('Auth', () => {
   afterAll(async () => { await disconnect(); });
   beforeEach(async () => { await cleanDB(); });
 
-  it('Register -> Login -> Me', async () => {
+  it('Register -> Login -> Obtener perfil', async () => {
     const user = buildUser();
 
-    // Register
+    // Registro del usuario
     const reg = await getApp().post(endpoints.auth.register).send(user);
     expect([200, 201]).toContain(reg.status);
     expect(reg.body).toHaveProperty('user');
     expect(reg.body).toHaveProperty('token');
+    const userId = reg.body.user.id;
 
     // Login
     const log = await getApp().post(endpoints.auth.login).send({
@@ -27,12 +28,12 @@ describe('Auth', () => {
     expect(log.body).toHaveProperty('token');
     const token = log.body.token;
 
-    // Me
+    // Obtener el perfil con el ID devuelto en el registro
     const me = await getApp()
-      .get(endpoints.auth.me)
+      .get(`/api/users/${userId}`)
       .set('Authorization', `Bearer ${token}`);
     expect(me.status).toBe(200);
-    // Ajustá el campo según tu DTO de respuesta
+    // Debe devolver el email correcto
     expect(me.body.email || me.body.user?.email).toBe(user.email);
   });
 });
