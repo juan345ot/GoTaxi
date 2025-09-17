@@ -19,7 +19,12 @@ const Stack = createStackNavigator();
 export default function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="AuthLogin" component={LoginScreen} />
+       {/* 
++        Ajuste de rutas: se usa el nombre "Login" en lugar de "AuthLogin"
++        para coincidir con las constantes de ruta (ROUTES.LOGIN) y evitar 
++        errores al navegar a la pantalla de login.
++      */}
++     <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />
       <Stack.Screen name="Home" component={DrawerNavigator} />
       {/* --- Flujo de viajes --- */}
