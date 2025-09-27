@@ -1,7 +1,7 @@
 // src/hooks/useRide.js
 import { useState } from 'react';
 import { showToast } from '../utils/toast';
-import * as rideApi from '../api/ride'; // Debes crear este archivo para consumir /api/rides de tu backend
+import * as rideApi from '../api/ride'; // API para consumir /api/trips del backend
 
 /**
  * Hook para gestionar viajes (solicitar, cancelar, seguir) REAL
