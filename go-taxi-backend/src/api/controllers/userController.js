@@ -19,6 +19,7 @@ exports.getAllUsers = async (req, res, next) => {
 
 exports.getCurrentUser = async (req, res, next) => {
   try {
+    logToFile(`getCurrentUser called with user: ${JSON.stringify(req.user)}`);
     const user = await User.findById(req.user.id).select('-password');
     if (!user) {
       const errObj = new Error('Usuario no encontrado');
@@ -26,6 +27,7 @@ exports.getCurrentUser = async (req, res, next) => {
       errObj.code = 'USER_NOT_FOUND';
       return next(errObj);
     }
+    logToFile(`getCurrentUser found user: ${user.email}`);
     return res.json(user);
   } catch (err) {
     logToFile(`Error getCurrentUser: ${err.message}`);
