@@ -1,25 +1,41 @@
-export const isValidEmail = (email) =>
-  /^\S+@\S+\.\S+$/.test(email.toLowerCase());
+const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-export const isValidPassword = (password) => password.length >= 6;
-
-export const isValidName = (name) => name.trim().length >= 2;
-
-export const isFieldFilled = (value) => value && value.trim() !== '';
-
-export const validateLogin = ({ email, password }) => {
-  if (!isFieldFilled(email) || !isFieldFilled(password)) return 'Todos los campos son obligatorios';
-  if (!isValidEmail(email)) return 'El email no es válido';
-  if (!isValidPassword(password)) return 'La contraseña debe tener al menos 6 caracteres';
-  return null;
-};
-
-export const validateRegister = ({ email, password, name }) => {
-  if (!isFieldFilled(email) || !isFieldFilled(password) || !isFieldFilled(name)) {
-    return 'Todos los campos son obligatorios';
+export function required(value, field = 'Campo') {
+  if (value === undefined || value === null || String(value).trim() === '') {
+    return `${field} es obligatorio`;
   }
-  if (!isValidName(name)) return 'El nombre es demasiado corto';
-  if (!isValidEmail(email)) return 'El email no es válido';
-  if (!isValidPassword(password)) return 'La contraseña debe tener al menos 6 caracteres';
   return null;
-};
+}
+
+export function isEmail(value) {
+  if (!emailRegex.test(String(value).trim())) {
+    return 'Email inválido';
+  }
+  return null;
+}
+
+export function minLength(value, len, field = 'Campo') {
+  if (String(value).length < len) {
+    return `${field} debe tener al menos ${len} caracteres`;
+  }
+  return null;
+}
+
+export function validateRegister({ name, email, password }) {
+  return (
+    required(name, 'Nombre') ||
+    required(email, 'Email') ||
+    isEmail(email) ||
+    required(password, 'Contraseña') ||
+    minLength(password, 6, 'Contraseña')
+  );
+}
+
+export function validateLogin({ email, password }) {
+  return (
+    required(email, 'Email') ||
+    isEmail(email) ||
+    required(password, 'Contraseña') ||
+    minLength(password, 6, 'Contraseña')
+  );
+}

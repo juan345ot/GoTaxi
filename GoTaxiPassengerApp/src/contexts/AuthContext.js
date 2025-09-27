@@ -1,64 +1,76 @@
 import React, { createContext, useState, useEffect } from 'react';
-import * as authApi from '../api/auth'; // Debe existir este archivo con login/register/profile usando httpClient.js
+import * as authApi from '../api/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { showToast } from '../utils/toast';
 
-export const AuthContext = createContext();
+export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Mantener sesión con JWT
+  // hidratar sesión al iniciar la app
   useEffect(() => {
-    const loadSession = async () => {
-      const savedToken = await AsyncStorage.getItem('token');
-      if (savedToken) {
-        try {
-          const userData = await authApi.getProfile(savedToken);
-          setUser(userData);
-        } catch (e) {
-          setUser(null);
-          await AsyncStorage.removeItem('token');
-        }
+    (async () => {
+      try {
+        const token = await AsyncStorage.getItem('token');
+        if (!token) return;
+        const me = await authApi.profile();
+        setUser(me?.user || me);
+      } catch (e) {
+        await AsyncStorage.removeItem('token');
+        setUser(null);
       }
-    };
-    loadSession();
+    })();
   }, []);
 
   const login = async (email, password) => {
     setLoading(true);
     try {
-      const data = await authApi.login(email, password);
-      await AsyncStorage.setItem('token', data.token);
-      setUser(data.user);
-      showToast('Sesión iniciada');
-    } catch (err) {
-      showToast('Error al iniciar sesión');
-      throw err;
+      const res = await authApi.login(email, password);
+      const token = res?.token;
+      const loggedUser = res?.user;
+      if (token) await AsyncStorage.setItem('token', token);
+      if (loggedUser) setUser(loggedUser);
+      else {
+        const me = await authApi.profile();
+        setUser(me?.user || me);
+      }
+      showToast('¡Inicio de sesión exitoso!');
+      return true;
+    } catch (e) {
+      const msg =
+        e?.response?.data?.message ||
+        e?.message ||
+        'No se pudo iniciar sesión';
+      showToast(msg);
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
-  const register = async (formData) => {
+  const register = async (payload) => {
     setLoading(true);
     try {
-      const data = await authApi.register(formData);
-      await AsyncStorage.setItem('token', data.token);
-      setUser(data.user);
-      showToast('Cuenta creada');
-    } catch (err) {
-      showToast('Error al registrarse');
-      throw err;
+      const res = await authApi.register(payload);
+      showToast(res?.message || 'Registro exitoso');
+      return true;
+    } catch (e) {
+      const msg =
+        e?.response?.data?.message ||
+        e?.message ||
+        'No se pudo registrar';
+      showToast(msg);
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
   const logout = async () => {
-    setUser(null);
     await AsyncStorage.removeItem('token');
+    setUser(null);
     showToast('Sesión cerrada');
   };
 

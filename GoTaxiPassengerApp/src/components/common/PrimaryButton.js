@@ -1,40 +1,38 @@
 import React from 'react';
-import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { TouchableOpacity, Text, ActivityIndicator, StyleSheet } from 'react-native';
 
-export default function PrimaryButton({ title, onPress, disabled = false, style, accessibilityLabel }) {
+export default function PrimaryButton({ title, onPress, disabled, loading, style, textStyle }) {
+  const isDisabled = disabled || loading;
   return (
     <TouchableOpacity
-      style={[styles.button, disabled && styles.disabled, style]}
+      style={[styles.btn, isDisabled ? styles.btnDisabled : null, style]}
       onPress={onPress}
-      activeOpacity={0.82}
-      disabled={disabled}
-      accessibilityLabel={accessibilityLabel || title}
-      accessibilityRole="button"
+      disabled={isDisabled}
+      activeOpacity={0.8}
+      testID="primary-button"
     >
-      <Text style={styles.text}>{title}</Text>
+      {loading ? (
+        <ActivityIndicator color="#fff" />
+      ) : (
+        <Text style={[styles.text, textStyle]}>{title}</Text>
+      )}
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
-  button: {
-    backgroundColor: '#007aff',
-    borderRadius: 8,
-    minHeight: 48,
-    justifyContent: 'center',
+  btn: {
+    backgroundColor: '#111827',
+    paddingVertical: 14,
+    borderRadius: 10,
     alignItems: 'center',
-    paddingVertical: 13,
-    paddingHorizontal: 34,
-    elevation: 2,
+  },
+  btnDisabled: {
+    opacity: 0.6,
   },
   text: {
     color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
-  },
-  disabled: {
-    backgroundColor: '#a8c7fa',
-    opacity: 0.7,
+    fontWeight: '600',
+    fontSize: 16,
   },
 });

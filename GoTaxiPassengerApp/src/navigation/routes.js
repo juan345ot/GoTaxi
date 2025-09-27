@@ -1,3 +1,7 @@
+/**
+ * Define todos los nombres de rutas usados en el proyecto.
+ * Utiliza estas constantes para evitar desalineaciones.
+ */
 export const ROUTES = {
   LOGIN: 'Login',
   REGISTER: 'Register',

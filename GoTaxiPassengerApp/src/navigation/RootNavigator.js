@@ -2,25 +2,22 @@ import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ROUTES } from './routes';
 
-// Auth
+// Importa las pantallas necesarias
 import LoginScreen from '../screens/Auth/LoginScreen';
 import RegisterScreen from '../screens/Auth/RegisterScreen';
-
-// App
 import DrawerNavigator from './DrawerNavigator';
-
-// Booking
 import RideRequestScreen from '../screens/Booking/RideRequestScreen';
 import RideTrackingScreen from '../screens/Booking/RideTrackingScreen';
 import TripSummaryScreen from '../screens/Booking/TripSummaryScreen';
 import PaymentMethodScreen from '../screens/Booking/PaymentMethodScreen';
 import RateRideScreen from '../screens/Booking/RateRideScreen';
-
-// Soporte
 import SupportScreen from '../screens/Support/SupportScreen';
 
 const Stack = createNativeStackNavigator();
 
+/**
+ * Navegador raíz de la aplicación. Define el flujo de auth, home y booking.
+ */
 export default function RootNavigator() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
@@ -28,7 +25,7 @@ export default function RootNavigator() {
       <Stack.Screen name={ROUTES.LOGIN} component={LoginScreen} />
       <Stack.Screen name={ROUTES.REGISTER} component={RegisterScreen} />
 
-      {/* App (drawer/tab) */}
+      {/* Drawer principal */}
       <Stack.Screen name={ROUTES.HOME} component={DrawerNavigator} />
 
       {/* Booking */}

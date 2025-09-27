@@ -1,14 +1,21 @@
 import React from 'react';
 import { View, TextInput, Text, StyleSheet } from 'react-native';
 
-export default function InputField({ label, value, onChangeText, placeholder, secureTextEntry, keyboardType, style, ...props }) {
+export default function InputField({
+  label,
+  value,
+  onChangeText,
+  placeholder,
+  secureTextEntry,
+  keyboardType = 'default',
+  autoCapitalize = 'none',
+  autoCorrect = false,
+  containerStyle,
+  ...rest
+}) {
   return (
-    <View style={[styles.container, style]}>
-      {label ? (
-        <Text style={styles.label} accessibilityLabel={label}>
-          {label}
-        </Text>
-      ) : null}
+    <View style={[styles.container, containerStyle]}>
+      {label ? <Text style={styles.label}>{label}</Text> : null}
       <TextInput
         style={styles.input}
         value={value}
@@ -16,11 +23,9 @@ export default function InputField({ label, value, onChangeText, placeholder, se
         placeholder={placeholder}
         secureTextEntry={secureTextEntry}
         keyboardType={keyboardType}
-        placeholderTextColor="#999"
-        autoCapitalize="none"
-        accessible
-        accessibilityLabel={label || placeholder}
-        {...props}
+        autoCapitalize={autoCapitalize}
+        autoCorrect={autoCorrect}
+        {...rest}
       />
     </View>
   );
@@ -28,22 +33,13 @@ export default function InputField({ label, value, onChangeText, placeholder, se
 
 const styles = StyleSheet.create({
   container: { marginBottom: 14 },
-  label: {
-    marginBottom: 5,
-    fontSize: 16,
-    color: '#333',
-    fontWeight: '600',
-    letterSpacing: 0.2,
-  },
+  label: { marginBottom: 6, color: '#374151' },
   input: {
-    borderWidth: 1.3,
-    borderColor: '#e0e0e0',
-    borderRadius: 7,
-    paddingHorizontal: 13,
-    paddingVertical: 10,
-    fontSize: 17,
-    color: '#222',
+    borderWidth: 1,
+    borderColor: '#D1D5DB',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
     backgroundColor: '#fff',
-    minHeight: 48,
   },
 });
