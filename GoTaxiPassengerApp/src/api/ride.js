@@ -2,13 +2,24 @@ import http from './httpClient';
 
 // Solicitar viaje: POST /api/trips
 export async function requestRide(origin, destination, paymentMethod) {
+  // Generar coordenadas simuladas para origen y destino
+  const generateCoordinates = () => ({
+    lat: -34.6037 + (Math.random() - 0.5) * 0.1, // Buenos Aires + variación
+    lng: -58.3816 + (Math.random() - 0.5) * 0.1
+  });
+
   const res = await http.post('/trips', {
     origen: {
-      direccion: origin
+      direccion: origin,
+      ...generateCoordinates()
     },
     destino: {
-      direccion: destination
+      direccion: destination,
+      ...generateCoordinates()
     },
+    tarifa: 1500, // Tarifa base simulada
+    distancia_km: 5.2, // Distancia simulada
+    duracion_min: 15, // Duración simulada
     metodoPago: paymentMethod,
   });
   return res.data; // Info del viaje creado
