@@ -12,4 +12,22 @@ export default {
   logout: 'Logout',
   profile: 'Profile',
   history: 'History',
+  // Translations for RideTrackingScreen
+  taxi_on_the_way: 'Driver on the way',
+  trip_in_progress: 'Trip in progress',
+  trip_arrived_title: 'We arrived!',
+  trip_cancelled_title: 'Trip cancelled',
+  cancel_trip_btn: 'Cancel trip',
+  cancel_warning_dialog: 'Are you sure you want to cancel the trip? A $500 fine will be applied.',
+  no: 'No',
+  yes_cancel: 'Yes, cancel',
+  // Translations for TripSummaryScreen
+  from: 'From',
+  to: 'To',
+  distance: 'Distance',
+  duration: 'Duration',
+  total_amount: 'Total',
+  cancel_warning: 'A $500 fine was applied for late cancellation.',
+  pay_methods_btn: 'Payment methods',
+  problem_btn: 'Report problem',
 };

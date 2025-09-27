@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation, Platform, UI
 import { Ionicons } from '@expo/vector-icons';
 import RatingStars from '../common/RatingStars';
 
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
+// Solo habilitar LayoutAnimation en Android y si no es la Nueva Arquitectura
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental && !global.__turboModuleProxy) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 

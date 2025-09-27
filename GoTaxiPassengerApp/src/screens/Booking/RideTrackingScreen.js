@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { View, StyleSheet, Text, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
 import TaxiMap from '../../components/map/TaxiMap';
 import DriverInfoCard from '../../components/booking/DriverInfoCard';
-import { t } from '../../translations';
+import i18n from '../../translations';
 import * as rideApi from '../../api/ride';
 
 export default function RideTrackingScreen({ route, navigation }) {
@@ -59,11 +59,11 @@ export default function RideTrackingScreen({ route, navigation }) {
       <View style={styles.infoBox}>
         <DriverInfoCard driver={driver} vehicle={vehicle} />
         <Text style={styles.estado}>
-          {status === 'requested' && t('taxi_on_the_way')}
-          {status === 'accepted' && t('taxi_on_the_way')}
-          {status === 'in_progress' && t('trip_in_progress')}
-          {status === 'completed' && t('trip_arrived_title')}
-          {status === 'cancelled' && t('trip_cancelled_title')}
+          {status === 'requested' && i18n.t('taxi_on_the_way')}
+          {status === 'accepted' && i18n.t('taxi_on_the_way')}
+          {status === 'in_progress' && i18n.t('trip_in_progress')}
+          {status === 'completed' && i18n.t('trip_arrived_title')}
+          {status === 'cancelled' && i18n.t('trip_cancelled_title')}
         </Text>
       </View>
       {/* Aquí van los botones SOS, Compartir, Cancelar, etc. */}
@@ -71,12 +71,12 @@ export default function RideTrackingScreen({ route, navigation }) {
         style={styles.cancelBtn}
         onPress={() => {
           Alert.alert(
-            t('cancel_trip_btn'),
-            t('cancel_warning_dialog', { fine: 500 }),
+            i18n.t('cancel_trip_btn'),
+            i18n.t('cancel_warning_dialog', { fine: 500 }),
             [
-              { text: t('no'), style: 'cancel' },
+              { text: i18n.t('no'), style: 'cancel' },
               {
-                text: t('yes_cancel'),
+                text: i18n.t('yes_cancel'),
                 style: 'destructive',
                 onPress: async () => {
                   await rideApi.cancelRide(rideId);
@@ -87,7 +87,7 @@ export default function RideTrackingScreen({ route, navigation }) {
           );
         }}
       >
-        <Text style={styles.cancelBtnText}>{t('cancel_trip_btn')}</Text>
+        <Text style={styles.cancelBtnText}>{i18n.t('cancel_trip_btn')}</Text>
       </TouchableOpacity>
     </View>
   );

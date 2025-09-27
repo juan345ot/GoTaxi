@@ -12,4 +12,22 @@ export default {
   logout: 'Cerrar sesión',
   profile: 'Perfil',
   history: 'Historial',
+  // Traducciones para RideTrackingScreen
+  taxi_on_the_way: 'Conductor en camino',
+  trip_in_progress: 'Viaje en progreso',
+  trip_arrived_title: '¡Llegamos!',
+  trip_cancelled_title: 'Viaje cancelado',
+  cancel_trip_btn: 'Cancelar viaje',
+  cancel_warning_dialog: '¿Estás seguro de cancelar el viaje? Se aplicará una multa de $500.',
+  no: 'No',
+  yes_cancel: 'Sí, cancelar',
+  // Traducciones para TripSummaryScreen
+  from: 'Desde',
+  to: 'Hasta',
+  distance: 'Distancia',
+  duration: 'Duración',
+  total_amount: 'Total',
+  cancel_warning: 'Se aplicó una multa de $500 por cancelación tardía.',
+  pay_methods_btn: 'Métodos de pago',
+  problem_btn: 'Reportar problema',
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { t } from '../../translations';
+import i18n from '../../translations';
 
 export default function TripSummaryScreen({ route, navigation }) {
   const {
@@ -19,19 +19,19 @@ export default function TripSummaryScreen({ route, navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{cancelado ? t('trip_cancelled_title') : t('trip_arrived_title')}</Text>
+      <Text style={styles.title}>{cancelado ? i18n.t('trip_cancelled_title') : i18n.t('trip_arrived_title')}</Text>
       <View style={styles.section}>
-        <Text style={styles.label}>{t('from')}: <Text style={styles.value}>{origin}</Text></Text>
-        <Text style={styles.label}>{t('to')}: <Text style={styles.value}>{destination}</Text></Text>
-        <Text style={styles.label}>{t('distance')}: <Text style={styles.value}>{distance} m</Text></Text>
-        <Text style={styles.label}>{t('duration')}: <Text style={styles.value}>{duration} min</Text></Text>
-        <Text style={styles.label}>{t('total_amount')}: <Text style={cancelado ? styles.importeMulta : styles.importe}>
+        <Text style={styles.label}>{i18n.t('from')}: <Text style={styles.value}>{origin}</Text></Text>
+        <Text style={styles.label}>{i18n.t('to')}: <Text style={styles.value}>{destination}</Text></Text>
+        <Text style={styles.label}>{i18n.t('distance')}: <Text style={styles.value}>{distance} m</Text></Text>
+        <Text style={styles.label}>{i18n.t('duration')}: <Text style={styles.value}>{duration} min</Text></Text>
+        <Text style={styles.label}>{i18n.t('total_amount')}: <Text style={cancelado ? styles.importeMulta : styles.importe}>
           ${cancelado ? multa : total}
         </Text></Text>
         {cancelado ? (
           <View style={styles.alertBox}>
             <Ionicons name="alert-circle" size={20} color="#e53935" style={{ marginRight: 7 }} />
-            <Text style={styles.multaDetalle}>{t('cancel_warning', { fine: multa })}</Text>
+            <Text style={styles.multaDetalle}>{i18n.t('cancel_warning', { fine: multa })}</Text>
           </View>
         ) : null}
       </View>
@@ -41,7 +41,7 @@ export default function TripSummaryScreen({ route, navigation }) {
           onPress={() => navigation.navigate('PaymentMethod', { total, paymentMethod })}
         >
           <Ionicons name="cash-outline" size={21} color="#fff" style={{ marginRight: 7 }} />
-          <Text style={styles.btnPagoText}>{t('pay_methods_btn')}</Text>
+          <Text style={styles.btnPagoText}>{i18n.t('pay_methods_btn')}</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.section}>
@@ -50,7 +50,7 @@ export default function TripSummaryScreen({ route, navigation }) {
           onPress={() => navigation.navigate('Support')}
         >
           <Ionicons name="alert-circle-outline" size={20} color="#e53935" />
-          <Text style={styles.btnProblemaText}>{t('problem_btn')}</Text>
+          <Text style={styles.btnProblemaText}>{i18n.t('problem_btn')}</Text>
         </TouchableOpacity>
       </View>
     </View>
