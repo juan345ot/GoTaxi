@@ -20,13 +20,12 @@ export default function RideRequestScreen({ navigation }) {
   const handleConfirm = async () => {
     setShowModal(false);
     try {
-      await requestRide(origin, destination, paymentMethod);
-      if (rideData) {
-        navigation.navigate('RideTracking', {
-          rideId: rideData._id,
-          ...rideData
-        });
-      }
+      const newRide = await requestRide(origin, destination, paymentMethod);
+      // Navegar inmediatamente con el viaje retornado
+      navigation.navigate('RideTracking', {
+        rideId: newRide._id,
+        ...newRide
+      });
     } catch (e) {
       showToast('No se pudo solicitar el viaje');
     }

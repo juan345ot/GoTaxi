@@ -20,9 +20,11 @@ export default function useRide() {
       const newRide = await rideApi.requestRide(origin, destination, paymentMethod);
       setRideData(newRide);
       showToast('Viaje solicitado');
+      return newRide; // Retornar el viaje creado
     } catch (err) {
       setError('Error al solicitar el viaje');
       showToast('Error al solicitar el viaje');
+      throw err; // Re-lanzar el error para que se pueda manejar en el componente
     } finally {
       setLoading(false);
     }
