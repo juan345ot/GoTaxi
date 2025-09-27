@@ -3,9 +3,9 @@ import http from './httpClient';
 // Solicitar viaje: POST /api/trips
 export async function requestRide(origin, destination, paymentMethod) {
   const res = await http.post('/trips', {
-    origin,
-    destination,
-    paymentMethod,
+    origen: origin,
+    destino: destination,
+    metodoPago: paymentMethod,
   });
   return res.data; // Info del viaje creado
 }
