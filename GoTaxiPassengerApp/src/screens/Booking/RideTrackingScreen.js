@@ -4,11 +4,13 @@ import TaxiMap from '../../components/map/TaxiMap';
 import DriverInfoCard from '../../components/booking/DriverInfoCard';
 import i18n from '../../translations';
 import * as rideApi from '../../api/ride';
+import { showToast } from '../../utils/toast';
 
 export default function RideTrackingScreen({ route, navigation }) {
   const { rideId } = route.params || {};
   const [ride, setRide] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [taxiPosition, setTaxiPosition] = useState(null);
   const wsRef = useRef(null);
 
   // 1. Polling REST cada 3 segs
@@ -40,6 +42,39 @@ export default function RideTrackingScreen({ route, navigation }) {
     return () => clearInterval(interval);
   }, [rideId]);
 
+  // 2. Simulación del movimiento del taxi
+  useEffect(() => {
+    if (!ride || !ride.origen || !ride.destino) return;
+
+    const startLat = ride.origen.lat;
+    const startLng = ride.origen.lng;
+    const endLat = ride.destino.lat;
+    const endLng = ride.destino.lng;
+
+    // Simular posición inicial del taxi (cerca del origen)
+    const initialTaxiLat = startLat + (Math.random() - 0.5) * 0.01;
+    const initialTaxiLng = startLng + (Math.random() - 0.5) * 0.01;
+    setTaxiPosition({ latitude: initialTaxiLat, longitude: initialTaxiLng });
+
+    // Simular movimiento del taxi hacia el destino
+    let progress = 0;
+    const moveTaxi = () => {
+      if (progress >= 1) return;
+      
+      progress += 0.02; // Incremento del progreso
+      if (progress > 1) progress = 1;
+
+      // Interpolación lineal entre origen y destino
+      const currentLat = startLat + (endLat - startLat) * progress;
+      const currentLng = startLng + (endLng - startLng) * progress;
+      
+      setTaxiPosition({ latitude: currentLat, longitude: currentLng });
+    };
+
+    const taxiInterval = setInterval(moveTaxi, 1000); // Mover cada segundo
+    return () => clearInterval(taxiInterval);
+  }, [ride]);
+
   // 2. WebSocket para actualizaciones instantáneas (opcional)
   // Si querés, podés sumar esto después usando el socketURL del backend
 
@@ -52,7 +87,6 @@ export default function RideTrackingScreen({ route, navigation }) {
     destino = { direccion: 'Destino no disponible' }, 
     driver = null, 
     vehicle = 'Vehículo no disponible', 
-    taxiPosition = null, 
     status = 'requested' 
   } = ride;
   
@@ -66,6 +100,20 @@ export default function RideTrackingScreen({ route, navigation }) {
         origin={origin}
         destination={destination}
         taxiPosition={taxiPosition}
+        onPressSOS={() => {
+          showToast('SOS activado - Enviando ubicación de emergencia');
+        }}
+        onPressShare={() => {
+          showToast('Compartiendo ubicación del viaje');
+        }}
+        onPressChat={() => {
+          navigation.navigate('Chat', { rideId });
+        }}
+        onPressCall={() => {
+          showToast('Llamando al conductor...');
+        }}
+        chatEnabled={true}
+        callEnabled={true}
       />
       <View style={styles.infoBox}>
         <DriverInfoCard driver={driver} vehicle={vehicle} />

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import MapView, { Marker, Polyline } from 'react-native-maps';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -46,25 +46,46 @@ export default function TaxiMap({
         loadingEnabled
       >
         {origin && origin.latitude && origin.longitude && (
-          <Marker coordinate={origin} title="Partida">
-            <Ionicons name="pin" size={32} color="#007aff" />
+          <Marker coordinate={origin} title="Origen">
+            <View style={{ alignItems: 'center' }}>
+              <Ionicons name="location" size={32} color="#007aff" />
+              <Text style={{ color: '#007aff', fontWeight: 'bold', fontSize: 12 }}>ORIGEN</Text>
+            </View>
           </Marker>
         )}
         {destination && destination.latitude && destination.longitude && (
           <Marker coordinate={destination} title="Destino">
-            <Ionicons name="flag-outline" size={32} color="#ffd600" />
+            <View style={{ alignItems: 'center' }}>
+              <Ionicons name="flag" size={32} color="#ff6b35" />
+              <Text style={{ color: '#ff6b35', fontWeight: 'bold', fontSize: 12 }}>DESTINO</Text>
+            </View>
           </Marker>
         )}
         {origin && destination && origin.latitude && origin.longitude && destination.latitude && destination.longitude && (
           <Polyline
-            coordinates={[origin, destination]}
+            coordinates={[
+              origin,
+              {
+                latitude: (origin.latitude + destination.latitude) / 2 + 0.002,
+                longitude: (origin.longitude + destination.longitude) / 2 + 0.001
+              },
+              {
+                latitude: (origin.latitude + destination.latitude) / 2 - 0.001,
+                longitude: (origin.longitude + destination.longitude) / 2 + 0.003
+              },
+              destination
+            ]}
             strokeColor="#007aff"
             strokeWidth={4}
+            strokePattern={[5, 5]}
           />
         )}
         {showTaxi && taxiPosition && (
-          <Marker coordinate={taxiPosition} title="Taxi">
-            <MaterialCommunityIcons name="taxi" size={36} color="#222" />
+          <Marker coordinate={taxiPosition} title="Taxi en camino">
+            <View style={{ alignItems: 'center' }}>
+              <MaterialCommunityIcons name="taxi" size={40} color="#00C851" />
+              <Text style={{ color: '#00C851', fontWeight: 'bold', fontSize: 10 }}>TAXI</Text>
+            </View>
           </Marker>
         )}
       </MapView>
