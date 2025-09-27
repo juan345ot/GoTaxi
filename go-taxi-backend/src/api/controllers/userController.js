@@ -17,6 +17,25 @@ exports.getAllUsers = async (req, res, next) => {
   }
 };
 
+exports.getCurrentUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+      const errObj = new Error('Usuario no encontrado');
+      errObj.status = 404;
+      errObj.code = 'USER_NOT_FOUND';
+      return next(errObj);
+    }
+    return res.json(user);
+  } catch (err) {
+    logToFile(`Error getCurrentUser: ${err.message}`);
+    err.status = err.status || 500;
+    err.code = err.code || 'USER_FETCH_FAILED';
+    err.details = err.details || null;
+    return next(err);
+  }
+};
+
 exports.getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id).select('-password');

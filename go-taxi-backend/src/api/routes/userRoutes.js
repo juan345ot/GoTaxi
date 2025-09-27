@@ -12,6 +12,12 @@ const ROLES = require('../../config/roles');
 router.get('/', verifyToken, permitRoles(ROLES.ADMIN), userController.getAllUsers);
 
 /**
+ * @route   GET /api/users/me
+ * @desc    Ver perfil del usuario actual
+ */
+router.get('/me', verifyToken, userController.getCurrentUser);
+
+/**
  * @route   GET /api/users/:id
  * @desc    Ver perfil usuario
  */
