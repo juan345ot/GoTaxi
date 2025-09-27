@@ -29,7 +29,7 @@ const PrimaryButton = memo(function PrimaryButton({ title, onPress, disabled, lo
       )}
     </TouchableOpacity>
   );
-}
+});
 
 const styles = StyleSheet.create({
   btn: {

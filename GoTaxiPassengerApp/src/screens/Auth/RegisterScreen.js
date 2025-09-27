@@ -118,7 +118,7 @@ const RegisterScreen = memo(function RegisterScreen() {
       </View>
     </ScrollView>
   );
-}
+});
 
 const styles = StyleSheet.create({
   scroll: { 

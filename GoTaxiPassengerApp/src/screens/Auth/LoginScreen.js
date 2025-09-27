@@ -88,7 +88,7 @@ const LoginScreen = memo(function LoginScreen() {
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   wrapper: { 

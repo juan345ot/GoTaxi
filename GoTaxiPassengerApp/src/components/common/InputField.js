@@ -42,7 +42,7 @@ const InputField = memo(function InputField({
       </View>
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   container: { marginBottom: 16 },
