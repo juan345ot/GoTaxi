@@ -17,6 +17,8 @@ const validateCreateTrip = (data) => {
     // Distancia (km) y duración (minutos) deben ser positivos
     distancia_km: Joi.number().positive().required(),
     duracion_min: Joi.number().positive().required(),
+    // Método de pago: efectivo, tarjeta, o Mercado Pago
+    metodoPago: Joi.string().valid('cash', 'card', 'mp').required(),
   });
   return schema.validate(data);
 };
