@@ -16,12 +16,15 @@ export default function useRide() {
     setLoading(true);
     setError(null);
     try {
+      console.log('Solicitando viaje:', { origin, destination, paymentMethod });
       // Aquí va la llamada real a la API de tu backend
       const newRide = await rideApi.requestRide(origin, destination, paymentMethod);
+      console.log('Viaje creado:', newRide);
       setRideData(newRide);
       showToast('Viaje solicitado');
       return newRide; // Retornar el viaje creado
     } catch (err) {
+      console.error('Error en requestRide:', err);
       setError('Error al solicitar el viaje');
       showToast('Error al solicitar el viaje');
       throw err; // Re-lanzar el error para que se pueda manejar en el componente

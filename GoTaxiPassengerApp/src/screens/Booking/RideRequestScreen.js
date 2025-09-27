@@ -22,11 +22,17 @@ export default function RideRequestScreen({ navigation }) {
     try {
       const newRide = await requestRide(origin, destination, paymentMethod);
       // Navegar inmediatamente con el viaje retornado
+      const rideId = newRide._id || newRide.id;
+      if (!rideId) {
+        showToast('Error: No se pudo obtener el ID del viaje');
+        return;
+      }
       navigation.navigate('RideTracking', {
-        rideId: newRide._id,
+        rideId: rideId,
         ...newRide
       });
     } catch (e) {
+      console.error('Error al solicitar viaje:', e);
       showToast('No se pudo solicitar el viaje');
     }
   };

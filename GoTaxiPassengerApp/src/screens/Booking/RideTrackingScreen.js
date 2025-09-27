@@ -46,8 +46,19 @@ export default function RideTrackingScreen({ route, navigation }) {
   if (loading) return <ActivityIndicator style={{ marginTop: 40 }} size="large" color="#007aff" />;
   if (!ride) return <Text style={{ textAlign: 'center', marginTop: 60 }}>No se encontró el viaje.</Text>;
 
-  // Mapear la info para el mapa y la UI:
-  const { origin, destination, driver, vehicle, taxiPosition, status } = ride;
+  // Mapear la info para el mapa y la UI con valores por defecto
+  const { 
+    origen = { direccion: 'Origen no disponible' }, 
+    destino = { direccion: 'Destino no disponible' }, 
+    driver = null, 
+    vehicle = 'Vehículo no disponible', 
+    taxiPosition = null, 
+    status = 'requested' 
+  } = ride;
+  
+  // Convertir origen/destino a formato de coordenadas para el mapa
+  const origin = origen.lat && origen.lng ? { latitude: origen.lat, longitude: origen.lng } : null;
+  const destination = destino.lat && destino.lng ? { latitude: destino.lat, longitude: destino.lng } : null;
 
   return (
     <View style={styles.container}>

@@ -19,7 +19,7 @@ export default function TaxiMap({
 
   // Foco automático
   useEffect(() => {
-    if (mapRef.current && origin && destination) {
+    if (mapRef.current && origin && destination && origin.latitude && origin.longitude && destination.latitude && destination.longitude) {
       mapRef.current.fitToCoordinates([origin, destination], {
         edgePadding: { top: 70, right: 70, bottom: 70, left: 70 },
         animated: true,
@@ -32,25 +32,30 @@ export default function TaxiMap({
       <MapView
         ref={mapRef}
         style={styles.map}
-        initialRegion={{
+        initialRegion={origin ? {
           ...origin,
+          latitudeDelta: 0.009,
+          longitudeDelta: 0.009,
+        } : {
+          latitude: -34.6037,
+          longitude: -58.3816,
           latitudeDelta: 0.009,
           longitudeDelta: 0.009,
         }}
         showsUserLocation
         loadingEnabled
       >
-        {origin && (
+        {origin && origin.latitude && origin.longitude && (
           <Marker coordinate={origin} title="Partida">
             <Ionicons name="pin" size={32} color="#007aff" />
           </Marker>
         )}
-        {destination && (
+        {destination && destination.latitude && destination.longitude && (
           <Marker coordinate={destination} title="Destino">
             <Ionicons name="flag-outline" size={32} color="#ffd600" />
           </Marker>
         )}
-        {origin && destination && (
+        {origin && destination && origin.latitude && origin.longitude && destination.latitude && destination.longitude && (
           <Polyline
             coordinates={[origin, destination]}
             strokeColor="#007aff"
