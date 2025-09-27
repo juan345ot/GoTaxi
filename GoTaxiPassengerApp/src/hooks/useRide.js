@@ -17,7 +17,7 @@ export default function useRide() {
     setError(null);
     try {
       // Aquí va la llamada real a la API de tu backend
-      const newRide = await rideApi.requestRide({ origin, destination, paymentMethod });
+      const newRide = await rideApi.requestRide(origin, destination, paymentMethod);
       setRideData(newRide);
       showToast('Viaje solicitado');
     } catch (err) {
