@@ -39,10 +39,25 @@ export const AuthProvider = ({ children }) => {
       showToast('¡Inicio de sesión exitoso!');
       return true;
     } catch (e) {
-      const msg =
-        e?.response?.data?.message ||
-        e?.message ||
-        'No se pudo iniciar sesión';
+      let msg = 'No se pudo iniciar sesión';
+      
+      if (e?.response?.data?.message) {
+        msg = e.response.data.message;
+      } else if (e?.response?.data?.error) {
+        msg = e.response.data.error;
+      } else if (e?.message) {
+        msg = e.message;
+      }
+      
+      // Manejar errores específicos del backend
+      if (msg.includes('incorrectos') || msg.includes('invalid') || msg.includes('credentials')) {
+        msg = 'Email o contraseña incorrectos';
+      } else if (msg.includes('validation') || msg.includes('required')) {
+        msg = 'Por favor, completá todos los campos correctamente';
+      } else if (msg.includes('network') || msg.includes('ECONNABORTED')) {
+        msg = 'Error de conexión. Verificá tu internet';
+      }
+      
       showToast(msg);
       return false;
     } finally {
@@ -54,13 +69,28 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const res = await authApi.register(payload);
-      showToast(res?.message || 'Registro exitoso');
+      showToast(res?.message || '¡Registro exitoso! Ya podés iniciar sesión');
       return true;
     } catch (e) {
-      const msg =
-        e?.response?.data?.message ||
-        e?.message ||
-        'No se pudo registrar';
+      let msg = 'No se pudo registrar';
+      
+      if (e?.response?.data?.message) {
+        msg = e.response.data.message;
+      } else if (e?.response?.data?.error) {
+        msg = e.response.data.error;
+      } else if (e?.message) {
+        msg = e.message;
+      }
+      
+      // Manejar errores específicos del backend
+      if (msg.includes('email') && msg.includes('ya está registrado')) {
+        msg = 'Este correo electrónico ya está registrado';
+      } else if (msg.includes('validation') || msg.includes('required')) {
+        msg = 'Por favor, completá todos los campos correctamente';
+      } else if (msg.includes('network') || msg.includes('ECONNABORTED')) {
+        msg = 'Error de conexión. Verificá tu internet';
+      }
+      
       showToast(msg);
       return false;
     } finally {

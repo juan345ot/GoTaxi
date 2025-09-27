@@ -1,4 +1,5 @@
 import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import dev from '../config/dev';
 import { toast } from '../utils/toast';
 
@@ -8,10 +9,16 @@ const client = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Si tenés token:
+// Interceptor para agregar token de autenticación
 client.interceptors.request.use(async (config) => {
-  // ejemplo: const token = await getToken();
-  // if (token) config.headers.Authorization = `Bearer ${token}`;
+  try {
+    const token = await AsyncStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  } catch (error) {
+    console.log('Error getting token:', error);
+  }
   return config;
 });
 
