@@ -22,6 +22,11 @@ const tripSchema = new mongoose.Schema(
     tarifa: { type: Number, min: 0 },
     distancia_km: { type: Number, min: 0 },
     duracion_min: { type: Number, min: 0 },
+    metodoPago: { 
+      type: String, 
+      enum: ['cash', 'card', 'mp'], 
+      required: true 
+    },
     calificacion_pasajero: Number,
     calificacion_conductor: Number,
     comentario: String,

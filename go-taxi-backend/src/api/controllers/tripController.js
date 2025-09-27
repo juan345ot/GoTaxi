@@ -25,6 +25,7 @@ exports.createTrip = async (req, res, next) => {
       tarifa,
       distancia_km: distancia,
       duracion_min: duracion,
+      metodoPago: req.body.metodoPago,
     });
     await trip.save();
     logToFile(`Viaje creado por pasajero ${req.user.email}`);
