@@ -26,7 +26,8 @@ export default function RideTrackingScreen({ route, navigation }) {
     rating: 4.5,
     vehicle: 'Hyundai Genesis',
     licensePlate: 'ABC-123',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+    carImage: 'https://images.unsplash.com/photo-1555215695-3004980ad54e?w=200&h=150&fit=crop'
   };
 
   // 1. Polling REST cada 3 segs
@@ -78,7 +79,7 @@ export default function RideTrackingScreen({ route, navigation }) {
     const simulateDriver = () => {
       if (phase === 'coming') {
         // El conductor viene hacia el origen
-        progress += 0.02;
+        progress += 0.01; // Más lento para que dure más tiempo
         if (progress >= 1) {
           progress = 1;
           phase = 'waiting';
@@ -108,7 +109,7 @@ export default function RideTrackingScreen({ route, navigation }) {
       }
     };
 
-    const taxiInterval = setInterval(simulateDriver, 2000);
+    const taxiInterval = setInterval(simulateDriver, 3000); // Más lento
     return () => clearInterval(taxiInterval);
   }, [ride]);
 
