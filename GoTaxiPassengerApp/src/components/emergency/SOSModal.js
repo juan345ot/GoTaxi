@@ -46,7 +46,8 @@ export default function SOSModal({ visible, onClose }) {
           text: `🚒 ${EMERGENCY_SERVICES.fire.name}`,
           onPress: () => callEmergencyService(EMERGENCY_SERVICES.fire)
         }
-      ]
+      ],
+      { cancelable: true }
     );
   };
 
