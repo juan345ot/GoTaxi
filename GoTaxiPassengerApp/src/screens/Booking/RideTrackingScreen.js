@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { View, StyleSheet, Text, ActivityIndicator, Alert, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Text, ActivityIndicator, Alert, TouchableOpacity, Linking } from 'react-native';
 import TaxiMap from '../../components/map/TaxiMap';
 import DriverInfoCard from '../../components/booking/DriverInfoCard';
+import SOSModal from '../../components/emergency/SOSModal';
+import ShareLocationModal from '../../components/emergency/ShareLocationModal';
 import i18n from '../../translations';
 import * as rideApi from '../../api/ride';
 import { showToast } from '../../utils/toast';
@@ -11,6 +13,8 @@ export default function RideTrackingScreen({ route, navigation }) {
   const [ride, setRide] = useState(null);
   const [loading, setLoading] = useState(true);
   const [taxiPosition, setTaxiPosition] = useState(null);
+  const [showSOSModal, setShowSOSModal] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
   const wsRef = useRef(null);
 
   // 1. Polling REST cada 3 segs
@@ -42,7 +46,7 @@ export default function RideTrackingScreen({ route, navigation }) {
     return () => clearInterval(interval);
   }, [rideId]);
 
-  // 2. Simulación del movimiento del taxi
+  // 2. Simulación del movimiento del taxi (mejorada)
   useEffect(() => {
     if (!ride || !ride.origen || !ride.destino) return;
 
@@ -58,10 +62,17 @@ export default function RideTrackingScreen({ route, navigation }) {
 
     // Simular movimiento del taxi hacia el destino
     let progress = 0;
+    let isMoving = true;
+    
     const moveTaxi = () => {
-      if (progress >= 1) return;
+      if (!isMoving || progress >= 1) {
+        if (progress >= 1) {
+          isMoving = false; // Detener cuando llegue al destino
+        }
+        return;
+      }
       
-      progress += 0.02; // Incremento del progreso
+      progress += 0.01; // Reducir velocidad para que sea más realista
       if (progress > 1) progress = 1;
 
       // Interpolación lineal entre origen y destino
@@ -71,8 +82,11 @@ export default function RideTrackingScreen({ route, navigation }) {
       setTaxiPosition({ latitude: currentLat, longitude: currentLng });
     };
 
-    const taxiInterval = setInterval(moveTaxi, 1000); // Mover cada segundo
-    return () => clearInterval(taxiInterval);
+    const taxiInterval = setInterval(moveTaxi, 2000); // Mover cada 2 segundos
+    return () => {
+      clearInterval(taxiInterval);
+      isMoving = false;
+    };
   }, [ride]);
 
   // 2. WebSocket para actualizaciones instantáneas (opcional)
@@ -100,17 +114,21 @@ export default function RideTrackingScreen({ route, navigation }) {
         origin={origin}
         destination={destination}
         taxiPosition={taxiPosition}
-        onPressSOS={() => {
-          showToast('SOS activado - Enviando ubicación de emergencia');
-        }}
-        onPressShare={() => {
-          showToast('Compartiendo ubicación del viaje');
-        }}
-        onPressChat={() => {
-          navigation.navigate('Chat', { rideId });
-        }}
+        onPressSOS={() => setShowSOSModal(true)}
+        onPressShare={() => setShowShareModal(true)}
+        onPressChat={() => navigation.navigate('Chat', { rideId })}
         onPressCall={() => {
-          showToast('Llamando al conductor...');
+          const driverPhone = ride?.driver?.phone || '+5491123456789'; // Número simulado
+          const phoneNumber = `tel:${driverPhone}`;
+          Linking.canOpenURL(phoneNumber)
+            .then((supported) => {
+              if (supported) {
+                Linking.openURL(phoneNumber);
+              } else {
+                showToast('No se puede realizar la llamada');
+              }
+            })
+            .catch(() => showToast('Error al abrir el marcador'));
         }}
         chatEnabled={true}
         callEnabled={true}
@@ -148,6 +166,18 @@ export default function RideTrackingScreen({ route, navigation }) {
       >
         <Text style={styles.cancelBtnText}>{i18n.t('cancel_trip_btn')}</Text>
       </TouchableOpacity>
+
+      {/* Modales */}
+      <SOSModal 
+        visible={showSOSModal} 
+        onClose={() => setShowSOSModal(false)} 
+      />
+      
+      <ShareLocationModal 
+        visible={showShareModal} 
+        onClose={() => setShowShareModal(false)}
+        location={origin ? `${origin.latitude}, ${origin.longitude}` : 'Ubicación no disponible'}
+      />
     </View>
   );
 }

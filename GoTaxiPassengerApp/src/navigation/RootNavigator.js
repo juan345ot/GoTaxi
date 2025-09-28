@@ -11,6 +11,7 @@ import RideTrackingScreen from '../screens/Booking/RideTrackingScreen';
 import TripSummaryScreen from '../screens/Booking/TripSummaryScreen';
 import PaymentMethodScreen from '../screens/Booking/PaymentMethodScreen';
 import RateRideScreen from '../screens/Booking/RateRideScreen';
+import ChatScreen from '../screens/Chat/ChatScreen';
 import SupportScreen from '../screens/Support/SupportScreen';
 
 const Stack = createNativeStackNavigator();
@@ -34,6 +35,9 @@ export default function RootNavigator() {
       <Stack.Screen name={ROUTES.TRIP_SUMMARY} component={TripSummaryScreen} />
       <Stack.Screen name={ROUTES.PAYMENT_METHOD} component={PaymentMethodScreen} />
       <Stack.Screen name={ROUTES.RATE_RIDE} component={RateRideScreen} />
+
+      {/* Chat */}
+      <Stack.Screen name={ROUTES.CHAT} component={ChatScreen} />
 
       {/* Soporte */}
       <Stack.Screen name={ROUTES.SUPPORT} component={SupportScreen} />
