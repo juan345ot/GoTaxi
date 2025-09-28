@@ -80,10 +80,11 @@ export default function RideTrackingScreen({ route, navigation }) {
     const simulateDriver = () => {
       if (phase === 'coming') {
         // El conductor viene hacia el origen
-        progress += 0.005; // Más lento para que dure más tiempo
+        progress += 0.002; // Aún más lento para que dure más tiempo
         if (progress >= 1) {
           progress = 1;
           phase = 'waiting';
+          console.log('Driver arrived, setting driverArrived to true');
           setDriverArrived(true);
           showToast('¡El conductor llegó! ¿Te subes al taxi?');
           clearInterval(intervalId);
@@ -97,7 +98,7 @@ export default function RideTrackingScreen({ route, navigation }) {
         
       } else if (phase === 'trip') {
         // El viaje ha comenzado, ir hacia el destino
-        progress += 0.005;
+        progress += 0.002;
         if (progress >= 1) {
           progress = 1;
           showToast('¡Llegamos al destino!');
@@ -112,7 +113,7 @@ export default function RideTrackingScreen({ route, navigation }) {
       }
     };
 
-    intervalId = setInterval(simulateDriver, 2000); // Más lento
+    intervalId = setInterval(simulateDriver, 3000); // Más lento aún
     return () => {
       if (intervalId) {
         clearInterval(intervalId);
@@ -133,7 +134,7 @@ export default function RideTrackingScreen({ route, navigation }) {
       let tripInterval = null;
       
       const moveToDestination = () => {
-        progress += 0.005;
+        progress += 0.002;
         if (progress >= 1) {
           progress = 1;
           showToast('¡Llegamos al destino!');
@@ -147,7 +148,7 @@ export default function RideTrackingScreen({ route, navigation }) {
         setTaxiPosition({ latitude: currentLat, longitude: currentLng });
       };
 
-      tripInterval = setInterval(moveToDestination, 2000);
+      tripInterval = setInterval(moveToDestination, 3000);
       return () => {
         if (tripInterval) {
           clearInterval(tripInterval);
@@ -226,6 +227,12 @@ export default function RideTrackingScreen({ route, navigation }) {
         >
           <Text style={styles.confirmBtnText}>Sí, me subo al taxi</Text>
         </TouchableOpacity>
+      )}
+      {/* Debug info */}
+      {__DEV__ && (
+        <Text style={{ fontSize: 12, color: '#666', textAlign: 'center', marginTop: 10 }}>
+          Debug: driverArrived={driverArrived.toString()}, tripStarted={tripStarted.toString()}
+        </Text>
       )}
 
       {/* Botón de cancelar viaje */}

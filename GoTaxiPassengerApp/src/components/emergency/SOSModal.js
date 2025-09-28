@@ -21,10 +21,14 @@ export default function SOSModal({ visible, onClose }) {
           style: 'destructive',
           onPress: () => {
             onClose();
-            showEmergencyOptions();
+            // Usar setTimeout para asegurar que el modal se cierre antes de mostrar el alert
+            setTimeout(() => {
+              showEmergencyOptions();
+            }, 100);
           }
         }
-      ]
+      ],
+      { cancelable: true }
     );
   };
 
