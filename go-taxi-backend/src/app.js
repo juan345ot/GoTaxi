@@ -43,6 +43,7 @@ app.use('/api/users', require('./api/routes/userRoutes'));
 app.use('/api/drivers', require('./api/routes/driverRoutes'));
 app.use('/api/admins', require('./api/routes/adminRoutes'));
 app.use('/api/trips', require('./api/routes/tripRoutes'));
+app.use('/api/trips', require('./api/routes/chatRoutes')); // Chat messages for trips
 app.use('/api/payments', require('./api/routes/paymentRoutes'));
 app.use('/api/payment-methods', require('./api/routes/paymentMethodRoutes'));
 app.use('/api/ratings', require('./api/routes/ratingRoutes'));

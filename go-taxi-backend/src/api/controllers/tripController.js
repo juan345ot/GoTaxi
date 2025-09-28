@@ -138,3 +138,29 @@ exports.getTripsByUser = async (req, res, next) => {
     return next(err);
   }
 };
+
+exports.cancelTrip = async (req, res, next) => {
+  try {
+    const trip = await Trip.findByIdAndUpdate(
+      req.params.id,
+      { estado: 'cancelado' },
+      { new: true }
+    );
+    
+    if (!trip) {
+      const errObj = new Error('Viaje no encontrado');
+      errObj.status = 404;
+      errObj.code = 'TRIP_NOT_FOUND';
+      return next(errObj);
+    }
+    
+    logToFile(`Viaje ${trip._id} cancelado por pasajero ${req.user.email}`);
+    return res.json(trip);
+  } catch (err) {
+    logToFile(`Error cancelTrip: ${err.message}`);
+    err.status = err.status || 500;
+    err.code = err.code || 'TRIP_CANCEL_FAILED';
+    err.details = err.details || null;
+    return next(err);
+  }
+};

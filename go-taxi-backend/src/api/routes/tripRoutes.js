@@ -34,4 +34,10 @@ router.get('/:id', verifyToken, tripController.getTripById);
  */
 router.get('/', verifyToken, permitRoles(ROLES.PASAJERO), tripController.getTripsByUser);
 
+/**
+ * @route   POST /api/trips/:id/cancel
+ * @desc    Cancelar viaje (pasajero)
+ */
+router.post('/:id/cancel', verifyToken, permitRoles(ROLES.PASAJERO), tripController.cancelTrip);
+
 module.exports = router;
