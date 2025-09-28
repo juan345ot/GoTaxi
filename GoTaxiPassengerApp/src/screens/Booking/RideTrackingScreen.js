@@ -15,7 +15,19 @@ export default function RideTrackingScreen({ route, navigation }) {
   const [taxiPosition, setTaxiPosition] = useState(null);
   const [showSOSModal, setShowSOSModal] = useState(false);
   const [showShareModal, setShowShareModal] = useState(false);
+  const [driverArrived, setDriverArrived] = useState(false);
+  const [tripStarted, setTripStarted] = useState(false);
   const wsRef = useRef(null);
+
+  // Datos simulados del conductor
+  const mockDriver = {
+    name: 'Carlos Mendoza',
+    phone: '+5491123456789',
+    rating: 4.5,
+    vehicle: 'Hyundai Genesis',
+    licensePlate: 'ABC-123',
+    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+  };
 
   // 1. Polling REST cada 3 segs
   useEffect(() => {
@@ -46,7 +58,7 @@ export default function RideTrackingScreen({ route, navigation }) {
     return () => clearInterval(interval);
   }, [rideId]);
 
-  // 2. Simulación del movimiento del taxi (mejorada)
+  // 2. Simulación del conductor y movimiento del taxi
   useEffect(() => {
     if (!ride || !ride.origen || !ride.destino) return;
 
@@ -55,39 +67,89 @@ export default function RideTrackingScreen({ route, navigation }) {
     const endLat = ride.destino.lat;
     const endLng = ride.destino.lng;
 
-    // Simular posición inicial del taxi (cerca del origen)
-    const initialTaxiLat = startLat + (Math.random() - 0.5) * 0.01;
-    const initialTaxiLng = startLng + (Math.random() - 0.5) * 0.01;
+    // Simular posición inicial del taxi (lejos del origen)
+    const initialTaxiLat = startLat + (Math.random() - 0.5) * 0.02 + 0.01;
+    const initialTaxiLng = startLng + (Math.random() - 0.5) * 0.02 + 0.01;
     setTaxiPosition({ latitude: initialTaxiLat, longitude: initialTaxiLng });
 
-    // Simular movimiento del taxi hacia el destino
     let progress = 0;
-    let isMoving = true;
+    let phase = 'coming'; // 'coming', 'waiting', 'trip'
     
-    const moveTaxi = () => {
-      if (!isMoving || progress >= 1) {
+    const simulateDriver = () => {
+      if (phase === 'coming') {
+        // El conductor viene hacia el origen
+        progress += 0.02;
         if (progress >= 1) {
-          isMoving = false; // Detener cuando llegue al destino
+          progress = 1;
+          phase = 'waiting';
+          setDriverArrived(true);
+          showToast('¡El conductor llegó! ¿Te subes al taxi?');
+          return;
         }
-        return;
+        
+        // Interpolación desde posición inicial hasta origen
+        const currentLat = initialTaxiLat + (startLat - initialTaxiLat) * progress;
+        const currentLng = initialTaxiLng + (startLng - initialTaxiLng) * progress;
+        setTaxiPosition({ latitude: currentLat, longitude: currentLng });
+        
+      } else if (phase === 'trip') {
+        // El viaje ha comenzado, ir hacia el destino
+        progress += 0.01;
+        if (progress >= 1) {
+          progress = 1;
+          showToast('¡Llegamos al destino!');
+          return;
+        }
+        
+        // Interpolación desde origen hasta destino
+        const currentLat = startLat + (endLat - startLat) * progress;
+        const currentLng = startLng + (endLng - startLng) * progress;
+        setTaxiPosition({ latitude: currentLat, longitude: currentLng });
       }
-      
-      progress += 0.01; // Reducir velocidad para que sea más realista
-      if (progress > 1) progress = 1;
-
-      // Interpolación lineal entre origen y destino
-      const currentLat = startLat + (endLat - startLat) * progress;
-      const currentLng = startLng + (endLng - startLng) * progress;
-      
-      setTaxiPosition({ latitude: currentLat, longitude: currentLng });
     };
 
-    const taxiInterval = setInterval(moveTaxi, 2000); // Mover cada 2 segundos
-    return () => {
-      clearInterval(taxiInterval);
-      isMoving = false;
-    };
+    const taxiInterval = setInterval(simulateDriver, 2000);
+    return () => clearInterval(taxiInterval);
   }, [ride]);
+
+  // 3. Efecto para iniciar el viaje cuando el usuario confirma
+  useEffect(() => {
+    if (tripStarted) {
+      // Reiniciar la simulación para ir al destino
+      const startLat = ride?.origen?.lat;
+      const startLng = ride?.origen?.lng;
+      const endLat = ride?.destino?.lat;
+      const endLng = ride?.destino?.lng;
+      
+      if (!startLat || !startLng || !endLat || !endLng) return;
+
+      let progress = 0;
+      
+      const moveToDestination = () => {
+        progress += 0.01;
+        if (progress >= 1) {
+          progress = 1;
+          showToast('¡Llegamos al destino!');
+          return;
+        }
+        
+        // Interpolación desde origen hasta destino
+        const currentLat = startLat + (endLat - startLat) * progress;
+        const currentLng = startLng + (endLng - startLng) * progress;
+        setTaxiPosition({ latitude: currentLat, longitude: currentLng });
+      };
+
+      const tripInterval = setInterval(moveToDestination, 2000);
+      return () => clearInterval(tripInterval);
+    }
+  }, [tripStarted, ride]);
+
+  // Función para confirmar que el pasajero se sube al taxi
+  const handleConfirmBoarding = () => {
+    setDriverArrived(false);
+    setTripStarted(true);
+    showToast('¡Viaje iniciado!');
+  };
 
   // 2. WebSocket para actualizaciones instantáneas (opcional)
   // Si querés, podés sumar esto después usando el socketURL del backend
@@ -99,10 +161,12 @@ export default function RideTrackingScreen({ route, navigation }) {
   const { 
     origen = { direccion: 'Origen no disponible' }, 
     destino = { direccion: 'Destino no disponible' }, 
-    driver = null, 
-    vehicle = 'Vehículo no disponible', 
     status = 'requested' 
   } = ride;
+
+  // Usar datos simulados del conductor
+  const driver = mockDriver;
+  const vehicle = `${mockDriver.vehicle} - ${mockDriver.licensePlate}`;
   
   // Convertir origen/destino a formato de coordenadas para el mapa
   const origin = origen.lat && origen.lng ? { latitude: origen.lat, longitude: origen.lng } : null;
@@ -118,8 +182,7 @@ export default function RideTrackingScreen({ route, navigation }) {
         onPressShare={() => setShowShareModal(true)}
         onPressChat={() => navigation.navigate('Chat', { rideId })}
         onPressCall={() => {
-          const driverPhone = ride?.driver?.phone || '+5491123456789'; // Número simulado
-          const phoneNumber = `tel:${driverPhone}`;
+          const phoneNumber = `tel:${mockDriver.phone}`;
           Linking.canOpenURL(phoneNumber)
             .then((supported) => {
               if (supported) {
@@ -136,14 +199,24 @@ export default function RideTrackingScreen({ route, navigation }) {
       <View style={styles.infoBox}>
         <DriverInfoCard driver={driver} vehicle={vehicle} />
         <Text style={styles.estado}>
-          {status === 'requested' && i18n.t('taxi_on_the_way')}
-          {status === 'accepted' && i18n.t('taxi_on_the_way')}
-          {status === 'in_progress' && i18n.t('trip_in_progress')}
+          {driverArrived && '¡El conductor llegó! ¿Te subes al taxi?'}
+          {!driverArrived && !tripStarted && i18n.t('taxi_on_the_way')}
+          {tripStarted && i18n.t('trip_in_progress')}
           {status === 'completed' && i18n.t('trip_arrived_title')}
           {status === 'cancelled' && i18n.t('trip_cancelled_title')}
         </Text>
       </View>
-      {/* Aquí van los botones SOS, Compartir, Cancelar, etc. */}
+      {/* Botón de confirmación de subida al taxi */}
+      {driverArrived && (
+        <TouchableOpacity
+          style={styles.confirmBtn}
+          onPress={handleConfirmBoarding}
+        >
+          <Text style={styles.confirmBtnText}>Sí, me subo al taxi</Text>
+        </TouchableOpacity>
+      )}
+
+      {/* Botón de cancelar viaje */}
       <TouchableOpacity
         style={styles.cancelBtn}
         onPress={() => {
@@ -195,6 +268,27 @@ const styles = StyleSheet.create({
     color: '#555',
     textAlign: 'center',
     fontWeight: '500',
+  },
+  confirmBtn: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 8,
+    paddingVertical: 13,
+    paddingHorizontal: 34,
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginTop: 10,
+    marginBottom: 10,
+    minHeight: 48,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  confirmBtnText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 17,
   },
   cancelBtn: {
     backgroundColor: '#fdecea',

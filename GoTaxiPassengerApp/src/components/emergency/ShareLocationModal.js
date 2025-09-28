@@ -17,20 +17,6 @@ export default function ShareLocationModal({ visible, onClose, location }) {
     }
   };
 
-  const handleShareWhatsApp = async () => {
-    try {
-      const message = `${locationText}\n\nVer en mapa: ${locationUrl}`;
-      await Share.share({
-        message: message,
-        url: locationUrl,
-        title: 'Mi ubicación - GoTaxi'
-      });
-      onClose();
-    } catch (error) {
-      Alert.alert('Error', 'No se pudo compartir por WhatsApp');
-    }
-  };
-
   const handleShareGeneral = async () => {
     try {
       await Share.share({
@@ -41,19 +27,6 @@ export default function ShareLocationModal({ visible, onClose, location }) {
       onClose();
     } catch (error) {
       Alert.alert('Error', 'No se pudo compartir la ubicación');
-    }
-  };
-
-  const handleShareSMS = async () => {
-    try {
-      const message = `${locationText}\n\nVer en mapa: ${locationUrl}`;
-      await Share.share({
-        message: message,
-        title: 'Mi ubicación - GoTaxi'
-      });
-      onClose();
-    } catch (error) {
-      Alert.alert('Error', 'No se pudo compartir por SMS');
     }
   };
 
@@ -76,19 +49,9 @@ export default function ShareLocationModal({ visible, onClose, location }) {
               <Text style={styles.optionText}>Copiar ubicación</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.option} onPress={handleShareWhatsApp}>
-              <Ionicons name="logo-whatsapp" size={24} color="#25D366" />
-              <Text style={styles.optionText}>Compartir por WhatsApp</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.option} onPress={handleShareSMS}>
-              <Ionicons name="chatbubble" size={24} color="#34C759" />
-              <Text style={styles.optionText}>Compartir por SMS</Text>
-            </TouchableOpacity>
-
             <TouchableOpacity style={styles.option} onPress={handleShareGeneral}>
               <Ionicons name="share" size={24} color="#FF9500" />
-              <Text style={styles.optionText}>Otras opciones</Text>
+              <Text style={styles.optionText}>Compartir ubicación</Text>
             </TouchableOpacity>
           </View>
 
