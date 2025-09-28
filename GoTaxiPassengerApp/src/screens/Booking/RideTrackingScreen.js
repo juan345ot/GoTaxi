@@ -75,16 +75,18 @@ export default function RideTrackingScreen({ route, navigation }) {
 
     let progress = 0;
     let phase = 'coming'; // 'coming', 'waiting', 'trip'
+    let intervalId = null;
     
     const simulateDriver = () => {
       if (phase === 'coming') {
         // El conductor viene hacia el origen
-        progress += 0.01; // Más lento para que dure más tiempo
+        progress += 0.005; // Más lento para que dure más tiempo
         if (progress >= 1) {
           progress = 1;
           phase = 'waiting';
           setDriverArrived(true);
           showToast('¡El conductor llegó! ¿Te subes al taxi?');
+          clearInterval(intervalId);
           return;
         }
         
@@ -95,10 +97,11 @@ export default function RideTrackingScreen({ route, navigation }) {
         
       } else if (phase === 'trip') {
         // El viaje ha comenzado, ir hacia el destino
-        progress += 0.01;
+        progress += 0.005;
         if (progress >= 1) {
           progress = 1;
           showToast('¡Llegamos al destino!');
+          clearInterval(intervalId);
           return;
         }
         
@@ -109,28 +112,32 @@ export default function RideTrackingScreen({ route, navigation }) {
       }
     };
 
-    const taxiInterval = setInterval(simulateDriver, 3000); // Más lento
-    return () => clearInterval(taxiInterval);
+    intervalId = setInterval(simulateDriver, 2000); // Más lento
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
   }, [ride]);
 
   // 3. Efecto para iniciar el viaje cuando el usuario confirma
   useEffect(() => {
-    if (tripStarted) {
+    if (tripStarted && ride?.origen && ride?.destino) {
       // Reiniciar la simulación para ir al destino
-      const startLat = ride?.origen?.lat;
-      const startLng = ride?.origen?.lng;
-      const endLat = ride?.destino?.lat;
-      const endLng = ride?.destino?.lng;
+      const startLat = ride.origen.lat;
+      const startLng = ride.origen.lng;
+      const endLat = ride.destino.lat;
+      const endLng = ride.destino.lng;
       
-      if (!startLat || !startLng || !endLat || !endLng) return;
-
       let progress = 0;
+      let tripInterval = null;
       
       const moveToDestination = () => {
-        progress += 0.01;
+        progress += 0.005;
         if (progress >= 1) {
           progress = 1;
           showToast('¡Llegamos al destino!');
+          clearInterval(tripInterval);
           return;
         }
         
@@ -140,8 +147,12 @@ export default function RideTrackingScreen({ route, navigation }) {
         setTaxiPosition({ latitude: currentLat, longitude: currentLng });
       };
 
-      const tripInterval = setInterval(moveToDestination, 2000);
-      return () => clearInterval(tripInterval);
+      tripInterval = setInterval(moveToDestination, 2000);
+      return () => {
+        if (tripInterval) {
+          clearInterval(tripInterval);
+        }
+      };
     }
   }, [tripStarted, ride]);
 
