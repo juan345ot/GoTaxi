@@ -10,7 +10,16 @@ export default function PaymentMethodScreen({ route, navigation }) {
   const [paymentMethod, setPaymentMethod] = useState(initialMethod || 'cash');
   const [loading, setLoading] = useState(false);
 
+  // Debug info
+  console.log('PaymentMethodScreen - rideId:', rideId);
+  console.log('PaymentMethodScreen - route.params:', route.params);
+
   const handleConfirmPayment = async () => {
+    if (!rideId) {
+      showToast('Error: ID del viaje no encontrado');
+      return;
+    }
+    
     setLoading(true);
     try {
       await rideApi.payForRide(rideId, paymentMethod);

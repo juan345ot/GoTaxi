@@ -14,7 +14,8 @@ export default function TripSummaryScreen({ route, navigation }) {
     vehicle,
     cancelado = false,
     multa = 0,
-    paymentMethod = 'cash'
+    paymentMethod = 'cash',
+    rideId
   } = route.params || {};
 
   return (
@@ -38,7 +39,7 @@ export default function TripSummaryScreen({ route, navigation }) {
       <View style={styles.section}>
         <TouchableOpacity
           style={styles.btnPago}
-          onPress={() => navigation.navigate('PaymentMethod', { total, paymentMethod })}
+          onPress={() => navigation.navigate('PaymentMethod', { total, paymentMethod, rideId })}
         >
           <Ionicons name="cash-outline" size={21} color="#fff" style={{ marginRight: 7 }} />
           <Text style={styles.btnPagoText}>{i18n.t('pay_methods_btn')}</Text>

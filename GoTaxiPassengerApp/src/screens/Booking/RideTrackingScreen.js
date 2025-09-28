@@ -39,13 +39,15 @@ export default function RideTrackingScreen({ route, navigation }) {
         setRide(data);
         if (data.status === 'completed') {
           navigation.replace('TripSummary', {
-            ...data
+            ...data,
+            rideId: data._id || data.id
           });
         }
         if (data.status === 'cancelled') {
           navigation.replace('TripSummary', {
             ...data,
-            cancelado: true
+            cancelado: true,
+            rideId: data._id || data.id
           });
         }
       } catch (e) {
@@ -80,7 +82,7 @@ export default function RideTrackingScreen({ route, navigation }) {
     const simulateDriver = () => {
       if (phase === 'coming') {
         // El conductor viene hacia el origen
-        progress += 0.002; // Aún más lento para que dure más tiempo
+        progress += 0.001; // Más lento para que dure más tiempo
         if (progress >= 1) {
           progress = 1;
           phase = 'waiting';
@@ -113,7 +115,11 @@ export default function RideTrackingScreen({ route, navigation }) {
       }
     };
 
-    intervalId = setInterval(simulateDriver, 3000); // Más lento aún
+    // Iniciar simulación después de 10 segundos
+    setTimeout(() => {
+      intervalId = setInterval(simulateDriver, 2000); // Cada 2 segundos
+    }, 10000);
+
     return () => {
       if (intervalId) {
         clearInterval(intervalId);
@@ -249,7 +255,11 @@ export default function RideTrackingScreen({ route, navigation }) {
                 style: 'destructive',
                 onPress: async () => {
                   await rideApi.cancelRide(rideId);
-                  navigation.replace('TripSummary', { ...ride, cancelado: true });
+                  navigation.replace('TripSummary', { 
+                    ...ride, 
+                    cancelado: true,
+                    rideId: ride?._id || ride?.id || rideId
+                  });
                 }
               }
             ]
