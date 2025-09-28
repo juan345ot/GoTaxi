@@ -40,4 +40,16 @@ router.get('/', verifyToken, permitRoles(ROLES.PASAJERO), tripController.getTrip
  */
 router.post('/:id/cancel', verifyToken, permitRoles(ROLES.PASAJERO), tripController.cancelTrip);
 
+/**
+ * @route   POST /api/trips/:id/pay
+ * @desc    Confirmar pago del viaje (pasajero)
+ */
+router.post('/:id/pay', verifyToken, permitRoles(ROLES.PASAJERO), tripController.payTrip);
+
+/**
+ * @route   POST /api/trips/:id/rate
+ * @desc    Calificar viaje (pasajero)
+ */
+router.post('/:id/rate', verifyToken, permitRoles(ROLES.PASAJERO), tripController.rateTrip);
+
 module.exports = router;

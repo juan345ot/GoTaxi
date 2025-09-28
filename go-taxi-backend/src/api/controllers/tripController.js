@@ -164,3 +164,80 @@ exports.cancelTrip = async (req, res, next) => {
     return next(err);
   }
 };
+
+exports.payTrip = async (req, res, next) => {
+  try {
+    const { paymentMethod } = req.body;
+    
+    if (!paymentMethod) {
+      const errObj = new Error('Método de pago requerido');
+      errObj.status = 400;
+      errObj.code = 'VALIDATION_ERROR';
+      return next(errObj);
+    }
+
+    const trip = await Trip.findByIdAndUpdate(
+      req.params.id,
+      { 
+        estado: 'completado',
+        metodoPago: paymentMethod,
+        fechaPago: new Date()
+      },
+      { new: true }
+    );
+    
+    if (!trip) {
+      const errObj = new Error('Viaje no encontrado');
+      errObj.status = 404;
+      errObj.code = 'TRIP_NOT_FOUND';
+      return next(errObj);
+    }
+    
+    logToFile(`Viaje ${trip._id} pagado por pasajero ${req.user.email} con método ${paymentMethod}`);
+    return res.json(trip);
+  } catch (err) {
+    logToFile(`Error payTrip: ${err.message}`);
+    err.status = err.status || 500;
+    err.code = err.code || 'TRIP_PAYMENT_FAILED';
+    err.details = err.details || null;
+    return next(err);
+  }
+};
+
+exports.rateTrip = async (req, res, next) => {
+  try {
+    const { rating, comment } = req.body;
+    
+    if (!rating || rating < 1 || rating > 5) {
+      const errObj = new Error('Calificación debe ser entre 1 y 5');
+      errObj.status = 400;
+      errObj.code = 'VALIDATION_ERROR';
+      return next(errObj);
+    }
+
+    const trip = await Trip.findByIdAndUpdate(
+      req.params.id,
+      { 
+        calificacion_pasajero: rating,
+        comentario: comment || ''
+      },
+      { new: true }
+    );
+    
+    if (!trip) {
+      const errObj = new Error('Viaje no encontrado');
+      errObj.status = 404;
+      errObj.code = 'TRIP_NOT_FOUND';
+      return next(errObj);
+    }
+    
+    logToFile(`Viaje ${trip._id} calificado con ${rating} estrellas por pasajero ${req.user.email}`);
+    return res.json(trip);
+  } catch (err) {
+    logToFile(`Error rateTrip: ${err.message}`);
+    err.status = err.status || 500;
+    err.code = err.code || 'TRIP_RATING_FAILED';
+    err.details = err.details || null;
+    return next(err);
+  }
+};
