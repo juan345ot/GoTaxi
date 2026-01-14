@@ -16,6 +16,11 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
       maxlength: 15,
     },
+    // Dirección del usuario
+    direccion: {
+      type: String,
+      trim: true,
+    },
     foto: { type: String },
     activo: { type: Boolean, default: true },
     penalizaciones: [

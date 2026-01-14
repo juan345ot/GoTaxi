@@ -15,7 +15,9 @@ const crypto = require('crypto');
  */
 function randomCode(length = 6) {
   const bytes = crypto.randomBytes(length);
-  return Array.from(bytes, (b) => (b % 36).toString(36)).join('').toUpperCase();
+  return Array.from(bytes, b => (b % 36).toString(36))
+    .join('')
+    .toUpperCase();
 }
 
 /**

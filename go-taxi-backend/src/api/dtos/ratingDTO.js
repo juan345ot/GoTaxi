@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const validateCreateRating = (data) => {
+const validateCreateRating = data => {
   const schema = Joi.object({
     // El ID del viaje debe ser un ObjectId válido
     trip: Joi.string().hex().length(24).required(),

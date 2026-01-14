@@ -1,6 +1,8 @@
 const Driver = require('../../models/Driver');
-const User = require('../../models/User');
+// const User = require('../../models/User'); // No usado
 const { logToFile } = require('../../utils/logger');
+const { createNotFoundResponse } = require('../../utils/responseHelpers');
+const mongoose = require('mongoose');
 
 exports.getAllDrivers = async (req, res, next) => {
   try {
@@ -17,12 +19,14 @@ exports.getAllDrivers = async (req, res, next) => {
 
 exports.getDriverById = async (req, res, next) => {
   try {
+    // Validar que el ID sea un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return createNotFoundResponse(res, 'Conductor', req.params.id);
+    }
+
     const driver = await Driver.findById(req.params.id).populate('user', '-password');
     if (!driver) {
-      const errObj = new Error('Conductor no encontrado');
-      errObj.status = 404;
-      errObj.code = 'DRIVER_NOT_FOUND';
-      return next(errObj);
+      return createNotFoundResponse(res, 'Conductor', req.params.id);
     }
     return res.json(driver);
   } catch (err) {

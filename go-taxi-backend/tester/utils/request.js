@@ -26,4 +26,4 @@ function getApp() {
   return request(cachedApp);
 }
 
-module.exports = getApp;
+module.exports = { getApp };

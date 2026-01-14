@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken');
-const ROLES = require('../config/roles');
 
 /*
  * Middleware de autenticación y autorización.
@@ -21,15 +20,55 @@ auth.verifyToken = (req, _res, next) => {
   }
   // Quitar el prefijo Bearer si existe
   const token = header.startsWith('Bearer ') ? header.slice(7) : header;
+  
+  // Verificar que el token no esté vacío
+  if (!token || token.trim() === '') {
+    const err = new Error('Token vacío');
+    err.status = 401;
+    err.code = 'EMPTY_TOKEN';
+    return next(err);
+  }
+  
+  // Verificar que JWT_SECRET esté configurado
+  if (!process.env.JWT_SECRET) {
+    console.error('JWT_SECRET no está configurado en las variables de entorno');
+    const err = new Error('Error de configuración del servidor');
+    err.status = 500;
+    err.code = 'SERVER_CONFIG_ERROR';
+    return next(err);
+  }
+  
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     // Añadimos la información del usuario al request para usarla más adelante
     req.user = decoded;
     return next();
   } catch (e) {
-    const err = new Error('Token inválido');
+    // Proporcionar mensajes de error más específicos
+    let errorMessage = 'Token inválido';
+    let errorCode = 'INVALID_TOKEN';
+    
+    if (e.name === 'TokenExpiredError') {
+      errorMessage = 'Token expirado';
+      errorCode = 'TOKEN_EXPIRED';
+    } else if (e.name === 'JsonWebTokenError') {
+      errorMessage = 'Token mal formado';
+      errorCode = 'MALFORMED_TOKEN';
+    } else if (e.name === 'NotBeforeError') {
+      errorMessage = 'Token no válido aún';
+      errorCode = 'TOKEN_NOT_ACTIVE';
+    }
+    
+    // Log del error para debugging (sin exponer el token completo)
+    console.warn(`Error de autenticación: ${errorCode} - ${errorMessage}`, {
+      tokenLength: token.length,
+      tokenPrefix: token.substring(0, 10) + '...',
+      errorName: e.name,
+    });
+    
+    const err = new Error(errorMessage);
     err.status = 401;
-    err.code = 'INVALID_TOKEN';
+    err.code = errorCode;
     return next(err);
   }
 };

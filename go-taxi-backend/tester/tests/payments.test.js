@@ -1,6 +1,6 @@
-const getApp = require('../utils/request');
+const { getApp } = require('../utils/request');
 const { connect, disconnect } = require('../utils/mongoMemory');
-const cleanDB = require('../utils/cleanDB');
+const { cleanDB } = require('../utils/cleanDB');
 const endpoints = require('../config/endpoints');
 const { buildUser } = require('../factories/userFactory');
 
@@ -24,7 +24,7 @@ describe('Payments (Mercado Pago)', () => {
     expect([200, 201]).toContain(reg.status);
     const login = await getApp().post(endpoints.auth.login).send({ email: user.email, password: user.password });
     expect(login.status).toBe(200);
-    const token = login.body.token;
+    const token = login.body.data.accessToken;
 
     // Invocar el endpoint de Mercado Pago con tripId y monto
     const res = await getApp()

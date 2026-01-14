@@ -1,11 +1,5 @@
 const nodemailer = require('nodemailer');
-const {
-  EMAIL_HOST,
-  EMAIL_PORT,
-  EMAIL_SECURE,
-  EMAIL_USER,
-  EMAIL_PASS,
-} = require('../config/env');
+const { EMAIL_HOST, EMAIL_PORT, EMAIL_SECURE, EMAIL_USER, EMAIL_PASS } = require('../config/env');
 const { logToFile } = require('../utils/logger');
 
 /*
@@ -18,9 +12,7 @@ const { logToFile } = require('../utils/logger');
  */
 
 const defaultFromName = process.env.EMAIL_FROM_NAME;
-const defaultFrom = defaultFromName
-  ? `${defaultFromName} <${EMAIL_USER}>`
-  : EMAIL_USER;
+const defaultFrom = defaultFromName ? `${defaultFromName} <${EMAIL_USER}>` : EMAIL_USER;
 
 const transporter = nodemailer.createTransport({
   host: EMAIL_HOST,

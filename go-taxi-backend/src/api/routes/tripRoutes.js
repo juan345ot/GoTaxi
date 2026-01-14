@@ -1,4 +1,5 @@
 const express = require('express');
+// eslint-disable-next-line new-cap
 const router = express.Router();
 const tripController = require('../controllers/tripController');
 const { verifyToken, permitRoles } = require('../../middlewares/auth');
@@ -20,7 +21,24 @@ router.put('/:id/assign', verifyToken, permitRoles(ROLES.ADMIN), tripController.
  * @route   PUT /api/trips/:id/status
  * @desc    Cambiar estado de viaje (conductor/admin)
  */
-router.put('/:id/status', verifyToken, permitRoles(ROLES.CONDUCTOR, ROLES.ADMIN), tripController.updateStatus);
+router.put(
+  '/:id/status',
+  verifyToken,
+  permitRoles(ROLES.CONDUCTOR, ROLES.ADMIN),
+  tripController.updateStatus,
+);
+
+/**
+ * @route   GET /api/trips/active
+ * @desc    Obtener viajes activos (solo admin)
+ */
+router.get('/active', verifyToken, permitRoles(ROLES.ADMIN), tripController.getActiveTrips);
+
+/**
+ * @route   GET /api/trips/stats
+ * @desc    Obtener estadísticas de viajes
+ */
+router.get('/stats', verifyToken, tripController.getTripStats);
 
 /**
  * @route   GET /api/trips/:id

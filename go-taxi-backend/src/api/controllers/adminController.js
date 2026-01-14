@@ -20,9 +20,7 @@ exports.getAllAdmins = async (req, res, next) => {
     const search = (req.query.search || '').trim();
 
     // Armamos sort dinámico para aggregate
-    const sort = sortQuery.startsWith('-')
-      ? { [sortQuery.slice(1)]: -1 }
-      : { [sortQuery]: 1 };
+    const sort = sortQuery.startsWith('-') ? { [sortQuery.slice(1)]: -1 } : { [sortQuery]: 1 };
 
     // Como el filtro es por campos del usuario (poblado), usamos aggregate + $lookup
     const matchStage = {};

@@ -1,0 +1,108 @@
+module.exports = {
+  env: {
+    browser: true,
+    es2021: true,
+    node: true,
+    jest: true,
+  },
+  extends: ['eslint:recommended', 'prettier'],
+  parserOptions: {
+    ecmaVersion: 'latest',
+    sourceType: 'module',
+  },
+  plugins: ['prettier'],
+  rules: {
+    'prettier/prettier': 'error',
+    'no-console': 'warn',
+    'no-debugger': 'error',
+    'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    'prefer-const': 'warn',
+    'no-var': 'warn',
+    'object-shorthand': 'warn',
+    'prefer-template': 'warn',
+    'template-curly-spacing': 'warn',
+    'arrow-spacing': 'warn',
+    'comma-dangle': ['warn', 'always-multiline'],
+    'comma-spacing': 'warn',
+    'comma-style': 'warn',
+    'computed-property-spacing': 'warn',
+    'func-call-spacing': 'warn',
+    'key-spacing': 'warn',
+    'keyword-spacing': 'warn',
+    'object-curly-spacing': ['warn', 'always'],
+    semi: ['warn', 'always'],
+    'semi-spacing': 'warn',
+    'space-before-blocks': 'warn',
+    'space-before-function-paren': [
+      'warn',
+      {
+        anonymous: 'always',
+        named: 'never',
+        asyncArrow: 'always',
+      },
+    ],
+    'space-in-parens': 'warn',
+    'space-infix-ops': 'warn',
+    'space-unary-ops': 'warn',
+    'spaced-comment': 'warn',
+    quotes: ['warn', 'single', { avoidEscape: true }],
+    'jsx-quotes': ['warn', 'prefer-double'],
+    'no-multiple-empty-lines': ['warn', { max: 2, maxEOF: 1 }],
+    'no-trailing-spaces': 'warn',
+    'eol-last': 'warn',
+    indent: ['warn', 2, { SwitchCase: 1 }],
+    'max-len': ['warn', { code: 100, ignoreUrls: true, ignoreStrings: true }],
+    'no-mixed-spaces-and-tabs': 'warn',
+    'no-tabs': 'warn',
+    'array-bracket-spacing': 'warn',
+    'brace-style': 'warn',
+    camelcase: ['warn', { 
+      properties: 'never',
+      ignoreDestructuring: true,
+      allow: ['^[a-z]+(_[a-z]+)*$'] // Permitir snake_case para campos de BD
+    }],
+    'new-cap': 'warn',
+    'new-parens': 'warn',
+    'no-array-constructor': 'warn',
+    'no-new-object': 'warn',
+    'no-spaced-func': 'warn',
+    'no-unneeded-ternary': 'warn',
+    'one-var': ['warn', 'never'],
+    'operator-assignment': 'warn',
+    'operator-linebreak': ['warn', 'after', { overrides: { '?': 'before', ':': 'before' } }],
+    'padded-blocks': ['warn', 'never'],
+    'quote-props': ['warn', 'as-needed'],
+    'space-after-keywords': 'off',
+    'space-before-keywords': 'off',
+    'space-return-throw-case': 'off',
+    'spaced-comment': 'warn',
+  },
+  overrides: [
+    {
+      files: ['**/*.test.js', '**/*.spec.js'],
+      env: {
+        jest: true,
+      },
+      rules: {
+        'no-console': 'off',
+      },
+    },
+    {
+      files: ['**/models/**/*.js', '**/dtos/**/*.js'],
+      rules: {
+        'camelcase': 'off', // Desactivar camelcase para modelos y DTOs
+      },
+    },
+    {
+      files: ['**/controllers/**/*.js', '**/services/**/*.js'],
+      rules: {
+        'no-unused-vars': ['warn', { 
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_'
+        }],
+        'max-len': ['warn', { code: 120, ignoreUrls: true, ignoreStrings: true }],
+      },
+    },
+  ],
+  ignorePatterns: ['node_modules/', 'dist/', 'build/', 'coverage/', '*.min.js', 'logs/'],
+};

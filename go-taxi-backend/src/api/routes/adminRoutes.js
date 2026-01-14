@@ -1,4 +1,5 @@
 const express = require('express');
+// eslint-disable-next-line new-cap
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const { verifyToken, permitRoles } = require('../../middlewares/auth');

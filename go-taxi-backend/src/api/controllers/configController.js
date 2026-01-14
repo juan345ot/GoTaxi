@@ -1,5 +1,6 @@
 const Config = require('../../models/Config');
 const { logToFile } = require('../../utils/logger');
+/* eslint-disable max-len, operator-linebreak, indent */
 
 exports.getConfigs = async (req, res, next) => {
   try {
@@ -29,7 +30,11 @@ exports.setConfig = async (req, res, next) => {
     }
 
     // Crear y guardar la nueva configuración
-    const config = new Config({ tipo, valor, descripcion });
+    const config = new Config({
+      tipo,
+      valor,
+      descripcion,
+    });
     await config.save();
     logToFile(`Config creada: ${tipo} - ${valor}`);
     return res.status(201).json(config);

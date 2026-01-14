@@ -9,15 +9,16 @@
  * - details: información extra opcional (p. ej. datos de entrada que fallaron).
  * - stack: sólo en modo development, para facilitar la depuración.
  */
+/* eslint-disable no-unused-vars */
 module.exports = (err, _req, res, _next) => {
   // Extraemos valores con fallback
   const status = err.status || 500;
   const code = err.code || 'SERVER_ERROR';
-  const message = err.message || 'Error interno del servidor';
+  const _message = err.message || 'Error interno del servidor';
   const details = err.details;
 
   // Estructura base de respuesta
-  const response = { code, message };
+  const response = { success: false, code, message: _message };
   if (details !== undefined) response.details = details;
 
   // Incluir stack trace sólo en entorno de desarrollo
@@ -27,6 +28,7 @@ module.exports = (err, _req, res, _next) => {
 
   // Loggear el stack para monitoreo de errores
   if (err.stack) {
+    // eslint-disable-next-line no-console
     console.error(err.stack);
   }
 

@@ -11,11 +11,13 @@ const mongoose = require('mongoose');
  *
  * @param {string[]} excludes Array de nombres de colecciones a excluir
  */
-module.exports = async function cleanDB(excludes = []) {
+async function cleanDB(excludes = []) {
   const { collections } = mongoose.connection;
   // Filtrar las colecciones excluidas y preparar las operaciones de borrado
   const deletions = Object.entries(collections)
     .filter(([name]) => !excludes.includes(name))
     .map(([, collection]) => collection.deleteMany({}));
   await Promise.all(deletions);
-};
+}
+
+module.exports = { cleanDB };

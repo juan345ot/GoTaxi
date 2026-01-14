@@ -1,4 +1,5 @@
 const express = require('express');
+// eslint-disable-next-line new-cap
 const router = express.Router();
 const ratingController = require('../controllers/ratingController');
 const { verifyToken, permitRoles } = require('../../middlewares/auth');
@@ -8,7 +9,12 @@ const ROLES = require('../../config/roles');
  * @route   POST /api/ratings/
  * @desc    Calificar viaje/conductor (pasajero o conductor)
  */
-router.post('/', verifyToken, permitRoles(ROLES.PASAJERO, ROLES.CONDUCTOR), ratingController.createRating);
+router.post(
+  '/',
+  verifyToken,
+  permitRoles(ROLES.PASAJERO, ROLES.CONDUCTOR),
+  ratingController.createRating,
+);
 
 /**
  * @route   GET /api/ratings/trip/:tripId

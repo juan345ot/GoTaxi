@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const validateCreateTrip = (data) => {
+const validateCreateTrip = data => {
   const schema = Joi.object({
     origen: Joi.object({
       direccion: Joi.string().required(),

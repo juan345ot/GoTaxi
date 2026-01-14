@@ -16,6 +16,24 @@ let mongoServer;
  * @returns {Promise<mongoose.Connection>} La conexión de Mongoose activa
  */
 async function connect(dbName = process.env.MONGO_TEST_DB_NAME || 'gotaxi_test') {
+  // Si ya hay una conexión activa, no intentar conectar de nuevo
+  if (mongoose.connection.readyState === 1) {
+    console.log('✅ Reutilizando conexión existente de Mongoose');
+    return mongoose.connection;
+  }
+
+  // Si ya hay una URI configurada (desde globalSetup), usarla
+  if (process.env.MONGODB_URI) {
+    console.log('✅ Usando URI configurada desde globalSetup:', process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGODB_URI, { 
+      dbName,
+      maxPoolSize: 10,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
+    return mongoose.connection;
+  }
+
   // Reusar la misma instancia si ya fue creada
   if (!mongoServer) {
     mongoServer = await MongoMemoryServer.create();
@@ -24,7 +42,12 @@ async function connect(dbName = process.env.MONGO_TEST_DB_NAME || 'gotaxi_test')
   // Exponer la URI para que la aplicación la utilice
   process.env.MONGO_URI = uri;
   // Conectar Mongoose al servidor en memoria con el nombre de base de datos elegido
-  await mongoose.connect(uri, { dbName });
+  await mongoose.connect(uri, { 
+    dbName,
+    maxPoolSize: 10,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+  });
   return mongoose.connection;
 }
 

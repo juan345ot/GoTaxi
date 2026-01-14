@@ -1,4 +1,4 @@
-const getApp = require('../utils/request');
+const { getApp } = require('../utils/request');
 const { connect, disconnect } = require('../utils/mongoMemory');
 const endpoints = require('../config/endpoints');
 

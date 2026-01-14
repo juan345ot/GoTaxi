@@ -1,4 +1,5 @@
 const express = require('express');
+// eslint-disable-next-line new-cap
 const router = express.Router();
 const paymentController = require('../controllers/paymentController');
 const { verifyToken, permitRoles } = require('../../middlewares/auth');
@@ -14,6 +15,11 @@ router.post('/simulado', verifyToken, permitRoles(ROLES.PASAJERO), paymentContro
  * @route   POST /api/payments/mercadopago
  * @desc    Pago real Mercado Pago – solo para pasajeros
  */
-router.post('/mercadopago', verifyToken, permitRoles(ROLES.PASAJERO), paymentController.payMercadoPago);
+router.post(
+  '/mercadopago',
+  verifyToken,
+  permitRoles(ROLES.PASAJERO),
+  paymentController.payMercadoPago,
+);
 
 module.exports = router;

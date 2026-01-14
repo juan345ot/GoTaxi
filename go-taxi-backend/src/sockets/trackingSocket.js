@@ -15,7 +15,7 @@ function initTrackingSocket(server) {
     // Log de conexión
     logToFile(`Nueva conexión WebSocket desde ${req.socket.remoteAddress}`);
 
-    ws.on('message', (data) => {
+    ws.on('message', data => {
       let msg;
       try {
         msg = typeof data === 'string' ? JSON.parse(data) : data;
@@ -101,6 +101,7 @@ function initTrackingSocket(server) {
     });
   });
 
+  // eslint-disable-next-line no-console
   console.log('🟢 WebSocket Tracking Server iniciado');
   return wss;
 }

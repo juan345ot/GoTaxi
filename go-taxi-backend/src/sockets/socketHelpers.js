@@ -35,32 +35,32 @@ function registerClient(ws, { userId, role, viajeId }) {
 
 // Eliminar cliente al desconectarse
 function unregisterClient(ws) {
-  wsClients = wsClients.filter((c) => c !== ws);
+  wsClients = wsClients.filter(c => c !== ws);
 }
 
 // Buscar clientes por userId
 function getClientsByUserId(userId) {
-  return wsClients.filter((ws) => ws.userId === userId);
+  return wsClients.filter(ws => ws.userId === userId);
 }
 
 // Buscar clientes por viajeId
 function getClientsByViajeId(viajeId) {
-  return wsClients.filter((ws) => ws.viajeId === viajeId);
+  return wsClients.filter(ws => ws.viajeId === viajeId);
 }
 
 // Emitir mensaje a todos
 function broadcast(data) {
-  wsClients.forEach((ws) => safeSend(ws, data));
+  wsClients.forEach(ws => safeSend(ws, data));
 }
 
 // Emitir a todos los usuarios de un viaje
 function emitToViaje(viajeId, data) {
-  getClientsByViajeId(viajeId).forEach((ws) => safeSend(ws, data));
+  getClientsByViajeId(viajeId).forEach(ws => safeSend(ws, data));
 }
 
 // Emitir a usuario específico
 function emitToUser(userId, data) {
-  getClientsByUserId(userId).forEach((ws) => safeSend(ws, data));
+  getClientsByUserId(userId).forEach(ws => safeSend(ws, data));
 }
 
 module.exports = {

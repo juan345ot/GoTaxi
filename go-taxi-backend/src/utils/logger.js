@@ -41,6 +41,7 @@ function logToFile(message) {
     fs.appendFileSync(filePath, logMessage, 'utf8');
   } catch (err) {
     // En caso de fallo al escribir en disco, loggear a consola como último recurso
+    // eslint-disable-next-line no-console
     console.error('Error escribiendo log:', err);
   }
 }

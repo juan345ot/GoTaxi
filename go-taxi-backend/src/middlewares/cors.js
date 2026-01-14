@@ -12,7 +12,7 @@ const cors = require('cors');
 // Lee la whitelist de CORS desde el entorno o usa valores por defecto
 const whitelist = (process.env.CORS_WHITELIST || 'http://localhost:3000,http://localhost:19006')
   .split(',')
-  .map((origin) => origin.trim())
+  .map(origin => origin.trim())
   .filter(Boolean);
 
 const corsOptions = {

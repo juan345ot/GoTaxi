@@ -12,12 +12,31 @@ const { randomUUID } = require('crypto');
  */
 function buildUser(overrides = {}) {
   const rnd = randomUUID().slice(0, 8);
-  return {
+  const apellidos = ['Garcia', 'Rodriguez', 'Martinez', 'Lopez', 'Gonzalez', 'Perez', 'Sanchez', 'Ramirez'];
+  const apellidoAleatorio = apellidos[Math.floor(Math.random() * apellidos.length)];
+  
+  const baseUser = {
     nombre: 'Test',
-    apellido: `User${rnd}`,
+    apellido: apellidoAleatorio,
     email: `test_${rnd}@example.com`,
     password: 'Passw0rd!',
     role: 'pasajero',
+  };
+
+  // Si es conductor, agregar campos requeridos
+  if (overrides.role === 'conductor') {
+    baseUser.licencia = `LIC${rnd.slice(0, 6).toUpperCase()}`;
+    baseUser.vehiculo = {
+      marca: 'Toyota',
+      modelo: 'Corolla',
+      año: 2020,
+      color: 'Blanco',
+      patente: `ABC${rnd.slice(0, 3).toUpperCase()}`,
+    };
+  }
+
+  return {
+    ...baseUser,
     ...overrides,
   };
 }

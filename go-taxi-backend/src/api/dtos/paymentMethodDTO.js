@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const validatePaymentMethod = (data) => {
+const validatePaymentMethod = data => {
   const schema = Joi.object({
     // Tipo de método: tarjeta o mercadopago
     tipo: Joi.string().valid('tarjeta', 'mercadopago').required(),

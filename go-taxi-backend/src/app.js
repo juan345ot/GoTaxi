@@ -1,4 +1,5 @@
 require('dotenv').config();
+/* eslint-disable no-console */
 
 const express = require('express');
 const mongoose = require('mongoose');
@@ -27,11 +28,28 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // --- Healthcheck ---
 app.get('/health', (req, res) => {
-  res.status(200).json({
+  const mongoStatus = mongoose.connection.readyState;
+  const mongoStates = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting',
+  };
+
+  const health = {
     ok: true,
     service: 'go-taxi-backend',
     env: process.env.NODE_ENV || 'development',
-  });
+    timestamp: new Date().toISOString(),
+    mongodb: {
+      status: mongoStates[mongoStatus] || 'unknown',
+      connected: mongoStatus === 1,
+    },
+  };
+
+  // Si MongoDB no está conectado, retornar 503 pero mantener ok: true para indicar que el servicio está corriendo
+  const statusCode = mongoStatus === 1 ? 200 : 503;
+  res.status(statusCode).json(health);
 });
 
 // --- Home simple ---
@@ -51,21 +69,36 @@ app.use('/api/configs', require('./api/routes/configRoutes'));
 
 // --- 404 ---
 app.use((req, res) => {
-  res.status(404).json({ message: 'Endpoint no encontrado' });
+  res.status(404).json({
+    success: false,
+    code: 'ENDPOINT_NOT_FOUND',
+    message: 'Endpoint no encontrado',
+  });
 });
 
 // --- Middleware global de manejo de errores ---
 app.use(errorHandler);
 
 // --- Conexión a MongoDB ---
-if (mongoose.connection.readyState === 0 && process.env.MONGO_URI) {
-  mongoose
-    .connect(process.env.MONGO_URI)
-    .then(() => console.log('🟢 MongoDB conectado'))
-    .catch((err) => {
-      console.error('🔴 Error conectando a MongoDB:', err.message);
-      process.exit(1);
-    });
+// No conectar en modo test (los tests manejan su propia conexión)
+if (process.env.NODE_ENV !== 'test' && mongoose.connection.readyState === 0) {
+  const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+  if (mongoUri) {
+    mongoose
+      .connect(mongoUri, {
+        serverSelectionTimeoutMS: 5000, // Timeout después de 5 segundos
+        socketTimeoutMS: 45000, // Cerrar sockets después de 45 segundos de inactividad
+      })
+      .then(() => console.log('🟢 MongoDB conectado'))
+      .catch(err => {
+        console.error('🔴 Error conectando a MongoDB:', err.message);
+        console.warn('⚠️ El servidor continuará ejecutándose sin MongoDB. Algunas funcionalidades no estarán disponibles.');
+        // No hacer process.exit(1) para permitir que el servidor continúe
+        // El healthcheck mostrará el estado de MongoDB
+      });
+  } else {
+    console.warn('⚠️ MONGO_URI no configurado. El servidor continuará sin MongoDB.');
+  }
 }
 
 // --- HTTP Server + WebSocket ---

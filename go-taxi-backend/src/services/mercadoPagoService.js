@@ -41,7 +41,7 @@ exports.createPayment = async ({ monto, description, payer_email }) => {
 /*
  * Obtiene el estado de un pago por ID en Mercado Pago.
  */
-exports.getPaymentStatus = async (paymentId) => {
+exports.getPaymentStatus = async paymentId => {
   try {
     const response = await mercadopago.payment.findById(paymentId);
     return response;

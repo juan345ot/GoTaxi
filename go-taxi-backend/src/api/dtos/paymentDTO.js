@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 // Validación para pagos simulados (efectivo/tarjeta)
-const validateSimulatedPayment = (data) => {
+const validateSimulatedPayment = data => {
   const schema = Joi.object({
     // Se espera un ObjectId de Mongo (24 caracteres hexadecimales)
     tripId: Joi.string().hex().length(24).required(),
@@ -14,7 +14,7 @@ const validateSimulatedPayment = (data) => {
 };
 
 // Validación para pagos vía Mercado Pago
-const validateMpPayment = (data) => {
+const validateMpPayment = data => {
   const schema = Joi.object({
     tripId: Joi.string().hex().length(24).required(),
     monto: Joi.number().positive().required(),
