@@ -1,9 +1,6 @@
 import React from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import HomeScreen from '../screens/Booking/HomeScreen';
-import HistoryScreen from '../screens/History/HistoryScreen';
-import ProfileScreen from '../screens/Profile/ProfileScreen';
-import SupportScreen from '../screens/Support/SupportScreen';
+import LazyScreen from '../components/common/LazyScreen';
 import { Ionicons } from '@expo/vector-icons';
 
 const Drawer = createDrawerNavigator();
@@ -21,40 +18,54 @@ export default function DrawerNavigator() {
     >
       <Drawer.Screen
         name="Inicio"
-        component={HomeScreen}
         options={{
           drawerIcon: ({ color, size }) => (
             <Ionicons name="home-outline" color={color} size={size} />
           ),
         }}
-      />
+      >
+        {(props) => <LazyScreen componentName="Booking/HomeScreen" {...props} />}
+      </Drawer.Screen>
       <Drawer.Screen
         name="Historial de viajes"
-        component={HistoryScreen}
         options={{
           drawerIcon: ({ color, size }) => (
             <Ionicons name="time-outline" color={color} size={size} />
           ),
         }}
-      />
+      >
+        {(props) => <LazyScreen componentName="History/HistoryScreen" {...props} />}
+      </Drawer.Screen>
       <Drawer.Screen
         name="Perfil"
-        component={ProfileScreen}
         options={{
           drawerIcon: ({ color, size }) => (
             <Ionicons name="person-outline" color={color} size={size} />
           ),
         }}
-      />
+      >
+        {(props) => <LazyScreen componentName="Profile/ProfileScreen" {...props} />}
+      </Drawer.Screen>
       <Drawer.Screen
         name="Soporte"
-        component={SupportScreen}
         options={{
           drawerIcon: ({ color, size }) => (
             <Ionicons name="help-buoy-outline" color={color} size={size} />
           ),
         }}
-      />
+      >
+        {(props) => <LazyScreen componentName="Support/SupportScreen" {...props} />}
+      </Drawer.Screen>
+      <Drawer.Screen
+        name="Mis Direcciones"
+        options={{
+          drawerIcon: ({ color, size }) => (
+            <Ionicons name="location-outline" color={color} size={size} />
+          ),
+        }}
+      >
+        {(props) => <LazyScreen componentName="Addresses/AddressesScreen" {...props} />}
+      </Drawer.Screen>
     </Drawer.Navigator>
   );
 }

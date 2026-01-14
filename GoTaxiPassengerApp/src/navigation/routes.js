@@ -17,4 +17,6 @@ export const ROUTES = {
   SUPPORT_DETAIL: 'SupportDetail',
   EDIT_PROFILE: 'EditProfile',
   CHAT: 'Chat',
+  ADDRESSES: 'Addresses',
+  CHANGE_PASSWORD: 'ChangePassword',
 };

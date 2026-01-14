@@ -1,13 +1,59 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import AppHeader from '../../components/common/AppHeader';
+import ProfileMenu from '../../components/common/ProfileMenu';
 import InputField from '../../components/common/InputField';
 import PrimaryButton from '../../components/common/PrimaryButton';
+import { useTheme } from '../../contexts/ThemeContext';
 import { showToast } from '../../utils/toast';
 
 export default function SupportScreen() {
+  const navigation = useNavigation();
+  
+  // Obtener tema con validación robusta
+  let themeContext;
+  try {
+    themeContext = useTheme();
+  } catch (error) {
+    console.warn('Error obteniendo tema:', error);
+    themeContext = null;
+  }
+  
+  const defaultColors = {
+    background: '#F8FAFC',
+    surface: '#FFFFFF',
+    text: '#111827',
+    textSecondary: '#6B7280',
+    border: '#E5E7EB',
+    primary: '#007AFF',
+  };
+  
+  // Validar y crear el tema de forma segura
+  let theme;
+  if (themeContext?.theme?.colors) {
+    theme = themeContext.theme;
+  } else {
+    theme = { isDarkMode: false, colors: { ...defaultColors } };
+  }
+  
+  // Garantizar que colors siempre exista
+  if (!theme || !theme.colors) {
+    theme = { isDarkMode: false, colors: { ...defaultColors } };
+  } else {
+    theme.colors = { ...defaultColors, ...theme.colors };
+  }
+  
+  // Validación final antes de renderizar
+  const safeTheme = theme?.colors ? theme : {
+    isDarkMode: false,
+    colors: { ...defaultColors },
+  };
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
   const [reclamos, setReclamos] = useState([]); // Simulación local
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
 
   const handleSubmit = () => {
     if (!subject || !message) {
@@ -31,7 +77,11 @@ export default function SupportScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: safeTheme.colors.background }]} edges={['top', 'bottom']}>
+      <AppHeader showBackButton={true} onProfilePress={() => setShowProfileMenu(true)} />
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+      <Text style={[styles.title, { color: safeTheme.colors.text }]}>Soporte Técnico</Text>
+      <Text style={[styles.subtitle, { color: safeTheme.colors.textSecondary }]}>Escribinos y te responderemos a la brevedad</Text>
       <InputField
         label="Asunto"
         value={subject}
@@ -49,13 +99,31 @@ export default function SupportScreen() {
       />
 
       <PrimaryButton title="Enviar" icon="send" onPress={handleSubmit} />
-    </View>
+      </ScrollView>
+      <ProfileMenu
+        visible={showProfileMenu}
+        onClose={() => setShowProfileMenu(false)}
+        navigation={navigation}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 20,
     flex: 1,
+  },
+  scrollContent: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 14,
+    marginBottom: 24,
   },
 });

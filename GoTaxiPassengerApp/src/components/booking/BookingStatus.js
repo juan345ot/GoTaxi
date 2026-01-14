@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../styles/theme';
@@ -19,7 +18,7 @@ const statusMap = {
     icon: 'checkmark-circle',
     color: colors.success,
   },
-  cancelado: { // ✅ nuevo estado agregado
+  cancelado: {
     label: 'Viaje cancelado',
     icon: 'close-circle',
     color: colors.error,

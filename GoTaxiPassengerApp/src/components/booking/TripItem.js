@@ -1,29 +1,57 @@
-import React, { useState } from 'react';
+import { useState, useCallback, useMemo, memo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import RatingStars from '../common/RatingStars';
 
 // Solo habilitar LayoutAnimation en Android y si no es la Nueva Arquitectura
-if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental && !global.__turboModuleProxy) {
+if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental && !globalThis.__turboModuleProxy) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-export default function TripItem({ trip }) {
+const TripItem = memo(function TripItem({ trip }) {
   const [expanded, setExpanded] = useState(false);
 
-  const handleExpand = () => {
+  const handleExpand = useCallback(() => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
     setExpanded((prev) => !prev);
-  };
+  }, []);
+
+  // Memoizar valores computados
+  const formattedDate = useMemo(() => {
+    return new Date(trip.fecha || trip.date).toLocaleString();
+  }, [trip.fecha, trip.date]);
+
+  const paymentMethodText = useMemo(() => {
+    switch (trip.metodoPago) {
+      case 'cash':
+        return 'Efectivo';
+      case 'mp':
+        return 'Mercado Pago';
+      default:
+        return 'Tarjeta';
+    }
+  }, [trip.metodoPago]);
+
+  const tripDetails = useMemo(() => {
+    return {
+      driver: trip.driver || 'N/A',
+      vehicle: trip.vehicle || 'N/A',
+      distance: trip.distancia ? `${trip.distancia} m` : 'N/A',
+      duration: trip.duration ? `${trip.duration} min` : 'N/A',
+      pin: trip.pin || 'N/A',
+      rating: trip.rating || 0,
+      hasComment: !!trip.comment,
+    };
+  }, [trip.driver, trip.vehicle, trip.distancia, trip.duration, trip.pin, trip.rating, trip.comment]);
 
   return (
     <View style={styles.card}>
       <TouchableOpacity style={styles.row} onPress={handleExpand} activeOpacity={0.75}>
         <View style={{ flex: 1 }}>
           <Text style={styles.title}>{trip.origin} ➔ {trip.destination}</Text>
-          <Text style={styles.date}>{new Date(trip.fecha || trip.date).toLocaleString()}</Text>
+          <Text style={styles.date}>{formattedDate}</Text>
           <Text style={styles.importe}>${trip.importe} — <Text style={styles.metodo}>
-            {trip.metodoPago === 'cash' ? 'Efectivo' : trip.metodoPago === 'mp' ? 'Mercado Pago' : 'Tarjeta'}
+            {paymentMethodText}
           </Text></Text>
         </View>
         <Ionicons
@@ -36,28 +64,28 @@ export default function TripItem({ trip }) {
       {expanded && (
         <View style={styles.details}>
           <Text style={styles.detailLabel}>Conductor:</Text>
-          <Text style={styles.detailValue}>{trip.driver || 'N/A'}</Text>
+          <Text style={styles.detailValue}>{tripDetails.driver}</Text>
           <Text style={styles.detailLabel}>Vehículo:</Text>
-          <Text style={styles.detailValue}>{trip.vehicle || 'N/A'}</Text>
+          <Text style={styles.detailValue}>{tripDetails.vehicle}</Text>
           <Text style={styles.detailLabel}>Distancia recorrida:</Text>
-          <Text style={styles.detailValue}>{trip.distancia ? trip.distancia + ' m' : 'N/A'}</Text>
+          <Text style={styles.detailValue}>{tripDetails.distance}</Text>
           <Text style={styles.detailLabel}>Duración:</Text>
-          <Text style={styles.detailValue}>{trip.duration ? trip.duration + ' min' : 'N/A'}</Text>
+          <Text style={styles.detailValue}>{tripDetails.duration}</Text>
           <Text style={styles.detailLabel}>PIN de pago:</Text>
-          <Text style={styles.detailValue}>{trip.pin || 'N/A'}</Text>
+          <Text style={styles.detailValue}>{tripDetails.pin}</Text>
           <Text style={styles.detailLabel}>Calificación:</Text>
-          <RatingStars value={trip.rating || 0} size={17} disabled />
-          {trip.comment ? (
+          <RatingStars value={tripDetails.rating} size={17} disabled />
+          {tripDetails.hasComment && (
             <>
               <Text style={styles.detailLabel}>Comentario:</Text>
               <Text style={styles.comentario}>{trip.comment}</Text>
             </>
-          ) : null}
+          )}
         </View>
       )}
     </View>
   );
-}
+});
 
 const styles = StyleSheet.create({
   card: {
@@ -123,3 +151,5 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
 });
+
+export default TripItem;

@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import InputField from '../common/InputField';
 import PrimaryButton from '../common/PrimaryButton';

@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import { memo } from 'react';
 import { TouchableOpacity, Text, ActivityIndicator, StyleSheet, View } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -17,11 +17,11 @@ const PrimaryButton = memo(function PrimaryButton({ title, onPress, disabled, lo
       ) : (
         <View style={styles.content}>
           {icon && (
-            <Ionicons 
-              name={icon} 
-              size={20} 
-              color="#fff" 
-              style={styles.icon} 
+            <Ionicons
+              name={icon}
+              size={20}
+              color="#fff"
+              style={styles.icon}
             />
           )}
           <Text style={[styles.text, textStyle]}>{title}</Text>

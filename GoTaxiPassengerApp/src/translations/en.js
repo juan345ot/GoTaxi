@@ -1,3 +1,4 @@
+
 export default {
   welcome: 'Welcome to GoTaxi',
   login: 'Login',
@@ -13,21 +14,21 @@ export default {
   profile: 'Profile',
   history: 'History',
   // Translations for RideTrackingScreen
-  taxi_on_the_way: 'Driver on the way',
-  trip_in_progress: 'Trip in progress',
-  trip_arrived_title: 'We arrived!',
-  trip_cancelled_title: 'Trip cancelled',
-  cancel_trip_btn: 'Cancel trip',
-  cancel_warning_dialog: 'Are you sure you want to cancel the trip? A $500 fine will be applied.',
+  taxiOnTheWay: 'Driver on the way',
+  tripInProgress: 'Trip in progress',
+  tripArrivedTitle: 'We arrived!',
+  tripCancelledTitle: 'Trip cancelled',
+  cancelTripBtn: 'Cancel trip',
+  cancelWarningDialog: 'Are you sure you want to cancel the trip? A $500 fine will be applied.',
   no: 'No',
-  yes_cancel: 'Yes, cancel',
+  yesCancel: 'Yes, cancel',
   // Translations for TripSummaryScreen
   from: 'From',
   to: 'To',
   distance: 'Distance',
   duration: 'Duration',
-  total_amount: 'Total',
-  cancel_warning: 'A $500 fine was applied for late cancellation.',
-  pay_methods_btn: 'Payment methods',
-  problem_btn: 'Report problem',
+  totalAmount: 'Total',
+  cancelWarning: 'A $500 fine was applied for late cancellation.',
+  payMethodsBtn: 'Payment methods',
+  problemBtn: 'Report problem',
 };

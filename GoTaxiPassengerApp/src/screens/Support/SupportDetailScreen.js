@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { View, FlatList, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
-import { colors } from '../../styles/theme';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import AppHeader from '../../components/common/AppHeader';
+import { useTheme } from '../../contexts/ThemeContext';
 import EmptyState from '../../components/common/EmptyState';
 import { formatDate } from '../../utils/formatDate';
 import { showToast } from '../../utils/toast';
@@ -25,47 +27,89 @@ const MOCK_RECLAMOS = [
 ];
 
 export default function SupportDetailScreen() {
+  // Obtener tema con validación robusta
+  let themeContext;
+  try {
+    themeContext = useTheme();
+  } catch (error) {
+    console.warn('Error obteniendo tema:', error);
+    themeContext = null;
+  }
+  
+  const defaultColors = {
+    background: '#F8FAFC',
+    surface: '#FFFFFF',
+    text: '#111827',
+    textSecondary: '#6B7280',
+    border: '#E5E7EB',
+    primary: '#007AFF',
+    error: '#e53935',
+    success: '#00C851',
+  };
+  
+  // Validar y crear el tema de forma segura
+  let theme;
+  if (themeContext?.theme?.colors) {
+    theme = themeContext.theme;
+  } else {
+    theme = { isDarkMode: false, colors: { ...defaultColors } };
+  }
+  
+  // Garantizar que colors siempre exista
+  if (!theme || !theme.colors) {
+    theme = { isDarkMode: false, colors: { ...defaultColors } };
+  } else {
+    theme.colors = { ...defaultColors, ...theme.colors };
+  }
+  
+  // Validación final antes de renderizar
+  const safeTheme = theme?.colors ? theme : {
+    isDarkMode: false,
+    colors: { ...defaultColors },
+  };
+  
   const [reclamos, setReclamos] = useState(MOCK_RECLAMOS);
   const [responseInput, setResponseInput] = useState('');
 
   const handleResponder = (id) => {
     setReclamos((prev) =>
       prev.map((rec) =>
-        rec.id === id
-          ? { ...rec, status: 'respondido', respuesta: responseInput }
-          : rec
-      )
+        rec.id === id ?
+          { ...rec, status: 'respondido', respuesta: responseInput } :
+          rec,
+      ),
     );
     showToast('Respuesta enviada (simulada)');
     setResponseInput('');
   };
 
   const renderItem = ({ item }) => (
-    <View style={styles.card}>
-      <Text style={styles.subject}>{item.subject}</Text>
-      <Text style={styles.date}>{formatDate(item.date)}</Text>
-      <Text style={styles.message}>{item.message}</Text>
+    <View style={[styles.card, { backgroundColor: safeTheme.colors.surface, borderColor: safeTheme.colors.border }]}>
+      <Text style={[styles.subject, { color: safeTheme.colors.text }]}>{item.subject}</Text>
+      <Text style={[styles.date, { color: safeTheme.colors.textSecondary }]}>{formatDate(item.date)}</Text>
+      <Text style={[styles.message, { color: safeTheme.colors.text }]}>{item.message}</Text>
       <Text
         style={[
           styles.status,
-          item.status === 'pendiente' ? styles.pending : styles.answered,
+          item.status === 'pendiente' ? { color: safeTheme.colors.error } : { color: safeTheme.colors.success },
         ]}
       >
         {item.status === 'pendiente' ? 'Pendiente' : 'Respondido'}
       </Text>
       {item.status === 'respondido' && (
-        <Text style={styles.respuesta}>Respuesta: {item.respuesta}</Text>
+        <Text style={[styles.respuesta, { color: safeTheme.colors.textSecondary }]}>Respuesta: {item.respuesta}</Text>
       )}
       {item.status === 'pendiente' && (
         <>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { borderColor: safeTheme.colors.border, color: safeTheme.colors.text, backgroundColor: safeTheme.colors.surface }]}
             value={responseInput}
             onChangeText={setResponseInput}
             placeholder="Responder al reclamo..."
+            placeholderTextColor={safeTheme.colors.textSecondary}
           />
           <TouchableOpacity
-            style={styles.btn}
+            style={[styles.btn, { backgroundColor: safeTheme.colors.primary }]}
             onPress={() => handleResponder(item.id)}
           >
             <Text style={styles.btnText}>Enviar Respuesta</Text>
@@ -76,7 +120,8 @@ export default function SupportDetailScreen() {
   );
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: safeTheme.colors.background }]} edges={['top', 'bottom']}>
+      <AppHeader showBackButton={true} />
       {reclamos.length === 0 ? (
         <EmptyState icon="chatbubble-ellipses" message="Sin reclamos enviados aún" />
       ) : (
@@ -87,60 +132,46 @@ export default function SupportDetailScreen() {
           contentContainerStyle={styles.list}
         />
       )}
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    padding: 16,
   },
   list: {
+    padding: 16,
     paddingBottom: 20,
   },
   card: {
-    backgroundColor: '#fff',
     borderRadius: 6,
     padding: 12,
     marginBottom: 10,
-    borderColor: colors.border,
     borderWidth: 1,
   },
   subject: {
     fontSize: 16,
     fontWeight: '600',
-    color: colors.text,
   },
   date: {
     fontSize: 12,
-    color: colors.textSecondary,
     marginBottom: 6,
   },
   message: {
     fontSize: 14,
-    color: colors.text,
     marginBottom: 4,
   },
   status: {
     fontWeight: '700',
     marginBottom: 5,
   },
-  pending: {
-    color: colors.error,
-  },
-  answered: {
-    color: colors.success,
-  },
   respuesta: {
-    color: colors.textSecondary,
     marginBottom: 8,
     fontSize: 13,
   },
   input: {
     borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: 6,
     padding: 8,
     marginTop: 4,
@@ -148,7 +179,6 @@ const styles = StyleSheet.create({
     fontSize: 13,
   },
   btn: {
-    backgroundColor: colors.primary,
     padding: 8,
     borderRadius: 5,
     alignItems: 'center',

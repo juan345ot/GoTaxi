@@ -9,15 +9,43 @@ const client = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
-// Interceptor para agregar token de autenticación
-client.interceptors.request.use(async (config) => {
+// Cache del token en memoria para evitar lecturas repetidas de AsyncStorage
+let tokenCache = null;
+
+// Función para actualizar el cache del token
+export const updateTokenCache = async() => {
   try {
-    const token = await AsyncStorage.getItem('token');
+    tokenCache = await AsyncStorage.getItem('token');
+    return tokenCache;
+  } catch {
+    tokenCache = null;
+    return null;
+  }
+};
+
+// Inicializar el cache al cargar el módulo
+updateTokenCache();
+
+// Interceptor para agregar token de autenticación
+client.interceptors.request.use(async(config) => {
+  try {
+    // Usar cache primero, luego actualizar desde AsyncStorage si es necesario
+    let token = tokenCache;
+    if (!token) {
+      token = await updateTokenCache();
+    }
+    
+    // Si el config tiene un token explícito, usarlo (para casos especiales)
+    if (config.token) {
+      token = config.token;
+      delete config.token; // Remover del config para no enviarlo como parte del body
+    }
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-  } catch (error) {
-    console.log('Error getting token:', error);
+  } catch {
+    // console.log('Error getting token');
   }
   return config;
 });
@@ -32,20 +60,45 @@ client.interceptors.response.use(
       error?.message ||
       'Ocurrió un error';
 
-    // Casos típicos
+    // Casos típicos - solo mostrar para errores críticos
     if (error.code === 'ECONNABORTED') {
+      // Timeout - solo log, no bloquear
+      console.warn('Timeout en petición:', error.config?.url);
+      // Solo mostrar toast para operaciones críticas
+      if (error.config?.method && ['post', 'put', 'delete'].includes(error.config.method.toLowerCase())) {
       toast.error('El servidor no respondió (timeout).');
+      }
     } else if (!error.response) {
-      // Sin respuesta del servidor ⇒ red/DNS/puerto incorrecto
-      toast.error('Network Error: no se pudo conectar con el servidor.');
+      // Sin respuesta del servidor - solo mostrar para operaciones críticas
+      console.warn('Error de red:', error.config?.url);
+      if (error.config?.method && ['post', 'put', 'delete'].includes(error.config.method.toLowerCase())) {
+        toast.error('Error de conexión. Verificá tu internet.');
+      }
     } else if (error.response.status >= 500) {
+      // Error del servidor - solo mostrar para operaciones críticas
+      if (error.config?.method && ['post', 'put', 'delete'].includes(error.config.method.toLowerCase())) {
       toast.error('Error del servidor. Intentalo más tarde.');
-    } else {
+      }
+    } else if (error.response.status === 401) {
+      // Error de autenticación - limpiar token y cache
+      console.warn('Error de autenticación:', error.response?.data?.code || 'UNKNOWN');
+      const errorCode = error.response?.data?.code;
+      
+      // Si el token está expirado o es inválido, limpiar el cache
+      if (errorCode === 'TOKEN_EXPIRED' || errorCode === 'INVALID_TOKEN' || errorCode === 'MALFORMED_TOKEN') {
+        tokenCache = null;
+        AsyncStorage.removeItem('token').catch(() => {});
+      }
+      // No mostrar toast aquí, se maneja en AuthContext
+    } else if (error.response.status !== 404) {
+      // Para otros errores (excepto 404), mostrar mensaje solo si hay uno y es crítico
+      if (msg && error.config?.method && ['post', 'put', 'delete'].includes(error.config.method.toLowerCase())) {
       toast.error(msg);
+      }
     }
 
     return Promise.reject(error);
-  }
+  },
 );
 
 export default client;

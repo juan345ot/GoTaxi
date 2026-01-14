@@ -1,11 +1,52 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, FlatList, StyleSheet, KeyboardAvoidingView, Platform, Text } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import AppHeader from '../../components/common/AppHeader';
 import ChatInput from '../../components/chat/ChatInput';
 import MessageBubble from '../../components/chat/MessageBubble';
-import { colors } from '../../styles/theme';
+import { useTheme } from '../../contexts/ThemeContext';
 import * as chatApi from '../../api/chat'; // 🚀 Nuevo servicio real
 
 export default function ChatScreen({ route }) {
+  // Obtener tema con validación robusta
+  let themeContext;
+  try {
+    themeContext = useTheme();
+  } catch (error) {
+    console.warn('Error obteniendo tema:', error);
+    themeContext = null;
+  }
+  
+  const defaultColors = {
+    background: '#F8FAFC',
+    surface: '#FFFFFF',
+    text: '#111827',
+    textSecondary: '#6B7280',
+    border: '#E5E7EB',
+    primary: '#007AFF',
+  };
+  
+  // Validar y crear el tema de forma segura
+  let theme;
+  if (themeContext?.theme?.colors) {
+    theme = themeContext.theme;
+  } else {
+    theme = { isDarkMode: false, colors: { ...defaultColors } };
+  }
+  
+  // Garantizar que colors siempre exista
+  if (!theme || !theme.colors) {
+    theme = { isDarkMode: false, colors: { ...defaultColors } };
+  } else {
+    theme.colors = { ...defaultColors, ...theme.colors };
+  }
+  
+  // Validación final antes de renderizar
+  const safeTheme = theme?.colors ? theme : {
+    isDarkMode: false,
+    colors: { ...defaultColors },
+  };
+  
   const { rideId } = route.params || {};
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -14,10 +55,9 @@ export default function ChatScreen({ route }) {
 
   // 1. Cargar mensajes reales desde la API al iniciar
   useEffect(() => {
-    let polling;
     if (!rideId) return;
 
-    const loadMessages = async () => {
+    const loadMessages = async() => {
       try {
         const msgs = await chatApi.getMessages(rideId);
         setMessages(msgs);
@@ -28,12 +68,12 @@ export default function ChatScreen({ route }) {
 
     loadMessages();
     // Opcional: polling cada 4s si no usás WebSocket
-    polling = setInterval(loadMessages, 4000);
+    const polling = setInterval(loadMessages, 4000);
     return () => clearInterval(polling);
   }, [rideId]);
 
   // 2. Enviar mensaje (POST a la API o vía socket)
-  const handleSend = async () => {
+  const handleSend = async() => {
     if (!newMessage.trim()) return;
     try {
       await chatApi.sendMessage(rideId, newMessage.trim());
@@ -48,12 +88,14 @@ export default function ChatScreen({ route }) {
   };
 
   return (
+    <SafeAreaView style={[styles.wrapper, { backgroundColor: safeTheme.colors.background }]} edges={['top', 'bottom']}>
+      <AppHeader showBackButton={true} />
     <KeyboardAvoidingView
-      style={styles.wrapper}
+        style={styles.keyboardView}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       keyboardVerticalOffset={90}
     >
-      <View style={styles.header}>
+        <View style={[styles.header, { backgroundColor: safeTheme.colors.primary }]}>
         <Text style={styles.headerText}>Conversación con el conductor</Text>
       </View>
 
@@ -78,13 +120,16 @@ export default function ChatScreen({ route }) {
         onSend={handleSend}
       />
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   wrapper: {
     flex: 1,
-    backgroundColor: '#fff',
+  },
+  keyboardView: {
+    flex: 1,
   },
   messages: {
     padding: 10,
@@ -93,7 +138,6 @@ const styles = StyleSheet.create({
   header: {
     paddingVertical: 12,
     paddingHorizontal: 20,
-    backgroundColor: colors.primary,
   },
   headerText: {
     color: '#fff',

@@ -1,7 +1,9 @@
-import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export default function AuthHeader({ eslogan = '¡Su taxi a un click de distancia!' }) {
+  const { theme } = useTheme();
+  
   return (
     <View style={styles.container}>
       <View style={styles.row}>
@@ -12,7 +14,7 @@ export default function AuthHeader({ eslogan = '¡Su taxi a un click de distanci
           <Text style={styles.taxiText}>Taxi</Text>
         </View>
       </View>
-      <Text style={styles.slogan}>{eslogan}</Text>
+      <Text style={[styles.slogan, { color: theme.colors.textSecondary }]}>{eslogan}</Text>
     </View>
   );
 }
@@ -67,7 +69,6 @@ const styles = StyleSheet.create({
   },
   slogan: {
     marginTop: 8,
-    color: '#6B7280',
     fontSize: 18,
     fontStyle: 'italic',
     fontWeight: '500',

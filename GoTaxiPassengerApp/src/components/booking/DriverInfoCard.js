@@ -1,23 +1,44 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { useTheme } from '../../contexts/ThemeContext';
 import RatingStars from '../common/RatingStars';
 
-export default function DriverInfoCard({ driver, vehicle }) {
+export default function DriverInfoCard({ driver, vehicle, onPress }) {
+  const { theme } = useTheme();
+  
+  const defaultColors = {
+    surface: '#FFFFFF',
+    text: '#111827',
+    textSecondary: '#6B7280',
+    primary: '#007AFF',
+  };
+  
+  const safeTheme = theme?.colors ? theme : {
+    isDarkMode: false,
+    colors: { ...defaultColors },
+  };
+
   return (
-    <View style={styles.card}>
+    <TouchableOpacity 
+      style={[styles.card, { backgroundColor: safeTheme.colors.surface }]} 
+      onPress={onPress}
+      activeOpacity={0.7}
+    >
       <Image
         source={driver?.avatar ? { uri: driver.avatar } : require('../../../assets/images/driver1.png')}
         style={styles.avatar}
       />
       <View style={{ flex: 1 }}>
-        <Text style={styles.name}>{driver?.name}</Text>
+        <Text style={[styles.name, { color: safeTheme.colors.primary }]}>{driver?.name}</Text>
         <RatingStars value={driver?.rating || 0} size={16} disabled />
-        <Text style={styles.vehicle}>{vehicle}</Text>
+        <Text style={[styles.vehicle, { color: safeTheme.colors.textSecondary }]}>{vehicle}</Text>
         {driver?.carImage && (
           <Image source={{ uri: driver.carImage }} style={styles.carImage} />
         )}
       </View>
+      <View style={styles.chevron}>
+        <Text style={[styles.chevronText, { color: safeTheme.colors.primary }]}>›</Text>
     </View>
+    </TouchableOpacity>
   );
 }
 
@@ -34,6 +55,13 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.07,
     shadowRadius: 7,
     shadowOffset: { width: 1, height: 5 },
+  },
+  chevron: {
+    marginLeft: 8,
+  },
+  chevronText: {
+    fontSize: 24,
+    fontWeight: '300',
   },
   avatar: {
     width: 44,

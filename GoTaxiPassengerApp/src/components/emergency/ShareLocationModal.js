@@ -1,4 +1,3 @@
-import React from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Alert, Share, Clipboard } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../styles/theme';
@@ -7,7 +6,7 @@ export default function ShareLocationModal({ visible, onClose, location }) {
   const locationText = `Mi ubicación actual: ${location || 'Ubicación no disponible'}`;
   const locationUrl = `https://maps.google.com/?q=${location || '0,0'}`;
 
-  const handleCopyLocation = async () => {
+  const handleCopyLocation = async() => {
     try {
       await Clipboard.setString(locationText);
       Alert.alert('Copiado', 'Ubicación copiada al portapapeles');
@@ -17,12 +16,12 @@ export default function ShareLocationModal({ visible, onClose, location }) {
     }
   };
 
-  const handleShareGeneral = async () => {
+  const handleShareGeneral = async() => {
     try {
       await Share.share({
         message: `${locationText}\n\nVer en mapa: ${locationUrl}`,
         url: locationUrl,
-        title: 'Mi ubicación - GoTaxi'
+        title: 'Mi ubicación - GoTaxi',
       });
       onClose();
     } catch (error) {
@@ -38,7 +37,7 @@ export default function ShareLocationModal({ visible, onClose, location }) {
             <Ionicons name="location" size={40} color="#007AFF" />
             <Text style={styles.title}>Compartir Ubicación</Text>
           </View>
-          
+
           <Text style={styles.description}>
             Selecciona cómo quieres compartir tu ubicación actual:
           </Text>

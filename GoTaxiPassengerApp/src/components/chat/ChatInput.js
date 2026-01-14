@@ -1,9 +1,9 @@
-import React, { forwardRef } from 'react';
+import { forwardRef } from 'react';
 import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../styles/theme';
 
-const ChatInput = forwardRef(({ value, onChangeText, onSend, placeholderText = 'Escribe un mensaje...' }, ref) => { // ✅ Nueva prop agregada
+const ChatInput = forwardRef(({ value, onChangeText, onSend, placeholderText = 'Escribe un mensaje...' }, ref) => {
   return (
     <View style={styles.container}>
       <TextInput
@@ -11,7 +11,7 @@ const ChatInput = forwardRef(({ value, onChangeText, onSend, placeholderText = '
         style={styles.input}
         value={value}
         onChangeText={onChangeText}
-        placeholder={placeholderText} // ✅ aplicado aquí
+        placeholder={placeholderText}
         placeholderTextColor="#aaa"
         multiline
       />

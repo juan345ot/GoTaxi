@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity, Alert, Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../styles/theme';
@@ -6,53 +6,18 @@ import { colors } from '../../styles/theme';
 const EMERGENCY_SERVICES = {
   police: { name: 'Policía', number: '911', icon: 'shield' },
   ambulance: { name: 'Ambulancia', number: '107', icon: 'medical' },
-  fire: { name: 'Bomberos', number: '100', icon: 'flame' }
+  fire: { name: 'Bomberos', number: '100', icon: 'flame' },
 };
 
 export default function SOSModal({ visible, onClose }) {
+  const [showServices, setShowServices] = useState(false);
+
   const handleEmergencyConfirm = () => {
-    Alert.alert(
-      '¿Estás en una emergencia real?',
-      'Si confirmas que estás en una emergencia, se activará el protocolo de seguridad. Si no es una emergencia real, se puede aplicar una multa por uso indebido del sistema.',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Sí, es una emergencia',
-          style: 'destructive',
-          onPress: () => {
-            onClose();
-            // Usar setTimeout para asegurar que el modal se cierre antes de mostrar el alert
-            setTimeout(() => {
-              showEmergencyOptions();
-            }, 100);
-          }
-        }
-      ],
-      { cancelable: true }
-    );
+    setShowServices(true);
   };
 
-  const showEmergencyOptions = () => {
-    Alert.alert(
-      'Servicios de Emergencia',
-      'Selecciona el servicio que necesitas:',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: `🚔 ${EMERGENCY_SERVICES.police.name}`,
-          onPress: () => callEmergencyService(EMERGENCY_SERVICES.police)
-        },
-        {
-          text: `🚑 ${EMERGENCY_SERVICES.ambulance.name}`,
-          onPress: () => callEmergencyService(EMERGENCY_SERVICES.ambulance)
-        },
-        {
-          text: `🚒 ${EMERGENCY_SERVICES.fire.name}`,
-          onPress: () => callEmergencyService(EMERGENCY_SERVICES.fire)
-        }
-      ],
-      { cancelable: true }
-    );
+  const handleBack = () => {
+    setShowServices(false);
   };
 
   const callEmergencyService = (service) => {
@@ -70,6 +35,75 @@ export default function SOSModal({ visible, onClose }) {
       });
   };
 
+  if (showServices) {
+    return (
+      <Modal visible={visible} animationType="slide" transparent>
+        <View style={styles.overlay}>
+          <View style={styles.modal}>
+            <View style={styles.header}>
+              <Ionicons name="warning" size={40} color="#e53935" />
+              <Text style={styles.title}>Servicios de Emergencia</Text>
+            </View>
+
+            <Text style={styles.description}>
+              Selecciona el servicio que necesitas:
+            </Text>
+
+            <View style={styles.servicesContainer}>
+              <TouchableOpacity 
+                style={styles.serviceBtn} 
+                onPress={() => {
+                  callEmergencyService(EMERGENCY_SERVICES.police);
+                  onClose();
+                  setShowServices(false);
+                }}
+              >
+                <Ionicons name="shield" size={28} color="#007AFF" />
+                <Text style={styles.serviceBtnText}>{EMERGENCY_SERVICES.police.name}</Text>
+                <Text style={styles.serviceNumber}>{EMERGENCY_SERVICES.police.number}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.serviceBtn} 
+                onPress={() => {
+                  callEmergencyService(EMERGENCY_SERVICES.ambulance);
+                  onClose();
+                  setShowServices(false);
+                }}
+              >
+                <Ionicons name="medical" size={28} color="#e53935" />
+                <Text style={styles.serviceBtnText}>{EMERGENCY_SERVICES.ambulance.name}</Text>
+                <Text style={styles.serviceNumber}>{EMERGENCY_SERVICES.ambulance.number}</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.serviceBtn} 
+                onPress={() => {
+                  callEmergencyService(EMERGENCY_SERVICES.fire);
+                  onClose();
+                  setShowServices(false);
+                }}
+              >
+                <Ionicons name="flame" size={28} color="#FF6B35" />
+                <Text style={styles.serviceBtnText}>{EMERGENCY_SERVICES.fire.name}</Text>
+                <Text style={styles.serviceNumber}>{EMERGENCY_SERVICES.fire.number}</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.buttons}>
+              <TouchableOpacity style={styles.cancelBtn} onPress={() => {
+                setShowServices(false);
+                onClose();
+              }}>
+                <Text style={styles.cancelBtnText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  }
+
   return (
     <Modal visible={visible} animationType="slide" transparent>
       <View style={styles.overlay}>
@@ -78,11 +112,11 @@ export default function SOSModal({ visible, onClose }) {
             <Ionicons name="warning" size={40} color="#e53935" />
             <Text style={styles.title}>Botón de Emergencia</Text>
           </View>
-          
+
           <Text style={styles.description}>
             ¿Estás en una situación de emergencia real? Este botón activará el protocolo de seguridad.
           </Text>
-          
+
           <Text style={styles.warning}>
             ⚠️ Si no es una emergencia real, se puede aplicar una multa por uso indebido del sistema.
           </Text>
@@ -91,7 +125,7 @@ export default function SOSModal({ visible, onClose }) {
             <TouchableOpacity style={styles.cancelBtn} onPress={onClose}>
               <Text style={styles.cancelBtnText}>Cancelar</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity style={styles.emergencyBtn} onPress={handleEmergencyConfirm}>
               <Ionicons name="call" size={20} color="#fff" />
               <Text style={styles.emergencyBtnText}>Sí, es emergencia</Text>
@@ -174,6 +208,33 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+    marginLeft: 8,
+  },
+  servicesContainer: {
+    width: '100%',
+    gap: 12,
+    marginBottom: 20,
+  },
+  serviceBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f5f5f5',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#e0e0e0',
+  },
+  serviceBtnText: {
+    flex: 1,
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+    marginLeft: 12,
+  },
+  serviceNumber: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#007AFF',
     marginLeft: 8,
   },
 });

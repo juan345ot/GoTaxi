@@ -5,7 +5,7 @@ export default function useMap() {
   const [location, setLocation] = useState(null);
   const [error, setError] = useState(null);
 
-  const getCurrentLocation = async () => {
+  const getCurrentLocation = async() => {
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {

@@ -1,4 +1,3 @@
-import React from 'react';
 import { Modal, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../../styles/theme';
@@ -12,8 +11,8 @@ export default function BookingConfirmationModal({
   onCancel,
   confirmText = 'Confirmar',
   cancelText = 'Cancelar',
-  customConfirmText, // ✅ Nueva prop agregada
-  customCancelText,  // ✅ Nueva prop agregada
+  customConfirmText,
+  customCancelText,
 }) {
   return (
     <Modal visible={visible} animationType="slide" transparent>

@@ -1,13 +1,12 @@
-import React from 'react';
 import { View, Text, StyleSheet, Image } from 'react-native';
 import { colors } from '../../styles/theme';
 import { formatDate } from '../../utils/formatDate';
 
-export default function MessageBubble({ message, sender, time, isOwn, avatar }) { // ✅ Nueva prop agregada (avatar)
+export default function MessageBubble({ message, time, isOwn, avatar }) {
   return (
     <View style={[styles.container, isOwn ? styles.ownMessage : styles.otherMessage]}>
       {!isOwn && avatar && (
-        <Image source={{ uri: avatar }} style={styles.avatar} /> // ✅ Avatar mostrado si no es mensaje propio
+        <Image source={{ uri: avatar }} style={styles.avatar} />
       )}
       <View style={styles.messageContent}>
         <Text style={styles.text}>{message}</Text>

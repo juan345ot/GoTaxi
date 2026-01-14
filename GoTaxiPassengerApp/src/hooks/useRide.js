@@ -1,10 +1,11 @@
 // src/hooks/useRide.js
-import { useState } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { showToast } from '../utils/toast';
 import * as rideApi from '../api/ride'; // API para consumir /api/trips del backend
 
 /**
  * Hook para gestionar viajes (solicitar, cancelar, seguir) REAL
+ * Optimizado con useCallback y useMemo para evitar re-renders innecesarios
  */
 export default function useRide() {
   const [rideData, setRideData] = useState(null);
@@ -12,41 +13,51 @@ export default function useRide() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const requestRide = async (origin, destination, paymentMethod) => {
+  const requestRide = useCallback(async(origin, destination, paymentMethod) => {
     setLoading(true);
     setError(null);
     try {
-      console.log('Solicitando viaje:', { origin, destination, paymentMethod });
       // Aquí va la llamada real a la API de tu backend
       const newRide = await rideApi.requestRide(origin, destination, paymentMethod);
-      console.log('Viaje creado:', newRide);
       setRideData(newRide);
       showToast('Viaje solicitado');
       return newRide; // Retornar el viaje creado
     } catch (err) {
-      console.error('Error en requestRide:', err);
-      setError('Error al solicitar el viaje');
-      showToast('Error al solicitar el viaje');
+      // Error en requestRide - handled by error handler
+      const errorMessage = err?.message || 'Error al solicitar el viaje';
+      setError(errorMessage);
+      showToast(errorMessage);
       throw err; // Re-lanzar el error para que se pueda manejar en el componente
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const trackCurrentRide = async (rideId) => {
+  const trackCurrentRide = useCallback(async(rideId) => {
+    if (!rideId) {
+      setError('ID de viaje requerido');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
       const tracking = await rideApi.getTracking(rideId);
       setTrackingInfo(tracking);
     } catch (err) {
-      setError('Error al obtener tracking');
+      const errorMessage = err?.message || 'Error al obtener tracking';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const cancelRide = async (rideId) => {
+  const cancelRide = useCallback(async(rideId) => {
+    if (!rideId) {
+      setError('ID de viaje requerido');
+      return;
+    }
+
     setLoading(true);
     try {
       await rideApi.cancelRide(rideId);
@@ -54,18 +65,32 @@ export default function useRide() {
       setTrackingInfo(null);
       showToast('Viaje cancelado');
     } catch (err) {
-      setError('Error al cancelar el viaje');
-      showToast('Error al cancelar el viaje');
+      const errorMessage = err?.message || 'Error al cancelar el viaje';
+      setError(errorMessage);
+      showToast(errorMessage);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  // Memoizar el estado del viaje para evitar re-renders innecesarios
+  const rideStatus = useMemo(() => {
+    if (!rideData) return 'idle';
+    return rideData.status || 'unknown';
+  }, [rideData]);
+
+  // Memoizar si hay un viaje activo
+  const hasActiveRide = useMemo(() => {
+    return rideData && ['requested', 'accepted', 'in_progress'].includes(rideStatus);
+  }, [rideData, rideStatus]);
 
   return {
     rideData,
     trackingInfo,
     loading,
     error,
+    rideStatus,
+    hasActiveRide,
     requestRide,
     trackCurrentRide,
     cancelRide,
