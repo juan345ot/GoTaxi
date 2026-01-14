@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🧪 Running pre-push checks..."
+
+# Run tests for all projects
+echo "🔬 Running tests..."
+cd go-taxi-backend && npm test
+cd ../GoTaxiPassengerApp && npm test
+cd ../go-taxi-admin-web && npm test
+
+echo "✅ Pre-push checks passed!"

@@ -1,0 +1,19 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-vscode.vscode-typescript-next",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-json",
+    "ms-vscode.vscode-markdown",
+    "ms-vscode.vscode-git",
+    "ms-vscode.vscode-git-graph",
+    "ms-vscode.vscode-gitlens",
+    "ms-vscode.vscode-jest",
+    "ms-vscode.vscode-mongodb",
+    "ms-vscode.vscode-docker",
+    "ms-vscode.vscode-thunder-client",
+    "ms-vscode.vscode-restclient",
+    "ms-vscode.vscode-postman"
+  ]
+}

@@ -1,0 +1,18 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Running pre-commit checks..."
+
+# Run linting for all projects
+echo "📝 Running ESLint..."
+cd go-taxi-backend && npm run lint
+cd ../GoTaxiPassengerApp && npm run lint
+cd ../go-taxi-admin-web && npm run lint
+
+# Run Prettier check
+echo "🎨 Running Prettier check..."
+cd ../go-taxi-backend && npm run format:check
+cd ../GoTaxiPassengerApp && npm run format:check
+cd ../go-taxi-admin-web && npm run format:check
+
+echo "✅ Pre-commit checks passed!"

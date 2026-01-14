@@ -1,0 +1,226 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  NODE_VERSION: '18'
+  MONGODB_VERSION: '5.0'
+
+jobs:
+  # Backend Tests
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    
+    services:
+      mongodb:
+        image: mongo:5.0
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --eval 'db.adminCommand(\"ping\")'"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: go-taxi-backend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./go-taxi-backend
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: ./go-taxi-backend
+        run: npm run lint
+
+      - name: Run Prettier check
+        working-directory: ./go-taxi-backend
+        run: npm run format:check
+
+      - name: Run tests
+        working-directory: ./go-taxi-backend
+        run: npm test
+        env:
+          NODE_ENV: test
+          MONGODB_URI: mongodb://localhost:27017/gotaxi_test
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./go-taxi-backend/coverage/lcov.info
+          flags: backend
+          name: backend-coverage
+
+  # Frontend Mobile Tests
+  frontend-mobile-tests:
+    name: Frontend Mobile Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: GoTaxiPassengerApp/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./GoTaxiPassengerApp
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: ./GoTaxiPassengerApp
+        run: npm run lint
+
+      - name: Run Prettier check
+        working-directory: ./GoTaxiPassengerApp
+        run: npm run format:check
+
+      - name: Run tests
+        working-directory: ./GoTaxiPassengerApp
+        run: npm test
+        env:
+          NODE_ENV: test
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./GoTaxiPassengerApp/coverage/lcov.info
+          flags: frontend-mobile
+          name: frontend-mobile-coverage
+
+  # Panel Admin Tests
+  frontend-admin-tests:
+    name: Frontend Admin Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: go-taxi-admin-web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./go-taxi-admin-web
+        run: npm ci
+
+      - name: Run ESLint
+        working-directory: ./go-taxi-admin-web
+        run: npm run lint
+
+      - name: Run Prettier check
+        working-directory: ./go-taxi-admin-web
+        run: npm run format:check
+
+      - name: Run tests
+        working-directory: ./go-taxi-admin-web
+        run: npm test
+        env:
+          NODE_ENV: test
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./go-taxi-admin-web/coverage/lcov.info
+          flags: frontend-admin
+          name: frontend-admin-coverage
+
+  # Security Scan
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results to GitHub Security tab
+        uses: github/codeql-action/upload-sarif@v2
+        if: always()
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Build and Deploy (only on main branch)
+  build-and-deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-mobile-tests, frontend-admin-tests, security-scan]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      # Build Backend
+      - name: Build Backend
+        working-directory: ./go-taxi-backend
+        run: |
+          npm ci
+          npm run build
+
+      # Build Frontend Mobile
+      - name: Build Frontend Mobile
+        working-directory: ./GoTaxiPassengerApp
+        run: |
+          npm ci
+          npm run build
+
+      # Build Panel Admin
+      - name: Build Panel Admin
+        working-directory: ./go-taxi-admin-web
+        run: |
+          npm ci
+          npm run build
+
+      # Deploy to staging/production
+      - name: Deploy to Staging
+        run: |
+          echo "Deploying to staging environment..."
+          # Add your deployment commands here
+
+  # Notify on failure
+  notify-failure:
+    name: Notify on Failure
+    runs-on: ubuntu-latest
+    needs: [backend-tests, frontend-mobile-tests, frontend-admin-tests, security-scan]
+    if: failure()
+
+    steps:
+      - name: Notify team
+        run: |
+          echo "CI/CD pipeline failed. Please check the logs."
+          # Add your notification logic here (Slack, Discord, etc.)

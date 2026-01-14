@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔧 Installing Husky hooks..."
+
+# Make sure all hook files are executable
+chmod +x .husky/pre-commit
+chmod +x .husky/commit-msg
+chmod +x .husky/pre-push
+
+echo "✅ Husky hooks installed successfully!"
