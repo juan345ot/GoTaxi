@@ -98,3 +98,23 @@ export async function getUserRides() {
   const res = await http.get('/trips');
   return res.data;
 }
+
+// Obtener conductores disponibles: GET /api/drivers/available
+export async function getAvailableDrivers() {
+  const res = await http.get('/drivers/available');
+  // El backend devuelve { success: true, data: [...] }
+  if (res.data && res.data.success && res.data.data) {
+    return res.data.data;
+  }
+  return res.data;
+}
+
+// Seleccionar conductor: PUT /api/trips/:id/select-driver
+export async function selectDriver(tripId, driverId) {
+  const res = await http.put(`/trips/${tripId}/select-driver`, { driverId });
+  // El backend devuelve { success: true, data: {...} }
+  if (res.data && res.data.success && res.data.data) {
+    return res.data.data;
+  }
+  return res.data;
+}

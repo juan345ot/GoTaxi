@@ -7,6 +7,8 @@ export const ROUTES = {
   REGISTER: 'Register',
   HOME: 'Home',
   RIDE_REQUEST: 'RideRequest',
+  DRIVER_SELECTION: 'DriverSelection',
+  DRIVER_CONFIRMATION: 'DriverConfirmation',
   RIDE_TRACKING: 'RideTracking',
   TRIP_SUMMARY: 'TripSummary',
   PAYMENT_METHOD: 'PaymentMethod',

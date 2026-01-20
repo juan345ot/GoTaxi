@@ -62,3 +62,38 @@ exports.approveDriver = async (req, res, next) => {
     return next(err);
   }
 };
+
+exports.getAvailableDrivers = async (req, res, next) => {
+  try {
+    // Obtener conductores disponibles y aprobados
+    const drivers = await Driver.find({
+      aprobado: true,
+      disponible: true,
+    }).populate('user', '-password');
+
+    // Formatear respuesta con datos completos
+    const driversData = drivers.map(driver => {
+      const driverObj = driver.toObject();
+      return {
+        id: driver._id,
+        user: driverObj.user,
+        vehiculo: driverObj.vehiculo,
+        calificacion: driverObj.calificacion || 5.0,
+        ubicacion: driverObj.ubicacion,
+        licencia: driverObj.licencia,
+      };
+    });
+
+    return res.json({
+      success: true,
+      data: driversData,
+      message: 'Conductores disponibles obtenidos exitosamente',
+    });
+  } catch (err) {
+    logToFile(`Error getAvailableDrivers: ${err.message}`);
+    err.status = err.status || 500;
+    err.code = err.code || 'AVAILABLE_DRIVERS_FETCH_FAILED';
+    err.details = err.details || null;
+    return next(err);
+  }
+};

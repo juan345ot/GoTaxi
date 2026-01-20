@@ -1,60 +1,121 @@
-import React, { useState } from 'react';
-import { View, Text, Alert, FlatList } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Alert, FlatList, ActivityIndicator } from 'react-native';
 import TripRequestCard from '../../components/Driver/TripRequestCard';
-
-const viajesEjemplo = [
-  {
-    id: '1',
-    origen: 'Calle 9 y 23',
-    destino: 'Hospital Municipal',
-    pasajero: 'Carlos Díaz',
-    rating: 4.8,
-    motivo: 'Turno médico',
-    monto: 1200,
-  },
-  {
-    id: '2',
-    origen: 'Av. San Martín 123',
-    destino: 'Terminal',
-    pasajero: 'Romina López',
-    rating: 5.0,
-    motivo: 'Viaje trabajo',
-    monto: 950,
-  },
-];
+import { useTripNotifications } from '../../hooks/useTripNotifications';
+import * as tripApi from '../../api/tripApi';
+import { useNavigation } from '@react-navigation/native';
 
 export default function TripRequestScreen() {
-  const [viajes, setViajes] = useState(viajesEjemplo);
-  const [rechazos, setRechazos] = useState(0);
+  const [requests, setRequests] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const { incomingTrip, clearNotification } = useTripNotifications();
+  const navigation = useNavigation();
 
-  const handleAccept = (id) => {
-    Alert.alert('¡Viaje aceptado!', 'Ya podés ver los datos completos del pasajero.');
-    setViajes(viajes.filter(v => v.id !== id));
-    // Aquí iría navegación al viaje activo
+  // Cargar solicitudes pendientes al iniciar
+  useEffect(() => {
+    loadPendingRequests();
+  }, []);
+
+  // Escuchar nuevas solicitudes vía WebSocket
+  useEffect(() => {
+    if (incomingTrip) {
+      // Verificar si ya existe para evitar duplicados
+      setRequests(prev => {
+        const exists = prev.find(r => r.id === incomingTrip.tripId);
+        if (exists) return prev;
+        
+        // Formatear datos para el componente TripRequestCard
+        const newRequest = {
+          id: incomingTrip.tripId,
+          origen: incomingTrip.origen?.direccion || 'Ubicación desconocida',
+          destino: incomingTrip.destino?.direccion || 'Destino desconocido',
+          pasajero: 'Pasajero', // El nombre podría venir en el socket o requerir fetch adicional
+          rating: 5.0, // Default o fetch adicional
+          monto: incomingTrip.tarifa || 0,
+          distancia: incomingTrip.distancia_km,
+        };
+        
+        return [newRequest, ...prev];
+      });
+      clearNotification();
+    }
+  }, [incomingTrip]);
+
+  const loadPendingRequests = async () => {
+    try {
+      setLoading(true);
+      const data = await tripApi.getTripRequests();
+      // Mapear datos del backend al formato de UI
+      const formatted = data.map(trip => ({
+        id: trip._id || trip.id,
+        origen: trip.origen?.direccion,
+        destino: trip.destino?.direccion,
+        pasajero: trip.pasajero?.nombre || 'Pasajero',
+        rating: trip.pasajero?.calificacion || 5.0,
+        monto: trip.tarifa,
+      }));
+      setRequests(formatted);
+    } catch (error) {
+      console.error('Error cargando solicitudes:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleReject = (id) => {
-    setViajes(viajes.filter(v => v.id !== id));
-    setRechazos(r => r + 1);
+  const handleAccept = async (id) => {
+    try {
+      setLoading(true);
+      await tripApi.acceptTrip(id);
+      Alert.alert('¡Viaje aceptado!', 'Navegando al mapa...');
+      
+      // Eliminar de la lista local
+      setRequests(requests.filter(req => req.id !== id));
+      
+      // Navegar a pantalla de viaje activo
+      navigation.navigate('ActiveTripScreen', { tripId: id });
+    } catch (error) {
+      console.error('Error aceptando viaje:', error);
+      Alert.alert('Error', 'No se pudo aceptar el viaje. Quizás ya fue tomado.');
+      // Refrescar lista por si acaso
+      loadPendingRequests();
+    } finally {
+      setLoading(false);
+    }
   };
 
-  React.useEffect(() => {
-    if (rechazos === 3) {
-      Alert.alert('Advertencia', 'Rechazaste 3 viajes seguidos. Si seguís rechazando podrías recibir una penalización.');
+  const handleReject = async (id) => {
+    try {
+      await tripApi.rejectTrip(id);
+      setRequests(requests.filter(req => req.id !== id));
+    } catch (error) {
+      console.error('Error rechazando viaje:', error);
+      Alert.alert('Error', 'No se pudo rechazar el viaje');
     }
-    if (rechazos === 5) {
-      Alert.alert('Penalización', 'No podés recibir viajes por 10 minutos por rechazar demasiados viajes.');
-      // Aquí podrías bloquear temporalmente el switch de disponibilidad.
-    }
-  }, [rechazos]);
+  };
+
+  if (loading && requests.length === 0) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+        <Text style={{ marginTop: 10 }}>Cargando solicitudes...</Text>
+      </View>
+    );
+  }
 
   return (
     <View style={{ flex: 1, padding: 14 }}>
-      {viajes.length === 0 ? (
-        <Text style={{ textAlign: 'center', marginTop: 60, color: '#888' }}>No hay solicitudes nuevas.</Text>
+      {requests.length === 0 ? (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ textAlign: 'center', color: '#888', fontSize: 16 }}>
+            No hay solicitudes pendientes.
+          </Text>
+          <Text style={{ textAlign: 'center', color: '#aaa', marginTop: 10, fontSize: 14 }}>
+            Esperando nuevos viajes...
+          </Text>
+        </View>
       ) : (
         <FlatList
-          data={viajes}
+          data={requests}
           keyExtractor={item => item.id}
           renderItem={({ item }) =>
             <TripRequestCard
@@ -63,6 +124,8 @@ export default function TripRequestScreen() {
               onReject={() => handleReject(item.id)}
             />
           }
+          refreshing={loading}
+          onRefresh={loadPendingRequests}
         />
       )}
     </View>

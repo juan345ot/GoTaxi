@@ -12,6 +12,17 @@ const ROLES = require('../../config/roles');
 router.get('/', verifyToken, permitRoles(ROLES.ADMIN), driverController.getAllDrivers);
 
 /**
+ * @route   GET /api/drivers/available
+ * @desc    Listar conductores disponibles (pasajero)
+ */
+router.get(
+  '/available',
+  verifyToken,
+  permitRoles(ROLES.PASAJERO, ROLES.ADMIN),
+  driverController.getAvailableDrivers,
+);
+
+/**
  * @route   GET /api/drivers/:id
  * @desc    Ver info de un conductor (pasajero/conductor/admin)
  */

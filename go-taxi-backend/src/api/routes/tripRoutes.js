@@ -70,4 +70,32 @@ router.post('/:id/pay', verifyToken, permitRoles(ROLES.PASAJERO), tripController
  */
 router.post('/:id/rate', verifyToken, permitRoles(ROLES.PASAJERO), tripController.rateTrip);
 
+/**
+ * @route   PUT /api/trips/:id/select-driver
+ * @desc    Seleccionar conductor (pasajero)
+ */
+router.put(
+  '/:id/select-driver',
+  verifyToken,
+  permitRoles(ROLES.PASAJERO),
+  tripController.selectDriver,
+);
+
+/**
+ * @route   PUT /api/trips/:id/confirm
+ * @desc    Confirmar viaje (conductor)
+ */
+router.put('/:id/confirm', verifyToken, permitRoles(ROLES.CONDUCTOR), tripController.confirmTrip);
+
+/**
+ * @route   PUT /api/trips/:id/reject-as-driver
+ * @desc    Rechazar viaje (conductor)
+ */
+router.put(
+  '/:id/reject-as-driver',
+  verifyToken,
+  permitRoles(ROLES.CONDUCTOR),
+  tripController.rejectTripAsDriver,
+);
+
 module.exports = router;

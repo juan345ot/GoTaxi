@@ -1,0 +1,211 @@
+const Trip = require('../../models/Trip');
+const { validateCreateTrip } = require('../dtos/tripDTO');
+const { logToFile } = require('../../utils/logger');
+const { createSuccessResponse, createNotFoundResponse } = require('../../utils/responseHelpers');
+const mongoose = require('mongoose');
+
+// Funciones de selección y confirmación de conductor
+exports.selectDriver = async (req, res, next) => {
+  try {
+    const { driverId } = req.body;
+
+    if (!driverId) {
+      const errObj = new Error('driverId es requerido');
+      errObj.status = 400;
+      errObj.code = 'VALIDATION_ERROR';
+      return next(errObj);
+    }
+
+    // Validar que el ID del viaje sea válido
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return createNotFoundResponse(res, 'Viaje', req.params.id);
+    }
+
+    const trip = await Trip.findById(req.params.id);
+
+    if (!trip) {
+      return createNotFoundResponse(res, 'Viaje', req.params.id);
+    }
+
+    // Verificar que el viaje esté en estado pendiente
+    if (trip.estado !== 'pendiente') {
+      const errObj = new Error('Solo se pueden asignar conductores a viajes pendientes');
+      errObj.status = 400;
+      errObj.code = 'INVALID_TRIP_STATE';
+      return next(errObj);
+    }
+
+    // Verificar que el pasajero sea el dueño del viaje
+    if (trip.pasajero.toString() !== req.user.id) {
+      const errObj = new Error('No autorizado para modificar este viaje');
+      errObj.status = 403;
+      errObj.code = 'UNAUTHORIZED';
+      return next(errObj);
+    }
+
+    // Actualizar viaje con conductor seleccionado
+    trip.conductor = driverId;
+    trip.estado = 'esperando_confirmacion';
+    await trip.save();
+
+    // Emitir notificación WebSocket al conductor
+    const helpers = require('../../sockets/socketHelpers');
+    helpers.emitToUser(driverId, {
+      type: 'trip_request',
+      tripId: trip._id,
+      pasajero: req.user.id,
+      origen: trip.origen,
+      destino: trip.destino,
+      tarifa: trip.tarifa,
+    });
+
+    logToFile(`Pasajero ${req.user.email} seleccionó conductor ${driverId} para viaje ${trip._id}`);
+
+    const tripObj = trip.toObject();
+    return createSuccessResponse(
+      res,
+      {
+        ...tripObj,
+        id: trip._id,
+        status: 'waiting_confirmation',
+      },
+      'Conductor seleccionado, esperando confirmación',
+    );
+  } catch (err) {
+    logToFile(`Error selectDriver: ${err.message}`);
+    err.status = err.status || 500;
+    err.code = err.code || 'SELECT_DRIVER_FAILED';
+    err.details = err.details || null;
+    return next(err);
+  }
+};
+
+exports.confirmTrip = async (req, res, next) => {
+  try {
+    // Validar que el ID del viaje sea válido
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return createNotFoundResponse(res, 'Viaje', req.params.id);
+    }
+
+    const trip = await Trip.findById(req.params.id);
+
+    if (!trip) {
+      return createNotFoundResponse(res, 'Viaje', req.params.id);
+    }
+
+    // Verificar que el viaje esté esperando confirmación
+    if (trip.estado !== 'esperando_confirmacion') {
+      const errObj = new Error('Solo se pueden confirmar viajes en espera de confirmación');
+      errObj.status = 400;
+      errObj.code = 'INVALID_TRIP_STATE';
+      return next(errObj);
+    }
+
+    // Verificar que el conductor sea el asignado
+    if (trip.conductor.toString() !== req.user.id) {
+      const errObj = new Error('No estás asignado a este viaje');
+      errObj.status = 403;
+      errObj.code = 'UNAUTHORIZED';
+      return next(errObj);
+    }
+
+    // Confirmar viaje
+    trip.estado = 'asignado';
+    await trip.save();
+
+    // Emitir notificación WebSocket al pasajero
+    const helpers = require('../../sockets/socketHelpers');
+    helpers.emitToUser(trip.pasajero.toString(), {
+      type: 'trip_confirmed',
+      tripId: trip._id,
+      conductor: req.user.id,
+    });
+
+    logToFile(`Conductor ${req.user.email} confirmó viaje ${trip._id}`);
+
+    const tripObj = trip.toObject();
+    return createSuccessResponse(
+      res,
+      {
+        ...tripObj,
+        id: trip._id,
+        status: 'accepted',
+      },
+      'Viaje confirmado exitosamente',
+    );
+  } catch (err) {
+    logToFile(`Error confirmTrip: ${err.message}`);
+    err.status = err.status || 500;
+    err.code = err.code || 'CONFIRM_TRIP_FAILED';
+    err.details = err.details || null;
+    return next(err);
+  }
+};
+
+exports.rejectTripAsDriver = async (req, res, next) => {
+  try {
+    // Validar que el ID del viaje sea válido
+    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+      return createNotFoundResponse(res, 'Viaje', req.params.id);
+    }
+
+    const trip = await Trip.findById(req.params.id);
+
+    if (!trip) {
+      return createNotFoundResponse(res, 'Viaje', req.params.id);
+    }
+
+    // Verificar que el viaje esté esperando confirmación
+    if (trip.estado !== 'esperando_confirmacion') {
+      const errObj = new Error('Solo se pueden rechazar viajes en espera de confirmación');
+      errObj.status = 400;
+      errObj.code = 'INVALID_TRIP_STATE';
+      return next(errObj);
+    }
+
+    // Verificar que el conductor sea el asignado
+    if (trip.conductor.toString() !== req.user.id) {
+      const errObj = new Error('No estás asignado a este viaje');
+      errObj.status = 403;
+      errObj.code = 'UNAUTHORIZED';
+      return next(errObj);
+    }
+
+    // Rechazar viaje - volver a estado pendiente
+    trip.conductor = null;
+    trip.estado = 'pendiente';
+    await trip.save();
+
+    // Emitir notificación WebSocket al pasajero
+    const helpers = require('../../sockets/socketHelpers');
+    helpers.emitToUser(trip.pasajero.toString(), {
+      type: 'trip_rejected',
+      tripId: trip._id,
+    });
+
+    logToFile(`Conductor ${req.user.email} rechazó viaje ${trip._id}`);
+
+    const tripObj = trip.toObject();
+    return createSuccessResponse(
+      res,
+      {
+        ...tripObj,
+        id: trip._id,
+        status: 'pending',
+      },
+      'Viaje rechazado, liberado para otros conductores',
+    );
+  } catch (err) {
+    logToFile(`Error rejectTripAsDriver: ${err.message}`);
+    err.status = err.status || 500;
+    err.code = err.code || 'REJECT_TRIP_FAILED';
+    err.details = err.details || null;
+    return next(err);
+  }
+};
+
+module.exports = {
+  selectDriver: exports.selectDriver,
+  confirmTrip: exports.confirmTrip,
+  rejectTripAsDriver: exports.rejectTripAsDriver,
+};

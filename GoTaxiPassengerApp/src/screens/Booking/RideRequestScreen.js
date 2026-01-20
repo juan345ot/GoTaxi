@@ -62,18 +62,24 @@ export default function RideRequestScreen({ navigation }) {
     setShowModal(false);
     try {
       const newRide = await requestRide(origin, destination, paymentMethod);
-      // Navegar inmediatamente con el viaje retornado
+      // Navegar a selección de conductor con el viaje creado
       const rideId = newRide._id || newRide.id;
       if (!rideId) {
         showToast('Error: No se pudo obtener el ID del viaje');
         return;
       }
-      navigation.navigate('RideTracking', {
+      navigation.navigate('DriverSelection', {
         rideId,
-        origin,
-        destination,
-        paymentMethod,
-        ...newRide,
+        origin: {
+          address: origin,
+          latitude: newRide.origen?.lat || 0,
+          longitude: newRide.origen?.lng || 0,
+        },
+        destination: {
+          address: destination,
+          latitude: newRide.destino?.lat || 0,
+          longitude: newRide.destino?.lng || 0,
+        },
       });
     } catch (e) {
       // Error al solicitar viaje - handled by error handler

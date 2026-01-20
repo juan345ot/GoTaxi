@@ -16,7 +16,15 @@ const tripSchema = new mongoose.Schema(
     },
     estado: {
       type: String,
-      enum: ['pendiente', 'asignado', 'en_curso', 'finalizado', 'completado', 'cancelado'],
+      enum: [
+        'pendiente',
+        'esperando_confirmacion',
+        'asignado',
+        'en_curso',
+        'finalizado',
+        'completado',
+        'cancelado',
+      ],
       default: 'pendiente',
     },
     tarifa: { type: Number, min: 0 },

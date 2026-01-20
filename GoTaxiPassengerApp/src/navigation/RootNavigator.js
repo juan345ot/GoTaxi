@@ -39,6 +39,16 @@ const RootNavigator = memo(() => {
       options: { gestureEnabled: true },
     },
     {
+      name: ROUTES.DRIVER_SELECTION,
+      component: 'Booking/DriverSelectionScreen',
+      options: { gestureEnabled: true },
+    },
+    {
+      name: ROUTES.DRIVER_CONFIRMATION,
+      component: 'Booking/DriverConfirmationScreen',
+      options: { gestureEnabled: false },
+    },
+    {
       name: ROUTES.RIDE_TRACKING,
       component: 'Booking/RideTrackingScreen',
       options: { gestureEnabled: true },
